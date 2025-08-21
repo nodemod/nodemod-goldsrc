@@ -62,14 +62,14 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 	"${HLSDK_DIRECTORY}/public"
 	"${METAMOD_DIRECTORY}/metamod"
 	"src"
-	"deps/node/include"
-	"deps/v8"
-    "deps/uv"
+	"deps/node/src"
+	"deps/node/deps/v8/include"
+    "deps/node/deps/uv/include"
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES 
 	OUTPUT_NAME "nodemod"
-	CXX_STANDARD 17
+	CXX_STANDARD 20
 	CXX_STANDARD_REQUIRED YES
 	CXX_EXTENSIONS NO
 )
@@ -105,11 +105,56 @@ if(NOT WIN32)
 	target_link_libraries(${PROJECT_NAME} PRIVATE dl pthread)
 endif()
 
-# link Node.js library (in future this should be entirely handled by vcpkg)
+# link Node.js library statically (in future this should be entirely handled by vcpkg)
 if(WIN32)
 	target_link_libraries(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/deps/node/lib/Release/win32/libnode.lib")
 else()
-	target_link_libraries(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/deps/node/lib/Release/linux/libnode.so.93")
+	# Define base directory for Node.js fat archives
+	set(LIBNODE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/deps/node/out/Release/obj.target")
+	
+	# Link Node.js using Half-Life 1 metamod approach with static groups
+	target_link_libraries(${PROJECT_NAME} PRIVATE
+		-Wl,--start-group
+		# Node.js snapshot object file (contains GetEmbeddedSnapshotData)
+		"${LIBNODE_DIR}/node/gen/node_snapshot.o"
+		# Following HL1 metamod fat archives order
+		"${LIBNODE_DIR}/deps/histogram/libhistogram_fat.a"
+		"${LIBNODE_DIR}/deps/ncrypto/libncrypto_fat.a"
+		"${LIBNODE_DIR}/deps/ada/libada_fat.a"
+		"${LIBNODE_DIR}/deps/nbytes/libnbytes_fat.a"
+		"${LIBNODE_DIR}/deps/llhttp/libllhttp_fat.a"
+		"${LIBNODE_DIR}/deps/brotli/libbrotli_fat.a"
+		"${LIBNODE_DIR}/deps/nghttp2/libnghttp2_fat.a"
+		"${LIBNODE_DIR}/deps/cares/libcares_fat.a"
+		"${LIBNODE_DIR}/deps/simdjson/libsimdjson_fat.a"
+		"${LIBNODE_DIR}/deps/uvwasi/libuvwasi_fat.a"
+		"${LIBNODE_DIR}/deps/sqlite/libsqlite_fat.a"
+		"${LIBNODE_DIR}/deps/openssl/libopenssl_fat.a"
+		"${LIBNODE_DIR}/deps/zlib/libzlib_fat.a"
+		"${LIBNODE_DIR}/deps/zlib/libzlib_adler32_simd_fat.a"
+		"${LIBNODE_DIR}/deps/zlib/libzlib_data_chunk_simd_fat.a"
+		"${LIBNODE_DIR}/deps/uv/libuv_fat.a"
+		"${LIBNODE_DIR}/deps/zstd/libzstd_fat.a"
+		"${LIBNODE_DIR}/tools/v8_gypfiles/libsimdutf_fat.a"
+		"${LIBNODE_DIR}/tools/v8_gypfiles/libhighway_fat.a"
+		"${LIBNODE_DIR}/tools/v8_gypfiles/libv8_init_fat.a"
+		"${LIBNODE_DIR}/tools/v8_gypfiles/libv8_initializers_fat.a"
+		"${LIBNODE_DIR}/tools/v8_gypfiles/libtorque_base_fat.a"
+		"${LIBNODE_DIR}/tools/v8_gypfiles/libabseil_fat.a"
+		"${LIBNODE_DIR}/tools/v8_gypfiles/libv8_zlib_fat.a"
+		"${LIBNODE_DIR}/tools/v8_gypfiles/libv8_base_without_compiler_fat.a"
+		"${LIBNODE_DIR}/tools/v8_gypfiles/libv8_initializers_slow_fat.a"
+		"${LIBNODE_DIR}/tools/v8_gypfiles/libv8_snapshot_fat.a"
+		"${LIBNODE_DIR}/tools/v8_gypfiles/libv8_libbase_fat.a"
+		"${LIBNODE_DIR}/tools/v8_gypfiles/libv8_libplatform_fat.a"
+		"${LIBNODE_DIR}/tools/v8_gypfiles/libv8_compiler_fat.a"
+		"${LIBNODE_DIR}/tools/icu/libicui18n_fat.a"
+		"${LIBNODE_DIR}/tools/icu/libicuucx_fat.a"
+		"${LIBNODE_DIR}/tools/icu/libicudata_fat.a"
+		"${LIBNODE_DIR}/deps/inspector_protocol/libcrdtp_fat.a"
+		"${LIBNODE_DIR}/libnode_fat.a"
+		-Wl,--end-group
+	)
 endif()
 
 # enable static runtime linking

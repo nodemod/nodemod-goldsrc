@@ -11,7 +11,7 @@ extern v8::Local<v8::ObjectTemplate> registerEngineFunctions(v8::Isolate *isolat
 extern v8::Local<v8::ObjectTemplate> registerDllFunctions(v8::Isolate *isolate);
 namespace players
 {
-  extern void getPlayers(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value> &info);
+  extern void getPlayers(v8::Local<v8::Name> property, const v8::PropertyCallbackInfo<v8::Value> &info);
 }
 
 extern globalvars_t *gpGlobals;
@@ -48,13 +48,13 @@ namespace bindings
         convert::str2js(isolate, cwd.string().c_str()));
 
     // add getters
-    nodemodObject->SetAccessor(
+    nodemodObject->SetNativeDataProperty(
         convert::str2js(isolate, "players"),
         players::getPlayers);
 
-    nodemodObject->SetAccessor(
+    nodemodObject->SetNativeDataProperty(
         convert::str2js(isolate, "mapname"),
-        [](v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value> &info)
+        [](v8::Local<v8::Name> property, const v8::PropertyCallbackInfo<v8::Value> &info)
         {
           v8::Isolate* isolate = info.GetIsolate();
           v8::Locker locker(isolate);
@@ -63,9 +63,9 @@ namespace bindings
           info.GetReturnValue().Set(convert::strid2js(isolate, gpGlobals->mapname));
         });
 
-    nodemodObject->SetAccessor(
+    nodemodObject->SetNativeDataProperty(
         convert::str2js(isolate, "time"),
-        [](v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value> &info)
+        [](v8::Local<v8::Name> property, const v8::PropertyCallbackInfo<v8::Value> &info)
         {
           v8::Isolate* isolate = info.GetIsolate();
           v8::Locker locker(isolate);

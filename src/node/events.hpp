@@ -15,19 +15,19 @@ using argument_collector_t = std::function<
 		struct EventListener_t
 		{
 			v8::Isolate* isolate;
-			v8::Persistent<v8::Context, v8::CopyablePersistentTraits<v8::Context>> context;
-			v8::Persistent<v8::Function, v8::CopyablePersistentTraits<v8::Function>> function;
+			v8::Global<v8::Context> context;
+			v8::Global<v8::Function> function;
 
 			EventListener_t(const EventListener_t &listener) {
 				isolate = listener.isolate;
-				context = listener.context;
-				function = listener.function;
+				context.Reset(isolate, listener.context);
+				function.Reset(isolate, listener.function);
 			}
 
 			EventListener_t(
 				v8::Isolate* _isolate,
-				const v8::Persistent<v8::Context, v8::CopyablePersistentTraits<v8::Context>>& _context,
-				const v8::Persistent<v8::Function, v8::CopyablePersistentTraits<v8::Function>>& _function
+				const v8::Global<v8::Context>& _context,
+				const v8::Global<v8::Function>& _function
 			)
 			{
 				isolate = _isolate;
@@ -51,6 +51,25 @@ using argument_collector_t = std::function<
 			~EventListener_t() {
 				context.Reset();
 				function.Reset();
+			}
+			
+			EventListener_t& operator=(const EventListener_t& other) {
+				if (this != &other) {
+					isolate = other.isolate;
+					context.Reset(isolate, other.context);
+					function.Reset(isolate, other.function);
+				}
+				return *this;
+			}
+
+			EventListener_t& operator=(EventListener_t&& other) noexcept {
+				if (this != &other) {
+					isolate = other.isolate;
+					context = std::move(other.context);
+					function = std::move(other.function);
+					other.isolate = nullptr;
+				}
+				return *this;
 			}
 
 			bool operator==(const EventListener_t& a) const {
@@ -87,7 +106,7 @@ using argument_collector_t = std::function<
 		std::string name;
 		std::string paramTypes;
 		std::vector<EventListener_t> functionList;
-		v8::Persistent<v8::Function, v8::CopyablePersistentTraits<v8::Function>> listener;
+		v8::Global<v8::Function> listener;
 	};
 
 	typedef std::unordered_map<std::string, event*> eventsContainer;

@@ -1,12 +1,18 @@
 #pragma once
 #define NODE_WANT_INTERNALS 1
 
+// Include HLSDK headers first to define enginefuncs_t
+#include "extdll.h"
+#include "enginecallback.h"
+
+// Include Node.js headers after HLSDK
 #include "node.h"
-#include "env.h"
-#include "env-inl.h"
-#include "v8.h"
 #include "uv.h"
+#include "v8.h"
 #include "libplatform/libplatform.h"
+
+// Node internals - include carefully
+#include "env.h"
 //#include "utils.hpp"
 
 	class Resource

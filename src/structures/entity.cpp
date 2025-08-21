@@ -32,8 +32,8 @@ extern enginefuncs_t g_engfuncs;
         if (edict == NULL) return; \
         TYPE(value, edict->field); })
 
-#define ACCESSOR(entity, name, field, GET, SET) entity->SetAccessor(v8::String::NewFromUtf8(isolate, name).ToLocalChecked(), GETTER(field, GET), SETTER(field, SET))
-#define ACCESSORL(entity, name, field, GET, SET) entity->SetAccessor(v8::String::NewFromUtf8(isolate, name).ToLocalChecked(), GETTER(field, GET), SETTERL(field, SET))
+#define ACCESSOR(entity, name, field, GET, SET) entity->SetNativeDataProperty(v8::String::NewFromUtf8(isolate, name).ToLocalChecked(), GETTER(field, GET), SETTER(field, SET))
+#define ACCESSORL(entity, name, field, GET, SET) entity->SetNativeDataProperty(v8::String::NewFromUtf8(isolate, name).ToLocalChecked(), GETTER(field, GET), SETTERL(field, SET))
 
 namespace structures
 {
@@ -136,7 +136,7 @@ namespace structures
     ACCESSOR(_entity, "yawSpeed", v.yaw_speed, GETN, SETFLOAT);
     ACCESSOR(_entity, "modelindex", v.modelindex, GETN, SETINT);
 
-    _entity->SetAccessor(
+    _entity->SetNativeDataProperty(
         convert::str2js(isolate, "model"),
         GETTER(v.model, GETSTR),
         [](v8::Local<v8::Name> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void> &info)

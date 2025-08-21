@@ -3,14 +3,13 @@
 #include <unordered_map>
 #include "node.h"
 #include "node_api.h"
-#include "env.h"
-#include "env-inl.h"
 #include "v8.h"
 #include "uv.h"
 #include "libplatform/libplatform.h"
+#include "env-inl.h"
+#include "node_internals.h"
+#include "node_v8_platform-inl.h"
 #include "uvloop.hpp"
-
-#define NODE_WANT_INTERNALS 1
 
 class NodeImpl
 {

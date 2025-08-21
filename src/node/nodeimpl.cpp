@@ -93,10 +93,7 @@ void NodeImpl::Initialize()
 	v8::Isolate::Scope isolateScope(v8Isolate);
 
 	std::vector<std::string> args{"--trace-uncaught", "--inspect"};
-	std::vector<std::string> exec_args;
-	std::vector<std::string> errors;
-
-	node::InitializeNodeWithArgs(&args, &exec_args, &errors);
+	node::InitializeOncePerProcess(args, node::ProcessInitializationFlags::kNoFlags);
 
 	auto isolateData = node::CreateIsolateData(v8Isolate, nodeLoop->GetLoop(), v8Platform.get(), arrayBufferAllocator.get());
 
@@ -121,5 +118,5 @@ void NodeImpl::Stop()
 	resource->Stop();
 	node::FreeIsolateData(nodeData.get());
 	v8::V8::Dispose();
-	v8::V8::ShutdownPlatform();
+	// v8::V8::ShutdownPlatform() - removed in V8 v24
 }

@@ -8,7 +8,7 @@ extern enginefuncs_t	 g_engfuncs;
 
 namespace players
 {
-  void getPlayers(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info) {
+  void getPlayers(v8::Local<v8::Name> property, const v8::PropertyCallbackInfo<v8::Value>& info) {
     auto isolate = info.GetIsolate();
     v8::Locker locker(isolate);
     v8::HandleScope scope(isolate);

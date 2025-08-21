@@ -132,7 +132,7 @@ static node::IsolateData* GetNodeIsolate()
 		v8::Context::Scope context_scope(ctx);
 
 		auto scriptname = v8::String::NewFromUtf8(isolate, name.c_str()).ToLocalChecked();
-		v8::ScriptOrigin origin(scriptname, v8::Integer::New(isolate, -1), v8::Integer::New(isolate, 0));
+		v8::ScriptOrigin origin(scriptname);
 		auto sourceCode = v8::String::NewFromUtf8(isolate, source.c_str());
 
 		v8::TryCatch try_catch(isolate);
