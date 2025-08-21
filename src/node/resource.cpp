@@ -2,6 +2,7 @@
 #include "nodeimpl.hpp"
 #include "common/logger.hpp"
 #include "bindings/bindings.hpp"
+#include "util/convert.hpp"
 #include <filesystem>
 
 extern void registerDllEvents();
@@ -82,13 +83,33 @@ static node::IsolateData* GetNodeIsolate()
 
 		if (useInspector) {
 			flags = static_cast<node::EnvironmentFlags::Flags>(flags | node::EnvironmentFlags::kOwnsInspector);
+		} else {
+			flags = static_cast<node::EnvironmentFlags::Flags>(flags | node::EnvironmentFlags::kNoCreateInspector);
 		}
 
-		// HACK we should use actual gamedir name instead "valve"
-		auto env = node::CreateEnvironment(GetNodeIsolate(), _context, args, exec_args, flags);
+		// Get the actual game directory from engine and change to it BEFORE creating environment
 		auto old_cwd = std::filesystem::current_path();
-		std::filesystem::current_path("valve/addons/nodemod");
+		
+		// Get game directory from engine
+		std::string gamedir_buffer;
+		gamedir_buffer.resize(256);
+		(*g_engfuncs.pfnGetGameDir)(gamedir_buffer.data());
+		gamedir_buffer.resize(strlen(gamedir_buffer.c_str())); // Trim to actual size
+		
+		std::string nodemod_path = gamedir_buffer + "/addons/nodemod";
+		
+		// Check if the path exists, fallback to current directory if not
+		if (!std::filesystem::exists(nodemod_path)) {
+			nodemod_path = ".";
+		}
+		
+		// Change directory BEFORE creating the Node.js environment so module resolution works correctly
+		std::filesystem::current_path(nodemod_path);
+		
+		// Create environment with correct working directory for ES module resolution
+		auto env = node::CreateEnvironment(GetNodeIsolate(), _context, args, exec_args, flags);
 		node::LoadEnvironment(env, node::StartExecutionCallback{});
+		
 		std::filesystem::current_path(old_cwd);
 
 		nodeEnvironment.reset(env);

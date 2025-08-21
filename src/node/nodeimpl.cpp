@@ -68,19 +68,38 @@ void NodeImpl::Tick()
 
 void NodeImpl::Initialize()
 {
+	// Initialize Node.js process following HL1 metamod approach - prevent Node.js from initializing V8
+	std::vector<std::string> args{"node"};
+	auto result = node::InitializeOncePerProcess(
+		args,
+		static_cast<node::ProcessInitializationFlags::Flags>(
+			node::ProcessInitializationFlags::kNoStdioInitialization |
+			node::ProcessInitializationFlags::kNoInitializeV8 |
+			node::ProcessInitializationFlags::kNoInitializeNodeV8Platform
+		)
+	);
+
+	// Handle initialization errors
+	for (const std::string& error : result->errors()) {
+		printf("Node.js init error: %s\n", error.c_str());
+	}
+	if (result->early_return() != 0) {
+		printf("Node.js early return with code: %d\n", result->exit_code());
+		return;
+	}
+
+	// Create our own V8 platform and initialize V8 manually
 	v8Platform = node::MultiIsolatePlatform::Create(4);
 	v8::V8::InitializePlatform(v8Platform.get());
-
-	const char *flags = "";
-	v8::V8::SetFlagsFromString(flags, strlen(flags));
-
 	v8::V8::Initialize();
 
 	arrayBufferAllocator = node::ArrayBufferAllocator::Create();
 
 	nodeLoop = std::make_unique<UvLoop>("mainNode");
 
-	v8Isolate = node::NewIsolate(arrayBufferAllocator.get(), nodeLoop->GetLoop(), v8Platform.get());
+	// Create IsolateSettings like HL1 metamod does
+	node::IsolateSettings isolate_settings;
+	v8Isolate = node::NewIsolate(arrayBufferAllocator.get(), nodeLoop->GetLoop(), v8Platform.get(), nullptr, isolate_settings);
 	v8Isolate->SetFatalErrorHandler([](const char *location, const char *message)
 																	{
 				printf("V8 FATAL [%s]: %s\n", location, message);
@@ -92,9 +111,6 @@ void NodeImpl::Initialize()
 	v8::Locker locker(v8Isolate);
 	v8::Isolate::Scope isolateScope(v8Isolate);
 
-	std::vector<std::string> args{"--trace-uncaught", "--inspect"};
-	node::InitializeOncePerProcess(args, node::ProcessInitializationFlags::kNoFlags);
-
 	auto isolateData = node::CreateIsolateData(v8Isolate, nodeLoop->GetLoop(), v8Platform.get(), arrayBufferAllocator.get());
 
 	nodeData.reset(isolateData);
@@ -104,11 +120,6 @@ bool NodeImpl::loadScript()
 {
 	resource = new Resource("main", ".");
 	resource->Init();
-
-	while (!isRun)
-	{
-		nodeImpl.Tick();
-	}
 
 	return true;
 }

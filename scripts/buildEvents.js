@@ -23,7 +23,7 @@ function getFunction(func, prefix, type) {
     func._eventName = `${prefix}_${func.name}`;
     return `${description}
   ${func.type === 'NULL' ? 'void' : func.type} ${prefix}_${func.name} (${customs[type]?.[func.name]?.event?.argsString || func.args.map(v => `${v.type} ${v.name}`).join(', ')}) {
-  SET_META_RESULT(MRES_IGNORED);
+    SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("${eventName}", [=](v8::Isolate* isolate) {
       ${customBody}
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
@@ -39,24 +39,26 @@ function getFunction(func, prefix, type) {
   if (func.name === 'pfnStartFrame' && prefix !== 'post') {
     return `// ${func.name}
   ${func.type} ${prefix}_${func.name} () {
-    nodeImpl.Tick();
+    SET_META_RESULT(MRES_IGNORED);
   }`;
   }
 
   if (func.args.length === 0) {
     return `${description}
   ${func.type} ${prefix}_${func.name} () {
+    SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("${eventName}", nullptr, 0);
   }`;
   }
 
+
   return `${description}
   ${func.type} ${prefix}_${func.name} (${func.args.map(v => `${v.type} ${v.name}`).join(', ')}) {
-  SET_META_RESULT(MRES_IGNORED);
+    SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("${eventName}", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = ${func.args.length};
-       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[${func.args.length}];
-      ${func.args.map((v, i) => `v8_args[${i}] = ${argToValue(v)}; // ${v.name} (${v.type})`).join('\n')}
+      v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[${func.args.length}];
+      ${func.args.map((v, i) => `v8_args[${i}] = ${argToValue(v)}; // ${v.name} (${v.type})`).join('\n      ')}
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }`;
@@ -173,14 +175,14 @@ function parseFunction(line) {
     ${baseDllFunctions.functions.join('\n\n')}
 
     DLL_FUNCTIONS g_DllFunctionTable = {
-      ${baseDllFunctions.definitions.join(',\n')}
+      ${baseDllFunctions.definitions.join(',\n      ')}
     };
 
   /* POST EVENTS */
     ${postDllFunctions.functions.join('\n\n')}
 
     DLL_FUNCTIONS g_DllFunctionTable_Post = {
-      ${postDllFunctions.definitions.join(',\n')}
+      ${postDllFunctions.definitions.join(',\n      ')}
     };
 
     void registerDllEvents()
@@ -208,14 +210,14 @@ function parseFunction(line) {
     ${baseEngineFunctions.functions.join('\n\n')}
 
     enginefuncs_t g_EngineFunctionsTable = {
-      ${baseEngineFunctions.definitions.join(',\n')}
+      ${baseEngineFunctions.definitions.join(',\n      ')}
     };
 
   /* POST EVENTS */
     ${postEngineFunctions.functions.join('\n\n')}
 
     enginefuncs_t g_EngineFunctionsTable_Post = {
-      ${postEngineFunctions.definitions.join(',\n')}
+      ${postEngineFunctions.definitions.join(',\n      ')}
     };
 
     void registerEngineEvents()

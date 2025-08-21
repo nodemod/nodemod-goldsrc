@@ -79,10 +79,14 @@ void getUserMsgName(const v8::FunctionCallbackInfo<v8::Value>& info) {
 	v8::HandleScope scope(info.GetIsolate());
 	auto context = info.GetIsolate()->GetCurrentContext();
 
-  info.GetReturnValue().Set(
-  v8::String::NewFromUtf8(info.GetIsolate(), GET_USER_MSG_NAME(&Plugin_info, info[0]->Int32Value(context).ToChecked(), NULL))
-	.ToLocalChecked()
-	);
+	const char* msgName = GET_USER_MSG_NAME(&Plugin_info, info[0]->Int32Value(context).ToChecked(), NULL);
+	if (msgName != NULL) {
+		info.GetReturnValue().Set(
+			v8::String::NewFromUtf8(info.GetIsolate(), msgName).ToLocalChecked()
+		);
+	} else {
+		info.GetReturnValue().Set(v8::String::NewFromUtf8(info.GetIsolate(), "").ToLocalChecked());
+	}
 }
 
 void setMetaResult(const v8::FunctionCallbackInfo<v8::Value>& info) {
