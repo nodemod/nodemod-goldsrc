@@ -45,6 +45,16 @@ list(APPEND SOURCES_LIST
 	"src/structures/entvars.cpp"
 	"src/structures/cvar.cpp"
 	"src/structures/usercmd.cpp"
+	"src/structures/clientdata.cpp"
+	"src/structures/customization.cpp"
+	"src/structures/delta.cpp"
+	"src/structures/entitystate.cpp"
+	"src/structures/keyvaluedata.cpp"
+	"src/structures/netadr.cpp"
+	"src/structures/playermove.cpp"
+	"src/structures/saverestoredata.cpp"
+	"src/structures/typedescription.cpp"
+	"src/structures/weapondata.cpp"
 )
 
 # required for proper plugin loading from metamod, don't touch

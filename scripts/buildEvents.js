@@ -508,29 +508,43 @@ function computeFunction(func, source) {
 
 async function parseStructureInterfaces() {
   const structureFiles = [
-    { file: 'src/structures/entvars.cpp', name: 'Entvars' },
-    { file: 'src/structures/clientdata.cpp', name: 'ClientData' },
-    { file: 'src/structures/entitystate.cpp', name: 'EntityState' },
-    { file: 'src/structures/usercmd.cpp', name: 'UserCmd' },
-    { file: 'src/structures/netadr.cpp', name: 'NetAdr' },
-    { file: 'src/structures/weapondata.cpp', name: 'WeaponData' },
-    { file: 'src/structures/playermove.cpp', name: 'PlayerMove' },
-    { file: 'src/structures/customization.cpp', name: 'Customization' },
-    { file: 'src/structures/keyvaluedata.cpp', name: 'KeyValueData' },
-    { file: 'src/structures/saverestoredata.cpp', name: 'SaveRestoreData' },
-    { file: 'src/structures/typedescription.cpp', name: 'TypeDescription' },
-    { file: 'src/structures/delta.cpp', name: 'Delta' },
-    { file: 'src/structures/cvar.cpp', name: 'Cvar' },
-    { file: 'src/structures/trace_result.cpp', name: 'TraceResult' }
+    { file: 'src/structures/entvars.cpp', name: 'Entvars', 
+      description: 'Entity variables - properties and state of game entities' },
+    { file: 'src/structures/clientdata.cpp', name: 'ClientData',
+      description: 'Client-specific data sent from server to client each frame' },
+    { file: 'src/structures/entitystate.cpp', name: 'EntityState',
+      description: 'Entity state for network transmission' },
+    { file: 'src/structures/usercmd.cpp', name: 'UserCmd',
+      description: 'Player input commands sent from client to server' },
+    { file: 'src/structures/netadr.cpp', name: 'NetAdr',
+      description: 'Network address information' },
+    { file: 'src/structures/weapondata.cpp', name: 'WeaponData',
+      description: 'Weapon state and timing information' },
+    { file: 'src/structures/playermove.cpp', name: 'PlayerMove',
+      description: 'Player movement state and physics parameters' },
+    { file: 'src/structures/customization.cpp', name: 'Customization',
+      description: 'Player customization data (sprays, models)' },
+    { file: 'src/structures/keyvaluedata.cpp', name: 'KeyValueData',
+      description: 'Key-value pairs for entity spawning' },
+    { file: 'src/structures/saverestoredata.cpp', name: 'SaveRestoreData',
+      description: 'Save/restore game state information' },
+    { file: 'src/structures/typedescription.cpp', name: 'TypeDescription',
+      description: 'Field type description for save/restore system' },
+    { file: 'src/structures/delta.cpp', name: 'Delta',
+      description: 'Delta compression structure for network optimization' },
+    { file: 'src/structures/cvar.cpp', name: 'Cvar',
+      description: 'Console variable (cvar) information' },
+    { file: 'src/structures/trace_result.cpp', name: 'TraceResult',
+      description: 'Results from line/hull trace operations' }
   ];
 
   const interfaces = [];
 
-  for (const { file, name } of structureFiles) {
+  for (const { file, name, description } of structureFiles) {
     try {
       const content = await fs.readFile(file, 'utf8');
       const properties = parseStructureProperties(content, name);
-      interfaces.push({ name, properties });
+      interfaces.push({ name, properties, description });
     } catch (error) {
       console.log(`Skipping ${file}: ${error.message}`);
     }
@@ -539,106 +553,107 @@ async function parseStructureInterfaces() {
   // Add Entity interface manually since it's more complex
   interfaces.push({
     name: 'Entity',
+    description: 'Game entity reference with properties and methods',
     properties: [
-      'id: number',
-      'classname: string',
-      'globalname: string',
-      'origin: number[]',
-      'oldorigin: number[]',
-      'velocity: number[]',
-      'basevelocity: number[]',
-      'clbasevelocity: number[]',
-      'movedir: number[]',
-      'angles: number[]',
-      'avelocity: number[]',
-      'punchangle: number[]',
-      'angle: number[]',
-      'endpos: number[]',
-      'startpos: number[]',
-      'impacttime: number',
-      'starttime: number',
-      'fixangle: number',
-      'idealpitch: number',
-      'pitchSpeed: number',
-      'idealYaw: number',
-      'yawSpeed: number',
-      'modelindex: number',
-      'model: string',
-      'viewmodel: number',
-      'weaponmodel: number',
-      'absmin: number[]',
-      'absmax: number[]',
-      'mins: number[]',
-      'maxs: number[]',
-      'size: number[]',
-      'ltime: number',
-      'nextthink: number',
-      'movetype: number',
-      'solid: number',
-      'skin: number',
-      'body: number',
-      'effects: number',
-      'gravity: number',
-      'friction: number',
-      'lightLevel: number',
-      'sequence: number',
-      'gaitsequence: number',
-      'frame: number',
-      'animtime: number',
-      'framerate: number',
-      'scale: number',
-      'rendermode: number',
-      'renderamt: number',
-      'rendercolor: number[]',
-      'renderfx: number',
-      'health: number',
-      'frags: number',
-      'weapons: number',
-      'takedamage: number',
-      'deadflag: number',
-      'viewOfs: number[]',
-      'button: number',
-      'impulse: number',
-      'spawnflags: number',
-      'flags: number',
-      'colormap: number',
-      'team: number',
-      'maxHealth: number',
-      'teleportTime: number',
-      'armortype: number',
-      'armorvalue: number',
-      'waterlevel: number',
-      'watertype: number',
-      'target: string',
-      'targetname: string',
-      'netname: string',
-      'message: string',
-      'dmgTake: number',
-      'dmgSave: number',
-      'dmg: number',
-      'dmgtime: number',
-      'noise: string',
-      'noise1: string',
-      'noise2: string',
-      'noise3: string',
-      'speed: number',
-      'airFinished: number',
-      'painFinished: number',
-      'radsuitFinished: number',
-      'playerclass: number',
-      'maxspeed: number',
-      'fov: number',
-      'weaponanim: number',
-      'pushmsec: number',
-      'bInDuck: number',
-      'flTimeStepSound: number',
-      'flSwimTime: number',
-      'flDuckTime: number',
-      'iStepLeft: number',
-      'fallVelocity: number',
-      'gamestate: number',
-      'oldbuttons: number',
-      'groupinfo: number'
+      { name: 'id', type: 'number', comment: 'obj->Set(..., v8::Number::New(isolate, entityId))' },
+      { name: 'classname', type: 'string', comment: 'ACCESSOR(_entity, "classname", v.classname, GETSTR, SETSTR)' },
+      { name: 'globalname', type: 'string', comment: 'ACCESSOR(_entity, "globalname", v.globalname, GETSTR, SETSTR)' },
+      { name: 'origin', type: 'number[]', comment: 'ACCESSORL(_entity, "origin", v.origin, GETVEC3, SETVEC3)' },
+      { name: 'oldorigin', type: 'number[]', comment: 'ACCESSORL(_entity, "oldorigin", v.oldorigin, GETVEC3, SETVEC3)' },
+      { name: 'velocity', type: 'number[]', comment: 'ACCESSORL(_entity, "velocity", v.velocity, GETVEC3, SETVEC3)' },
+      { name: 'basevelocity', type: 'number[]', comment: 'ACCESSORL(_entity, "basevelocity", v.basevelocity, GETVEC3, SETVEC3)' },
+      { name: 'clbasevelocity', type: 'number[]', comment: 'ACCESSORL(_entity, "clbasevelocity", v.clbasevelocity, GETVEC3, SETVEC3)' },
+      { name: 'movedir', type: 'number[]', comment: 'ACCESSORL(_entity, "movedir", v.movedir, GETVEC3, SETVEC3)' },
+      { name: 'angles', type: 'number[]', comment: 'ACCESSORL(_entity, "angles", v.angles, GETVEC3, SETVEC3)' },
+      { name: 'avelocity', type: 'number[]', comment: 'ACCESSORL(_entity, "avelocity", v.avelocity, GETVEC3, SETVEC3)' },
+      { name: 'punchangle', type: 'number[]', comment: 'ACCESSORL(_entity, "punchangle", v.punchangle, GETVEC3, SETVEC3)' },
+      { name: 'angle', type: 'number[]', comment: 'ACCESSORL(_entity, "angle", v.v_angle, GETVEC3, SETVEC3)' },
+      { name: 'endpos', type: 'number[]', comment: 'ACCESSORL(_entity, "endpos", v.endpos, GETVEC3, SETVEC3)' },
+      { name: 'startpos', type: 'number[]', comment: 'ACCESSORL(_entity, "startpos", v.startpos, GETVEC3, SETVEC3)' },
+      { name: 'impacttime', type: 'number', comment: 'ACCESSOR(_entity, "impacttime", v.impacttime, GETN, SETFLOAT)' },
+      { name: 'starttime', type: 'number', comment: 'ACCESSOR(_entity, "starttime", v.starttime, GETN, SETFLOAT)' },
+      { name: 'fixangle', type: 'number', comment: 'ACCESSOR(_entity, "fixangle", v.fixangle, GETN, SETINT)' },
+      { name: 'idealpitch', type: 'number', comment: 'ACCESSOR(_entity, "idealpitch", v.idealpitch, GETN, SETFLOAT)' },
+      { name: 'pitchSpeed', type: 'number', comment: 'ACCESSOR(_entity, "pitchSpeed", v.pitch_speed, GETN, SETFLOAT)' },
+      { name: 'idealYaw', type: 'number', comment: 'ACCESSOR(_entity, "idealYaw", v.ideal_yaw, GETN, SETFLOAT)' },
+      { name: 'yawSpeed', type: 'number', comment: 'ACCESSOR(_entity, "yawSpeed", v.yaw_speed, GETN, SETFLOAT)' },
+      { name: 'modelindex', type: 'number', comment: 'ACCESSOR(_entity, "modelindex", v.modelindex, GETN, SETINT)' },
+      { name: 'model', type: 'string', comment: '_entity->SetNativeDataProperty(..., GETTER(v.model, GETSTR), ...)' },
+      { name: 'viewmodel', type: 'number', comment: 'ACCESSOR(_entity, "viewmodel", v.viewmodel, GETN, SETINT)' },
+      { name: 'weaponmodel', type: 'number', comment: 'ACCESSOR(_entity, "weaponmodel", v.weaponmodel, GETN, SETINT)' },
+      { name: 'absmin', type: 'number[]', comment: 'ACCESSORL(_entity, "absmin", v.absmin, GETVEC3, SETVEC3)' },
+      { name: 'absmax', type: 'number[]', comment: 'ACCESSORL(_entity, "absmax", v.absmax, GETVEC3, SETVEC3)' },
+      { name: 'mins', type: 'number[]', comment: 'ACCESSORL(_entity, "mins", v.mins, GETVEC3, SETVEC3)' },
+      { name: 'maxs', type: 'number[]', comment: 'ACCESSORL(_entity, "maxs", v.maxs, GETVEC3, SETVEC3)' },
+      { name: 'size', type: 'number[]', comment: 'ACCESSORL(_entity, "size", v.maxs, GETVEC3, SETVEC3)' },
+      { name: 'ltime', type: 'number', comment: 'ACCESSOR(_entity, "ltime", v.ltime, GETN, SETFLOAT)' },
+      { name: 'nextthink', type: 'number', comment: 'ACCESSOR(_entity, "nextthink", v.nextthink, GETN, SETFLOAT)' },
+      { name: 'movetype', type: 'number', comment: 'ACCESSOR(_entity, "movetype", v.movetype, GETN, SETINT)' },
+      { name: 'solid', type: 'number', comment: 'ACCESSOR(_entity, "solid", v.solid, GETN, SETINT)' },
+      { name: 'skin', type: 'number', comment: 'ACCESSOR(_entity, "skin", v.skin, GETN, SETINT)' },
+      { name: 'body', type: 'number', comment: 'ACCESSOR(_entity, "body", v.body, GETN, SETINT)' },
+      { name: 'effects', type: 'number', comment: 'ACCESSOR(_entity, "effects", v.effects, GETN, SETINT)' },
+      { name: 'gravity', type: 'number', comment: 'ACCESSOR(_entity, "gravity", v.gravity, GETN, SETFLOAT)' },
+      { name: 'friction', type: 'number', comment: 'ACCESSOR(_entity, "friction", v.friction, GETN, SETFLOAT)' },
+      { name: 'lightLevel', type: 'number', comment: 'ACCESSOR(_entity, "lightLevel", v.light_level, GETN, SETINT)' },
+      { name: 'sequence', type: 'number', comment: 'ACCESSOR(_entity, "sequence", v.sequence, GETN, SETINT)' },
+      { name: 'gaitsequence', type: 'number', comment: 'ACCESSOR(_entity, "gaitsequence", v.gaitsequence, GETN, SETINT)' },
+      { name: 'frame', type: 'number', comment: 'ACCESSOR(_entity, "frame", v.frame, GETN, SETFLOAT)' },
+      { name: 'animtime', type: 'number', comment: 'ACCESSOR(_entity, "animtime", v.animtime, GETN, SETFLOAT)' },
+      { name: 'framerate', type: 'number', comment: 'ACCESSOR(_entity, "framerate", v.framerate, GETN, SETFLOAT)' },
+      { name: 'scale', type: 'number', comment: 'ACCESSOR(_entity, "scale", v.scale, GETN, SETFLOAT)' },
+      { name: 'rendermode', type: 'number', comment: 'ACCESSOR(_entity, "rendermode", v.rendermode, GETN, SETINT)' },
+      { name: 'renderamt', type: 'number', comment: 'ACCESSOR(_entity, "renderamt", v.renderamt, GETN, SETFLOAT)' },
+      { name: 'rendercolor', type: 'number[]', comment: 'ACCESSORL(_entity, "rendercolor", v.rendercolor, GETVEC3, SETVEC3)' },
+      { name: 'renderfx', type: 'number', comment: 'ACCESSOR(_entity, "renderfx", v.renderfx, GETN, SETINT)' },
+      { name: 'health', type: 'number', comment: 'ACCESSOR(_entity, "health", v.health, GETN, SETFLOAT)' },
+      { name: 'frags', type: 'number', comment: 'ACCESSOR(_entity, "frags", v.frags, GETN, SETFLOAT)' },
+      { name: 'weapons', type: 'number', comment: 'ACCESSOR(_entity, "weapons", v.weapons, GETN, SETINT)' },
+      { name: 'takedamage', type: 'number', comment: 'ACCESSOR(_entity, "takedamage", v.takedamage, GETN, SETFLOAT)' },
+      { name: 'deadflag', type: 'number', comment: 'ACCESSOR(_entity, "deadflag", v.deadflag, GETN, SETINT)' },
+      { name: 'viewOfs', type: 'number[]', comment: 'ACCESSORL(_entity, "viewOfs", v.view_ofs, GETVEC3, SETVEC3)' },
+      { name: 'button', type: 'number', comment: 'ACCESSOR(_entity, "button", v.button, GETN, SETINT)' },
+      { name: 'impulse', type: 'number', comment: 'ACCESSOR(_entity, "impulse", v.impulse, GETN, SETINT)' },
+      { name: 'spawnflags', type: 'number', comment: 'ACCESSOR(_entity, "spawnflags", v.spawnflags, GETN, SETINT)' },
+      { name: 'flags', type: 'number', comment: 'ACCESSOR(_entity, "flags", v.flags, GETN, SETINT)' },
+      { name: 'colormap', type: 'number', comment: 'ACCESSOR(_entity, "colormap", v.colormap, GETN, SETINT)' },
+      { name: 'team', type: 'number', comment: 'ACCESSOR(_entity, "team", v.team, GETN, SETINT)' },
+      { name: 'maxHealth', type: 'number', comment: 'ACCESSOR(_entity, "maxHealth", v.max_health, GETN, SETFLOAT)' },
+      { name: 'teleportTime', type: 'number', comment: 'ACCESSOR(_entity, "teleportTime", v.teleport_time, GETN, SETFLOAT)' },
+      { name: 'armortype', type: 'number', comment: 'ACCESSOR(_entity, "armortype", v.armortype, GETN, SETFLOAT)' },
+      { name: 'armorvalue', type: 'number', comment: 'ACCESSOR(_entity, "armorvalue", v.armorvalue, GETN, SETFLOAT)' },
+      { name: 'waterlevel', type: 'number', comment: 'ACCESSOR(_entity, "waterlevel", v.waterlevel, GETN, SETINT)' },
+      { name: 'watertype', type: 'number', comment: 'ACCESSOR(_entity, "watertype", v.watertype, GETN, SETINT)' },
+      { name: 'target', type: 'string', comment: 'ACCESSOR(_entity, "target", v.target, GETSTR, SETSTR)' },
+      { name: 'targetname', type: 'string', comment: 'ACCESSOR(_entity, "targetname", v.targetname, GETSTR, SETSTR)' },
+      { name: 'netname', type: 'string', comment: 'ACCESSOR(_entity, "netname", v.netname, GETSTR, SETSTR)' },
+      { name: 'message', type: 'string', comment: 'ACCESSOR(_entity, "message", v.message, GETSTR, SETSTR)' },
+      { name: 'dmgTake', type: 'number', comment: 'ACCESSOR(_entity, "dmgTake", v.dmg_take, GETN, SETFLOAT)' },
+      { name: 'dmgSave', type: 'number', comment: 'ACCESSOR(_entity, "dmgSave", v.dmg_save, GETN, SETFLOAT)' },
+      { name: 'dmg', type: 'number', comment: 'ACCESSOR(_entity, "dmg", v.dmg, GETN, SETFLOAT)' },
+      { name: 'dmgtime', type: 'number', comment: 'ACCESSOR(_entity, "dmgtime", v.dmgtime, GETN, SETFLOAT)' },
+      { name: 'noise', type: 'string', comment: 'ACCESSOR(_entity, "noise", v.noise, GETSTR, SETSTR)' },
+      { name: 'noise1', type: 'string', comment: 'ACCESSOR(_entity, "noise1", v.noise1, GETSTR, SETSTR)' },
+      { name: 'noise2', type: 'string', comment: 'ACCESSOR(_entity, "noise2", v.noise2, GETSTR, SETSTR)' },
+      { name: 'noise3', type: 'string', comment: 'ACCESSOR(_entity, "noise3", v.noise3, GETSTR, SETSTR)' },
+      { name: 'speed', type: 'number', comment: 'ACCESSOR(_entity, "speed", v.speed, GETN, SETFLOAT)' },
+      { name: 'airFinished', type: 'number', comment: 'ACCESSOR(_entity, "airFinished", v.air_finished, GETN, SETFLOAT)' },
+      { name: 'painFinished', type: 'number', comment: 'ACCESSOR(_entity, "painFinished", v.pain_finished, GETN, SETFLOAT)' },
+      { name: 'radsuitFinished', type: 'number', comment: 'ACCESSOR(_entity, "radsuitFinished", v.radsuit_finished, GETN, SETFLOAT)' },
+      { name: 'playerclass', type: 'number', comment: 'ACCESSOR(_entity, "playerclass", v.playerclass, GETN, SETINT)' },
+      { name: 'maxspeed', type: 'number', comment: 'ACCESSOR(_entity, "maxspeed", v.maxspeed, GETN, SETFLOAT)' },
+      { name: 'fov', type: 'number', comment: 'ACCESSOR(_entity, "fov", v.fov, GETN, SETFLOAT)' },
+      { name: 'weaponanim', type: 'number', comment: 'ACCESSOR(_entity, "weaponanim", v.weaponanim, GETN, SETINT)' },
+      { name: 'pushmsec', type: 'number', comment: 'ACCESSOR(_entity, "pushmsec", v.pushmsec, GETN, SETINT)' },
+      { name: 'bInDuck', type: 'number', comment: 'ACCESSOR(_entity, "bInDuck", v.bInDuck, GETN, SETINT)' },
+      { name: 'flTimeStepSound', type: 'number', comment: 'ACCESSOR(_entity, "flTimeStepSound", v.flTimeStepSound, GETN, SETINT)' },
+      { name: 'flSwimTime', type: 'number', comment: 'ACCESSOR(_entity, "flSwimTime", v.flSwimTime, GETN, SETINT)' },
+      { name: 'flDuckTime', type: 'number', comment: 'ACCESSOR(_entity, "flDuckTime", v.flDuckTime, GETN, SETINT)' },
+      { name: 'iStepLeft', type: 'number', comment: 'ACCESSOR(_entity, "iStepLeft", v.iStepLeft, GETN, SETINT)' },
+      { name: 'fallVelocity', type: 'number', comment: 'ACCESSOR(_entity, "fallVelocity", v.flFallVelocity, GETN, SETFLOAT)' },
+      { name: 'gamestate', type: 'number', comment: 'ACCESSOR(_entity, "gamestate", v.gamestate, GETN, SETINT)' },
+      { name: 'oldbuttons', type: 'number', comment: 'ACCESSOR(_entity, "oldbuttons", v.oldbuttons, GETN, SETINT)' },
+      { name: 'groupinfo', type: 'number', comment: 'ACCESSOR(_entity, "groupinfo", v.groupinfo, GETN, SETINT)' }
     ]
   });
 
@@ -647,34 +662,235 @@ async function parseStructureInterfaces() {
 
 function parseStructureProperties(content, structureName) {
   const properties = [];
+  const propertyMap = new Map(); // Use Map to avoid duplicates - stores {type, sourceLine}
   
-  // Extract property setting patterns from the C++ wrapper code
-  // Match obj->Set calls with various V8 value types
-  const setCallRegex = /obj->Set\([^,]*,\s*(?:v8::String::NewFromUtf8\(isolate,\s*"([^"]+)"\)|convert::str2js\(isolate,\s*"([^"]+)"\))[^,]*,\s*([^;]+);/g;
+  // Parse new accessor pattern - ACCESSOR_T, ACCESSORL_T macros
+  const accessorRegex = /ACCESSOR(?:L)?_T\([^,]+,\s*[^,]+,\s*[^,]+,\s*"([^"]+)",\s*([^,]+),\s*([^,]+),\s*([^)]+)\);/g;
+  
+  // Parse manual SetNativeDataProperty calls
+  const manualAccessorRegex = /templ->SetNativeDataProperty\(v8::String::NewFromUtf8\(isolate,\s*"([^"]+)"\)\.ToLocalChecked\(\)/g;
   
   let match;
-  while ((match = setCallRegex.exec(content)) !== null) {
-    const propName = match[1] || match[2]; // Either v8::String or convert::str2js captured the name
-    const valueExpression = match[3];
+  
+  // Process ACCESSOR_T/ACCESSORL_T macro calls
+  while ((match = accessorRegex.exec(content)) !== null) {
+    const propName = match[1]; // Property name
+    const fieldName = match[2]; // C++ field name
+    const getterType = match[3]; // Getter type (GETN, GETVEC3, etc.)
+    const setterType = match[4]; // Setter type (SETINT, SETVEC3, etc.)
     
-    // Determine TypeScript type based on the V8 value creation
+    const sourceLine = `ACCESSOR_T(..., "${propName}", ${fieldName}, ${getterType}, ${setterType})`;
+    
+    // Determine TypeScript type from getter/setter types
     let tsType = 'unknown';
     
-    if (valueExpression.includes('v8::String::NewFromUtf8') || valueExpression.includes('g_engfuncs.pfnSzFromIndex')) {
+    if (getterType === 'GETVEC3' || setterType === 'SETVEC3') {
+      tsType = 'number[]';
+    } else if (getterType === 'GETSTR' || setterType === 'SETSTR') {
       tsType = 'string';
-    } else if (valueExpression.includes('v8::Number::New')) {
-      tsType = 'number';
-    } else if (valueExpression.includes('v8::Boolean::New')) {
+    } else if (getterType === 'GETBOOL' || setterType === 'SETBOOL') {
       tsType = 'boolean';
-    } else if (valueExpression.includes('utils::vect2js')) {
-      tsType = 'number[]';
-    } else if (valueExpression.includes('wrapEntity')) {
-      tsType = 'Entity | null';
-    } else if (valueExpression.includes('utils::arr2js') || valueExpression.includes('Array::New') || (propName.includes('ip') && valueExpression.includes('Array'))) {
-      tsType = 'number[]';
+    } else if (setterType === 'SETINT') {
+      tsType = 'number';
+    } else if (setterType === 'SETFLOAT') {
+      tsType = 'number';
+    } else if (getterType === 'GETN') {
+      tsType = 'number';
     }
     
-    properties.push(`${propName}: ${tsType}`);
+    propertyMap.set(propName, { type: tsType, sourceLine });
+  }
+  
+  // Process manual SetNativeDataProperty calls (for complex properties)
+  while ((match = manualAccessorRegex.exec(content)) !== null) {
+    const propName = match[1];
+    
+    // Look for the lambda function content after this call
+    const startIndex = match.index + match[0].length;
+    const contentAfter = content.substring(startIndex, startIndex + 1000);
+    
+    let tsType = 'unknown';
+    const sourceLine = `templ->SetNativeDataProperty("${propName}", ...)`;
+    
+    // Analyze the lambda content to determine type  
+    if (propName === 'pNext' && contentAfter.includes('wrapCustomization')) {
+      tsType = 'Customization | null';
+    } else if (propName === 'resource' && contentAfter.includes('v8::Object::New') && contentAfter.includes('resObj')) {
+      tsType = 'object'; // For nested resource objects
+    } else if ((propName === 'pInfo' || propName === 'pBuffer') && contentAfter.includes('v8::Null')) {
+      tsType = 'null'; // These always return null for safety
+    } else if ((propName === 'ip' || propName === 'ipx') && contentAfter.includes('v8::Array::New')) {
+      tsType = 'number[]'; // IP/IPX address arrays
+    } else if (propName === 'ipString' && contentAfter.includes('v8::String::NewFromUtf8')) {
+      tsType = 'string'; // IP string representation
+    } else if ((propName === 'szClassName' || propName === 'szKeyName' || propName === 'szValue') && contentAfter.includes('v8::String::NewFromUtf8')) {
+      tsType = 'string'; // String properties
+    } else if (propName === 'sztexturename' && contentAfter.includes('v8::String::NewFromUtf8')) {
+      tsType = 'string'; // Texture name string
+    } else if (propName === 'physinfo' && contentAfter.includes('v8::String::NewFromUtf8')) {
+      tsType = 'string'; // Physics info string
+    } else if ((propName === 'fieldName' || propName === 'fieldTypeName') && contentAfter.includes('v8::String::NewFromUtf8')) {
+      tsType = 'string'; // Field name strings
+    } else if (propName === 'fieldType' && contentAfter.includes('v8::Number::New')) {
+      tsType = 'number'; // Field type enumeration
+    } else if ((propName === 'isGlobal' || propName === 'isValid' || propName === 'allSolid' || propName === 'startSolid' || propName === 'inOpen' || propName === 'inWater') && contentAfter.includes('v8::Boolean::New')) {
+      tsType = 'boolean'; // Boolean flags
+    } else if (propName === 'toString' && contentAfter.includes('v8::String::NewFromUtf8')) {
+      tsType = 'string'; // String representation methods
+    } else if (propName === 'pointer' && contentAfter.includes('v8::Number::New')) {
+      tsType = 'number'; // Raw pointer as number
+    } else if (propName === 'model' && contentAfter.includes('pfnSetModel')) {
+      tsType = 'string'; // Model path string
+    } else if (propName === 'cmd' && contentAfter.includes('wrapUserCmd')) {
+      tsType = 'UserCmd | null'; // UserCmd wrapper
+    } else if (propName === 'movevars' && contentAfter.includes('v8::Object::New')) {
+      tsType = 'object | null'; // Movevars object with properties
+    } else if (propName === 'next' && contentAfter.includes('wrapCvar')) {
+      tsType = 'Cvar | null'; // Next cvar in linked list
+    } else if ((propName === 'pInfo' || propName === 'pBuffer') && contentAfter.includes('v8::Null')) {
+      tsType = 'null'; // These are intentionally null for safety
+    } else if (contentAfter.includes('wrapCustomization')) {
+      tsType = 'Customization | null';
+    } else if (contentAfter.includes('wrapEntity')) {
+      tsType = 'Entity | null';
+    } else if (contentAfter.includes('v8::String::NewFromUtf8') && !contentAfter.includes('pfnSzFromIndex')) {
+      tsType = 'string'; // Generic string properties
+    } else if (contentAfter.includes('v8::Boolean::New')) {
+      tsType = 'boolean'; // Generic boolean properties
+    } else if (contentAfter.includes('v8::Number::New')) {
+      tsType = 'number'; // Generic number properties
+    } else if (contentAfter.includes('v8::Array::New')) {
+      tsType = 'number[]'; // Generic arrays
+    } else if (contentAfter.includes('v8::Null')) {
+      tsType = 'null';
+    } else if (contentAfter.includes('v8::Object::New')) {
+      tsType = 'object';
+    }
+    
+    propertyMap.set(propName, { type: tsType, sourceLine });
+  }
+  
+  // Extract property setting patterns from the C++ wrapper code  
+  // Match obj->Set calls - capture property name and everything up to .Check()
+  const setCallRegex = /obj->Set\([^,]*,\s*(?:v8::String::NewFromUtf8\(isolate,\s*"([^"]+)"\)\.ToLocalChecked\(\)|convert::str2js\(isolate,\s*"([^"]+)"\)),[\s\S]*?\)\.Check\(\);/g;
+  
+  // Process matches
+  while ((match = setCallRegex.exec(content)) !== null) {
+    const propName = match[1] || match[2]; // Property name from either capture group
+    const fullExpression = match[0]; // The full matched expression
+    
+    // Extract a cleaner source line for the comment
+    const sourceLine = fullExpression
+      .replace(/\s+/g, ' ') // Normalize whitespace
+      .replace(/^obj->Set\([^,]+,\s*/, '') // Remove obj->Set prefix
+      .replace(/\)\.Check\(\);$/, ')'); // Remove .Check() suffix
+    
+    // Determine TypeScript type based on the V8 value creation in the full expression
+    let tsType = 'unknown';
+    
+    // Extract the value part (after the comma) for better type detection
+    const commaIndex = fullExpression.indexOf(',', fullExpression.indexOf(propName));
+    const valuePart = commaIndex > -1 ? fullExpression.substring(commaIndex) : fullExpression;
+    
+    // Check patterns in the value part for better accuracy
+    // Special handling for specific property names in obj->Set patterns
+    if (propName === 'model' && valuePart.includes('pfnSzFromIndex')) {
+      tsType = 'string';
+    } else if ((propName === 'szClassName' || propName === 'szKeyName' || propName === 'fieldName' || propName === 'fieldTypeName') && valuePart.includes('v8::String::NewFromUtf8')) {
+      tsType = 'string';
+    } else if (propName === 'fieldType' && valuePart.includes('v8::Number::New')) {
+      tsType = 'number';
+    } else if ((propName === 'isGlobal' || propName === 'isValid') && valuePart.includes('v8::Boolean::New')) {
+      tsType = 'boolean';
+    } else if (propName === 'physinfo' && valuePart.includes('v8::String::NewFromUtf8')) {
+      tsType = 'string';
+    } else if (propName === 'sztexturename' && valuePart.includes('v8::String::NewFromUtf8')) {
+      tsType = 'string';
+    // Handle ternary expressions with null checks
+    } else if (valuePart.includes('?') && valuePart.includes('v8::Null')) {
+      // This is a nullable type - check what wrapper is used
+      if (valuePart.includes('wrapEntity')) {
+        tsType = 'Entity | null';
+      } else if (valuePart.includes('wrapEntvars')) {
+        tsType = 'Entvars | null';
+      } else if (valuePart.includes('wrapTraceResult')) {
+        tsType = 'TraceResult | null';
+      } else if (valuePart.includes('wrapCvar')) {
+        tsType = 'Cvar | null';
+      } else if (valuePart.includes('wrapEntityState')) {
+        tsType = 'EntityState | null';
+      } else if (valuePart.includes('wrapClientData')) {
+        tsType = 'ClientData | null';
+      } else if (valuePart.includes('wrapUserCmd')) {
+        tsType = 'UserCmd | null';
+      } else if (valuePart.includes('wrapWeaponData')) {
+        tsType = 'WeaponData | null';
+      } else if (valuePart.includes('wrapPlayerMove')) {
+        tsType = 'PlayerMove | null';
+      } else if (valuePart.includes('wrapCustomization')) {
+        tsType = 'Customization | null';
+      } else if (valuePart.includes('wrapKeyValueData')) {
+        tsType = 'KeyValueData | null';
+      } else if (valuePart.includes('wrapSaveRestoreData')) {
+        tsType = 'SaveRestoreData | null';
+      } else if (valuePart.includes('wrapTypeDescription')) {
+        tsType = 'TypeDescription | null';
+      } else if (valuePart.includes('wrapNetAdr')) {
+        tsType = 'NetAdr | null';
+      } else if (valuePart.includes('wrapDelta')) {
+        tsType = 'Delta | null';
+      } else {
+        tsType = 'unknown | null';
+      }
+    } else if (valuePart.includes('wrapEntity')) {
+      tsType = 'Entity';
+    } else if (valuePart.includes('wrapEntvars')) {
+      tsType = 'Entvars';
+    } else if (valuePart.includes('wrapTraceResult')) {
+      tsType = 'TraceResult';
+    } else if (valuePart.includes('wrapCvar')) {
+      tsType = 'Cvar';
+    } else if (valuePart.includes('wrapEntityState')) {
+      tsType = 'EntityState';
+    } else if (valuePart.includes('wrapClientData')) {
+      tsType = 'ClientData';
+    } else if (valuePart.includes('wrapUserCmd')) {
+      tsType = 'UserCmd';
+    } else if (valuePart.includes('wrapWeaponData')) {
+      tsType = 'WeaponData';
+    } else if (valuePart.includes('wrapPlayerMove')) {
+      tsType = 'PlayerMove';
+    } else if (valuePart.includes('wrapCustomization')) {
+      tsType = 'Customization';
+    } else if (valuePart.includes('wrapKeyValueData')) {
+      tsType = 'KeyValueData';
+    } else if (valuePart.includes('wrapSaveRestoreData')) {
+      tsType = 'SaveRestoreData';
+    } else if (valuePart.includes('wrapTypeDescription')) {
+      tsType = 'TypeDescription';
+    } else if (valuePart.includes('wrapNetAdr')) {
+      tsType = 'NetAdr';
+    } else if (valuePart.includes('wrapDelta')) {
+      tsType = 'Delta';
+    } else if (valuePart.includes('g_engfuncs.pfnSzFromIndex')) {
+      tsType = 'string';
+    } else if (valuePart.includes('convert::strid2js')) {
+      tsType = 'string';
+    } else if (valuePart.includes('v8::Boolean::New')) {
+      tsType = 'boolean';
+    } else if (valuePart.includes('utils::vect2js')) {
+      tsType = 'number[]';
+    } else if (valuePart.includes('utils::arr2js') || valuePart.includes('v8::Array::New')) {
+      tsType = 'number[]';
+    } else if (valuePart.includes('v8::Number::New')) {
+      tsType = 'number';
+    } else if (valuePart.includes('v8::Null')) {
+      tsType = 'null';
+    } else if (valuePart.includes('v8::String::NewFromUtf8') && !valuePart.includes('pfnSzFromIndex')) {
+      tsType = 'string';
+    }
+    
+    propertyMap.set(propName, { type: tsType, sourceLine });
   }
   
   // Look for variable assignments that are arrays (for multi-line array creation)
@@ -691,8 +907,22 @@ function parseStructureProperties(content, structureName) {
     const propName = arrayMatch[1];
     const varName = arrayMatch[2];
     if (arrayVars.includes(varName)) {
-      properties.push(`${propName}: number[]`);
+      // Override with more specific array type and simplified source
+      const existing = propertyMap.get(propName);
+      propertyMap.set(propName, { 
+        type: 'number[]', 
+        sourceLine: existing ? existing.sourceLine : `${varName}` 
+      });
     }
+  }
+  
+  // Convert Map to array of property strings with comments
+  for (const [propName, info] of propertyMap) {
+    properties.push({
+      name: propName,
+      type: info.type,
+      comment: info.sourceLine
+    });
   }
   
   // Add special handling for specific structures if no properties found

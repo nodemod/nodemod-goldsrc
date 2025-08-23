@@ -1,102 +1,158 @@
 #include "structures.hpp"
-#include "../util/convert.hpp"
-#include "../node/utils.hpp"
+#include "common_macros.hpp"
+#include <netadr.h>
+#include <unordered_map>
 
 namespace structures {
 
+v8::Eternal<v8::ObjectTemplate> netadrTemplate;
+std::unordered_map<void*, v8::Persistent<v8::Object>> wrappedNetAdrs;
+
+netadr_s* unwrapNetAdr_internal(v8::Isolate* isolate, const v8::Local<v8::Value>& obj) {
+    v8::Locker locker(isolate);
+    if (obj.IsEmpty() || !obj->IsObject()) {
+        return nullptr;
+    }
+    
+    auto object = obj->ToObject(isolate->GetCurrentContext());
+    if (object.IsEmpty()) {
+        return nullptr;
+    }
+    
+    auto field = object.ToLocalChecked()->GetAlignedPointerFromInternalField(0);
+    return static_cast<netadr_s*>(field);
+}
+
+void createNetAdrTemplate(v8::Isolate* isolate) {
+    v8::Locker locker(isolate);
+    v8::HandleScope scope(isolate);
+    
+    v8::Local<v8::ObjectTemplate> templ = v8::ObjectTemplate::New(isolate);
+    templ->SetInternalFieldCount(1);
+    
+    // Type field (netadrtype_t enum)
+    ACCESSOR_T(netadr_s, unwrapNetAdr_internal, templ, "type", type, GETN, SETINT);
+    
+    // Port field
+    ACCESSOR_T(netadr_s, unwrapNetAdr_internal, templ, "port", port, GETN, SETINT);
+    
+    // IP address array (4 bytes)
+    templ->SetNativeDataProperty(v8::String::NewFromUtf8(isolate, "ip").ToLocalChecked(),
+        [](v8::Local<v8::Name> property, const v8::PropertyCallbackInfo<v8::Value> &info) {
+            netadr_s *addr = unwrapNetAdr_internal(info.GetIsolate(), info.Holder());
+            if (addr == nullptr) {
+                info.GetReturnValue().Set(v8::Null(info.GetIsolate()));
+                return;
+            }
+            
+            v8::Local<v8::Array> arr = v8::Array::New(info.GetIsolate(), 4);
+            auto context = info.GetIsolate()->GetCurrentContext();
+            for (int i = 0; i < 4; i++) {
+                arr->Set(context, i, v8::Number::New(info.GetIsolate(), addr->ip[i])).Check();
+            }
+            info.GetReturnValue().Set(arr);
+        },
+        [](v8::Local<v8::Name> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void> &info) {
+            netadr_s *addr = unwrapNetAdr_internal(info.GetIsolate(), info.Holder());
+            if (addr == nullptr || !value->IsArray()) return;
+            
+            v8::Local<v8::Array> arr = value.As<v8::Array>();
+            auto context = info.GetIsolate()->GetCurrentContext();
+            for (int i = 0; i < 4 && i < arr->Length(); i++) {
+                v8::Local<v8::Value> element = arr->Get(context, i).ToLocalChecked();
+                if (element->IsNumber()) {
+                    addr->ip[i] = element->Uint32Value(context).FromJust() & 0xFF;
+                }
+            }
+        });
+    
+    // IPX address array (10 bytes)
+    templ->SetNativeDataProperty(v8::String::NewFromUtf8(isolate, "ipx").ToLocalChecked(),
+        [](v8::Local<v8::Name> property, const v8::PropertyCallbackInfo<v8::Value> &info) {
+            netadr_s *addr = unwrapNetAdr_internal(info.GetIsolate(), info.Holder());
+            if (addr == nullptr) {
+                info.GetReturnValue().Set(v8::Null(info.GetIsolate()));
+                return;
+            }
+            
+            v8::Local<v8::Array> arr = v8::Array::New(info.GetIsolate(), 10);
+            auto context = info.GetIsolate()->GetCurrentContext();
+            for (int i = 0; i < 10; i++) {
+                arr->Set(context, i, v8::Number::New(info.GetIsolate(), addr->ipx[i])).Check();
+            }
+            info.GetReturnValue().Set(arr);
+        },
+        [](v8::Local<v8::Name> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void> &info) {
+            netadr_s *addr = unwrapNetAdr_internal(info.GetIsolate(), info.Holder());
+            if (addr == nullptr || !value->IsArray()) return;
+            
+            v8::Local<v8::Array> arr = value.As<v8::Array>();
+            auto context = info.GetIsolate()->GetCurrentContext();
+            for (int i = 0; i < 10 && i < arr->Length(); i++) {
+                v8::Local<v8::Value> element = arr->Get(context, i).ToLocalChecked();
+                if (element->IsNumber()) {
+                    addr->ipx[i] = element->Uint32Value(context).FromJust() & 0xFF;
+                }
+            }
+        });
+    
+    // Helper property to get/set IP as a string (e.g., "192.168.1.1")
+    templ->SetNativeDataProperty(v8::String::NewFromUtf8(isolate, "ipString").ToLocalChecked(),
+        [](v8::Local<v8::Name> property, const v8::PropertyCallbackInfo<v8::Value> &info) {
+            netadr_s *addr = unwrapNetAdr_internal(info.GetIsolate(), info.Holder());
+            if (addr == nullptr) {
+                info.GetReturnValue().Set(v8::String::NewFromUtf8(info.GetIsolate(), "0.0.0.0").ToLocalChecked());
+                return;
+            }
+            
+            char buffer[32];
+            snprintf(buffer, sizeof(buffer), "%d.%d.%d.%d", 
+                     addr->ip[0], addr->ip[1], addr->ip[2], addr->ip[3]);
+            info.GetReturnValue().Set(v8::String::NewFromUtf8(info.GetIsolate(), buffer).ToLocalChecked());
+        },
+        [](v8::Local<v8::Name> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void> &info) {
+            netadr_s *addr = unwrapNetAdr_internal(info.GetIsolate(), info.Holder());
+            if (addr == nullptr || !value->IsString()) return;
+            
+            v8::String::Utf8Value str(info.GetIsolate(), value);
+            if (*str) {
+                int ip[4] = {0, 0, 0, 0};
+                sscanf(*str, "%d.%d.%d.%d", &ip[0], &ip[1], &ip[2], &ip[3]);
+                for (int i = 0; i < 4; i++) {
+                    addr->ip[i] = ip[i] & 0xFF;
+                }
+            }
+        });
+    
+    netadrTemplate.Set(isolate, templ);
+}
+
 v8::Local<v8::Value> wrapNetAdr(v8::Isolate* isolate, void* netadr) {
     v8::Locker locker(isolate);
-    v8::HandleScope handleScope(isolate);
-    
     if (!netadr) {
         return v8::Null(isolate);
     }
     
-    netadr_t* addr = static_cast<netadr_t*>(netadr);
-    v8::Local<v8::Object> obj = v8::Object::New(isolate);
-    auto context = isolate->GetCurrentContext();
-    
-    obj->Set(context, v8::String::NewFromUtf8(isolate, "type").ToLocalChecked(), 
-        v8::Number::New(isolate, addr->type)).Check();
-    
-    // Create IP array
-    v8::Local<v8::Array> ipArray = v8::Array::New(isolate, 4);
-    for (int i = 0; i < 4; i++) {
-        ipArray->Set(context, i, v8::Number::New(isolate, addr->ip[i])).Check();
+    // Check if already wrapped
+    if (wrappedNetAdrs.find(netadr) != wrappedNetAdrs.end()) {
+        return v8::Local<v8::Object>::New(isolate, wrappedNetAdrs[netadr]);
     }
-    obj->Set(context, v8::String::NewFromUtf8(isolate, "ip").ToLocalChecked(), ipArray).Check();
     
-    // Create IPX array
-    v8::Local<v8::Array> ipxArray = v8::Array::New(isolate, 10);
-    for (int i = 0; i < 10; i++) {
-        ipxArray->Set(context, i, v8::Number::New(isolate, addr->ipx[i])).Check();
+    // Create template if not initialized
+    if (netadrTemplate.IsEmpty()) {
+        createNetAdrTemplate(isolate);
     }
-    obj->Set(context, v8::String::NewFromUtf8(isolate, "ipx").ToLocalChecked(), ipxArray).Check();
     
-    obj->Set(context, v8::String::NewFromUtf8(isolate, "port").ToLocalChecked(), 
-        v8::Number::New(isolate, addr->port)).Check();
+    // Create new instance
+    v8::Local<v8::Object> obj = netadrTemplate.Get(isolate)->NewInstance(isolate->GetCurrentContext()).ToLocalChecked();
+    obj->SetAlignedPointerInInternalField(0, netadr);
     
+    wrappedNetAdrs[netadr].Reset(isolate, obj);
     return obj;
 }
 
-void* unwrapNetAdr(v8::Isolate* isolate, const v8::Local<v8::Value> &obj) {
-    v8::Locker locker(isolate);
-    v8::HandleScope handleScope(isolate);
-    
-    if (obj->IsNull() || obj->IsUndefined()) {
-        return nullptr;
-    }
-    
-    if (obj->IsExternal()) {
-        v8::Local<v8::External> ext = obj.As<v8::External>();
-        return ext->Value();
-    }
-    
-    if (!obj->IsObject()) {
-        return nullptr;
-    }
-    
-    v8::Local<v8::Object> jsObj = obj.As<v8::Object>();
-    auto context = isolate->GetCurrentContext();
-    netadr_t* addr = new netadr_t();
-    
-    // Extract type
-    v8::Local<v8::Value> typeVal = jsObj->Get(context, v8::String::NewFromUtf8(isolate, "type").ToLocalChecked()).ToLocalChecked();
-    if (typeVal->IsNumber()) {
-        addr->type = static_cast<netadrtype_t>(typeVal->Int32Value(context).FromJust());
-    }
-    
-    // Extract IP array
-    v8::Local<v8::Value> ipVal = jsObj->Get(context, v8::String::NewFromUtf8(isolate, "ip").ToLocalChecked()).ToLocalChecked();
-    if (ipVal->IsArray()) {
-        v8::Local<v8::Array> ipArray = ipVal.As<v8::Array>();
-        for (int i = 0; i < 4 && i < ipArray->Length(); i++) {
-            v8::Local<v8::Value> element = ipArray->Get(context, i).ToLocalChecked();
-            if (element->IsNumber()) {
-                addr->ip[i] = element->Uint32Value(context).FromJust() & 0xFF;
-            }
-        }
-    }
-    
-    // Extract IPX array
-    v8::Local<v8::Value> ipxVal = jsObj->Get(context, v8::String::NewFromUtf8(isolate, "ipx").ToLocalChecked()).ToLocalChecked();
-    if (ipxVal->IsArray()) {
-        v8::Local<v8::Array> ipxArray = ipxVal.As<v8::Array>();
-        for (int i = 0; i < 10 && i < ipxArray->Length(); i++) {
-            v8::Local<v8::Value> element = ipxArray->Get(context, i).ToLocalChecked();
-            if (element->IsNumber()) {
-                addr->ipx[i] = element->Uint32Value(context).FromJust() & 0xFF;
-            }
-        }
-    }
-    
-    // Extract port
-    v8::Local<v8::Value> portVal = jsObj->Get(context, v8::String::NewFromUtf8(isolate, "port").ToLocalChecked()).ToLocalChecked();
-    if (portVal->IsNumber()) {
-        addr->port = portVal->Uint32Value(context).FromJust() & 0xFFFF;
-    }
-    
-    return addr;
+void* unwrapNetAdr(v8::Isolate* isolate, const v8::Local<v8::Value>& obj) {
+    return unwrapNetAdr_internal(isolate, obj);
 }
 
 }

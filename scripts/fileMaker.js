@@ -7,9 +7,20 @@ const fileMaker = {
   },
   typings: {
     makeIndex(computed, structureInterfaces = []) {
-      const interfaceDefinitions = structureInterfaces.map(iface => 
-        `  interface ${iface.name} {\n${iface.properties.map(prop => `    ${prop};`).join('\n')}\n  }`
-      ).join('\n');
+      const interfaceDefinitions = structureInterfaces.map(iface => {
+        const comment = iface.description ? `  /** ${iface.description} */\n` : '';
+        const propertyLines = iface.properties.map(prop => {
+          if (typeof prop === 'string') {
+            // Simple string property
+            return `    ${prop};`;
+          } else {
+            // Object with name, type, and comment
+            const propComment = prop.comment ? `    /** ${prop.comment} */\n` : '';
+            return `${propComment}    ${prop.name}: ${prop.type};`;
+          }
+        }).join('\n\n');
+        return `${comment}  interface ${iface.name} {\n${propertyLines}\n  }`;
+      }).join('\n');
       
       return fileMaker.makeFile(
         'declare namespace nodemod {',

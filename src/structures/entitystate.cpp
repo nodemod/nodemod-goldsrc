@@ -1,122 +1,194 @@
 #include "structures.hpp"
-#include "../util/convert.hpp"
-#include "../node/utils.hpp"
+#include "common_macros.hpp"
+#include <entity_state.h>
+#include <unordered_map>
 
 namespace structures {
 
+v8::Eternal<v8::ObjectTemplate> entityStateTemplate;
+std::unordered_map<void*, v8::Persistent<v8::Object>> wrappedEntityStates;
+
+entity_state_s* unwrapEntityState_internal(v8::Isolate* isolate, const v8::Local<v8::Value>& obj) {
+    v8::Locker locker(isolate);
+    if (obj.IsEmpty() || !obj->IsObject()) {
+        return nullptr;
+    }
+    
+    auto object = obj->ToObject(isolate->GetCurrentContext());
+    if (object.IsEmpty()) {
+        return nullptr;
+    }
+    
+    auto field = object.ToLocalChecked()->GetAlignedPointerFromInternalField(0);
+    return static_cast<entity_state_s*>(field);
+}
+
+void createEntityStateTemplate(v8::Isolate* isolate) {
+    v8::Locker locker(isolate);
+    v8::HandleScope scope(isolate);
+    
+    v8::Local<v8::ObjectTemplate> templ = v8::ObjectTemplate::New(isolate);
+    templ->SetInternalFieldCount(1);
+    
+    // Integer fields
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "entityType", entityType, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "number", number, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "messagenum", messagenum, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "modelindex", modelindex, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "sequence", sequence, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "colormap", colormap, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "skin", skin, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "solid", solid, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "effects", effects, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "eflags", eflags, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "rendermode", rendermode, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "renderamt", renderamt, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "renderfx", renderfx, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "movetype", movetype, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "body", body, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "aiment", aiment, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "owner", owner, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "team", team, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "playerclass", playerclass, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "health", health, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "spectator", spectator, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "weaponmodel", weaponmodel, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "gaitsequence", gaitsequence, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "usehull", usehull, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "oldbuttons", oldbuttons, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "onground", onground, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "iStepLeft", iStepLeft, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "weaponanim", weaponanim, GETN, SETINT);
+    
+    // Float fields
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "msg_time", msg_time, GETN, SETFLOAT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "frame", frame, GETN, SETFLOAT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "scale", scale, GETN, SETFLOAT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "animtime", animtime, GETN, SETFLOAT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "framerate", framerate, GETN, SETFLOAT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "friction", friction, GETN, SETFLOAT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "gravity", gravity, GETN, SETFLOAT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "flFallVelocity", flFallVelocity, GETN, SETFLOAT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "fov", fov, GETN, SETFLOAT);
+    
+    // Vector fields
+    ACCESSORL_T(entity_state_s, unwrapEntityState_internal, templ, "origin", origin, GETVEC3, SETVEC3);
+    ACCESSORL_T(entity_state_s, unwrapEntityState_internal, templ, "angles", angles, GETVEC3, SETVEC3);
+    ACCESSORL_T(entity_state_s, unwrapEntityState_internal, templ, "velocity", velocity, GETVEC3, SETVEC3);
+    ACCESSORL_T(entity_state_s, unwrapEntityState_internal, templ, "mins", mins, GETVEC3, SETVEC3);
+    ACCESSORL_T(entity_state_s, unwrapEntityState_internal, templ, "maxs", maxs, GETVEC3, SETVEC3);
+    ACCESSORL_T(entity_state_s, unwrapEntityState_internal, templ, "basevelocity", basevelocity, GETVEC3, SETVEC3);
+    // rendercolor is a color24 struct, not a vector
+    templ->SetNativeDataProperty(v8::String::NewFromUtf8(isolate, "rendercolor").ToLocalChecked(),
+        [](v8::Local<v8::Name> property, const v8::PropertyCallbackInfo<v8::Value> &info) {
+            entity_state_s *state = unwrapEntityState_internal(info.GetIsolate(), info.Holder());
+            if (state == nullptr) {
+                info.GetReturnValue().Set(v8::Null(info.GetIsolate()));
+                return;
+            }
+            
+            v8::Local<v8::Array> arr = v8::Array::New(info.GetIsolate(), 3);
+            auto context = info.GetIsolate()->GetCurrentContext();
+            arr->Set(context, 0, v8::Number::New(info.GetIsolate(), state->rendercolor.r)).Check();
+            arr->Set(context, 1, v8::Number::New(info.GetIsolate(), state->rendercolor.g)).Check();
+            arr->Set(context, 2, v8::Number::New(info.GetIsolate(), state->rendercolor.b)).Check();
+            info.GetReturnValue().Set(arr);
+        },
+        [](v8::Local<v8::Name> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void> &info) {
+            entity_state_s *state = unwrapEntityState_internal(info.GetIsolate(), info.Holder());
+            if (state == nullptr || !value->IsArray()) return;
+            
+            v8::Local<v8::Array> arr = value.As<v8::Array>();
+            auto context = info.GetIsolate()->GetCurrentContext();
+            if (arr->Length() >= 3) {
+                v8::Local<v8::Value> r = arr->Get(context, 0).ToLocalChecked();
+                v8::Local<v8::Value> g = arr->Get(context, 1).ToLocalChecked();
+                v8::Local<v8::Value> b = arr->Get(context, 2).ToLocalChecked();
+                
+                if (r->IsNumber()) state->rendercolor.r = r->Int32Value(context).FromJust();
+                if (g->IsNumber()) state->rendercolor.g = g->Int32Value(context).FromJust();
+                if (b->IsNumber()) state->rendercolor.b = b->Int32Value(context).FromJust();
+            }
+        });
+    ACCESSORL_T(entity_state_s, unwrapEntityState_internal, templ, "startpos", startpos, GETVEC3, SETVEC3);
+    ACCESSORL_T(entity_state_s, unwrapEntityState_internal, templ, "endpos", endpos, GETVEC3, SETVEC3);
+    
+    // Array fields (controller and blending) - read-only for now
+    templ->SetNativeDataProperty(v8::String::NewFromUtf8(isolate, "controller").ToLocalChecked(),
+        [](v8::Local<v8::Name> property, const v8::PropertyCallbackInfo<v8::Value> &info) {
+            entity_state_s *state = unwrapEntityState_internal(info.GetIsolate(), info.Holder());
+            if (state == nullptr) {
+                info.GetReturnValue().Set(v8::Null(info.GetIsolate()));
+                return;
+            }
+            
+            v8::Local<v8::Array> arr = v8::Array::New(info.GetIsolate(), 4);
+            auto context = info.GetIsolate()->GetCurrentContext();
+            for (int i = 0; i < 4; i++) {
+                arr->Set(context, i, v8::Number::New(info.GetIsolate(), state->controller[i])).Check();
+            }
+            info.GetReturnValue().Set(arr);
+        });
+    
+    templ->SetNativeDataProperty(v8::String::NewFromUtf8(isolate, "blending").ToLocalChecked(),
+        [](v8::Local<v8::Name> property, const v8::PropertyCallbackInfo<v8::Value> &info) {
+            entity_state_s *state = unwrapEntityState_internal(info.GetIsolate(), info.Holder());
+            if (state == nullptr) {
+                info.GetReturnValue().Set(v8::Null(info.GetIsolate()));
+                return;
+            }
+            
+            v8::Local<v8::Array> arr = v8::Array::New(info.GetIsolate(), 4);
+            auto context = info.GetIsolate()->GetCurrentContext();
+            for (int i = 0; i < 4; i++) {
+                arr->Set(context, i, v8::Number::New(info.GetIsolate(), state->blending[i])).Check();
+            }
+            info.GetReturnValue().Set(arr);
+        });
+    
+    // User data fields from end of structure
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "iuser1", iuser1, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "iuser2", iuser2, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "iuser3", iuser3, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "iuser4", iuser4, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "fuser1", fuser1, GETN, SETFLOAT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "fuser2", fuser2, GETN, SETFLOAT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "fuser3", fuser3, GETN, SETFLOAT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "fuser4", fuser4, GETN, SETFLOAT);
+    ACCESSORL_T(entity_state_s, unwrapEntityState_internal, templ, "vuser1", vuser1, GETVEC3, SETVEC3);
+    ACCESSORL_T(entity_state_s, unwrapEntityState_internal, templ, "vuser2", vuser2, GETVEC3, SETVEC3);
+    ACCESSORL_T(entity_state_s, unwrapEntityState_internal, templ, "vuser3", vuser3, GETVEC3, SETVEC3);
+    ACCESSORL_T(entity_state_s, unwrapEntityState_internal, templ, "vuser4", vuser4, GETVEC3, SETVEC3);
+    
+    entityStateTemplate.Set(isolate, templ);
+}
+
 v8::Local<v8::Value> wrapEntityState(v8::Isolate* isolate, void* entitystate) {
     v8::Locker locker(isolate);
-    v8::HandleScope handleScope(isolate);
-    
     if (!entitystate) {
         return v8::Null(isolate);
     }
     
-    entity_state_t* state = static_cast<entity_state_t*>(entitystate);
-    v8::Local<v8::Object> obj = v8::Object::New(isolate);
-    auto context = isolate->GetCurrentContext();
+    // Check if already wrapped
+    if (wrappedEntityStates.find(entitystate) != wrappedEntityStates.end()) {
+        return v8::Local<v8::Object>::New(isolate, wrappedEntityStates[entitystate]);
+    }
     
-    obj->Set(context, v8::String::NewFromUtf8(isolate, "entityType").ToLocalChecked(), 
-        v8::Number::New(isolate, state->entityType)).Check();
-    obj->Set(context, v8::String::NewFromUtf8(isolate, "number").ToLocalChecked(), 
-        v8::Number::New(isolate, state->number)).Check();
-    obj->Set(context, v8::String::NewFromUtf8(isolate, "msg_time").ToLocalChecked(), 
-        v8::Number::New(isolate, state->msg_time)).Check();
-    obj->Set(context, v8::String::NewFromUtf8(isolate, "messagenum").ToLocalChecked(), 
-        v8::Number::New(isolate, state->messagenum)).Check();
-    obj->Set(context, v8::String::NewFromUtf8(isolate, "origin").ToLocalChecked(), 
-        utils::vect2js(isolate, state->origin)).Check();
-    obj->Set(context, v8::String::NewFromUtf8(isolate, "angles").ToLocalChecked(), 
-        utils::vect2js(isolate, state->angles)).Check();
-    obj->Set(context, v8::String::NewFromUtf8(isolate, "modelindex").ToLocalChecked(), 
-        v8::Number::New(isolate, state->modelindex)).Check();
-    obj->Set(context, v8::String::NewFromUtf8(isolate, "sequence").ToLocalChecked(), 
-        v8::Number::New(isolate, state->sequence)).Check();
-    obj->Set(context, v8::String::NewFromUtf8(isolate, "frame").ToLocalChecked(), 
-        v8::Number::New(isolate, state->frame)).Check();
-    obj->Set(context, v8::String::NewFromUtf8(isolate, "colormap").ToLocalChecked(), 
-        v8::Number::New(isolate, state->colormap)).Check();
-    obj->Set(context, v8::String::NewFromUtf8(isolate, "skin").ToLocalChecked(), 
-        v8::Number::New(isolate, state->skin)).Check();
-    obj->Set(context, v8::String::NewFromUtf8(isolate, "solid").ToLocalChecked(), 
-        v8::Number::New(isolate, state->solid)).Check();
-    obj->Set(context, v8::String::NewFromUtf8(isolate, "effects").ToLocalChecked(), 
-        v8::Number::New(isolate, state->effects)).Check();
-    obj->Set(context, v8::String::NewFromUtf8(isolate, "scale").ToLocalChecked(), 
-        v8::Number::New(isolate, state->scale)).Check();
-    obj->Set(context, v8::String::NewFromUtf8(isolate, "eflags").ToLocalChecked(), 
-        v8::Number::New(isolate, state->eflags)).Check();
-    obj->Set(context, v8::String::NewFromUtf8(isolate, "rendermode").ToLocalChecked(), 
-        v8::Number::New(isolate, state->rendermode)).Check();
-    obj->Set(context, v8::String::NewFromUtf8(isolate, "renderamt").ToLocalChecked(), 
-        v8::Number::New(isolate, state->renderamt)).Check();
-    obj->Set(context, v8::String::NewFromUtf8(isolate, "renderfx").ToLocalChecked(), 
-        v8::Number::New(isolate, state->renderfx)).Check();
-    obj->Set(context, v8::String::NewFromUtf8(isolate, "movetype").ToLocalChecked(), 
-        v8::Number::New(isolate, state->movetype)).Check();
-    obj->Set(context, v8::String::NewFromUtf8(isolate, "animtime").ToLocalChecked(), 
-        v8::Number::New(isolate, state->animtime)).Check();
-    obj->Set(context, v8::String::NewFromUtf8(isolate, "framerate").ToLocalChecked(), 
-        v8::Number::New(isolate, state->framerate)).Check();
-    obj->Set(context, v8::String::NewFromUtf8(isolate, "body").ToLocalChecked(), 
-        v8::Number::New(isolate, state->body)).Check();
-    obj->Set(context, v8::String::NewFromUtf8(isolate, "velocity").ToLocalChecked(), 
-        utils::vect2js(isolate, state->velocity)).Check();
-    obj->Set(context, v8::String::NewFromUtf8(isolate, "mins").ToLocalChecked(), 
-        utils::vect2js(isolate, state->mins)).Check();
-    obj->Set(context, v8::String::NewFromUtf8(isolate, "maxs").ToLocalChecked(), 
-        utils::vect2js(isolate, state->maxs)).Check();
+    // Create template if not initialized
+    if (entityStateTemplate.IsEmpty()) {
+        createEntityStateTemplate(isolate);
+    }
     
+    // Create new instance
+    v8::Local<v8::Object> obj = entityStateTemplate.Get(isolate)->NewInstance(isolate->GetCurrentContext()).ToLocalChecked();
+    obj->SetAlignedPointerInInternalField(0, entitystate);
+    
+    wrappedEntityStates[entitystate].Reset(isolate, obj);
     return obj;
 }
 
-void* unwrapEntityState(v8::Isolate* isolate, const v8::Local<v8::Value> &obj) {
-    v8::Locker locker(isolate);
-    v8::HandleScope handleScope(isolate);
-    
-    if (obj->IsNull() || obj->IsUndefined()) {
-        return nullptr;
-    }
-    
-    if (obj->IsExternal()) {
-        v8::Local<v8::External> ext = obj.As<v8::External>();
-        return ext->Value();
-    }
-    
-    if (!obj->IsObject()) {
-        return nullptr;
-    }
-    
-    v8::Local<v8::Object> jsObj = obj.As<v8::Object>();
-    auto context = isolate->GetCurrentContext();
-    entity_state_t* state = new entity_state_t();
-    
-    // Extract numeric fields
-    v8::Local<v8::Value> val;
-    
-    val = jsObj->Get(context, v8::String::NewFromUtf8(isolate, "entityType").ToLocalChecked()).ToLocalChecked();
-    if (val->IsNumber()) state->entityType = val->Int32Value(context).FromJust();
-    
-    val = jsObj->Get(context, v8::String::NewFromUtf8(isolate, "number").ToLocalChecked()).ToLocalChecked();
-    if (val->IsNumber()) state->number = val->Int32Value(context).FromJust();
-    
-    val = jsObj->Get(context, v8::String::NewFromUtf8(isolate, "msg_time").ToLocalChecked()).ToLocalChecked();
-    if (val->IsNumber()) state->msg_time = val->NumberValue(context).FromJust();
-    
-    val = jsObj->Get(context, v8::String::NewFromUtf8(isolate, "messagenum").ToLocalChecked()).ToLocalChecked();
-    if (val->IsNumber()) state->messagenum = val->Int32Value(context).FromJust();
-    
-    // Extract vector fields
-    val = jsObj->Get(context, v8::String::NewFromUtf8(isolate, "origin").ToLocalChecked()).ToLocalChecked();
-    if (val->IsArray()) utils::js2vect(isolate, val, state->origin);
-    
-    val = jsObj->Get(context, v8::String::NewFromUtf8(isolate, "angles").ToLocalChecked()).ToLocalChecked();
-    if (val->IsArray()) utils::js2vect(isolate, val, state->angles);
-    
-    val = jsObj->Get(context, v8::String::NewFromUtf8(isolate, "velocity").ToLocalChecked()).ToLocalChecked();
-    if (val->IsArray()) utils::js2vect(isolate, val, state->velocity);
-    
-    return state;
+void* unwrapEntityState(v8::Isolate* isolate, const v8::Local<v8::Value>& obj) {
+    return unwrapEntityState_internal(isolate, obj);
 }
 
 }
