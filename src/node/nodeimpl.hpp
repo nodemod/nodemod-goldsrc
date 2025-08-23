@@ -42,6 +42,7 @@ public:
 	void Tick();
 	void Stop();
 	bool loadScript();
+	bool reload();
 
 private:
 	struct IsolateDataDeleter

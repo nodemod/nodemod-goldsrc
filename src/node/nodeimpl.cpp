@@ -131,3 +131,18 @@ void NodeImpl::Stop()
 	v8::V8::Dispose();
 	// v8::V8::ShutdownPlatform() - removed in V8 v24
 }
+
+bool NodeImpl::reload()
+{
+	if (resource) {
+		{
+			v8::Locker locker(v8Isolate);
+			v8::Isolate::Scope isolateScope(v8Isolate);
+			resource->Stop();
+		}
+		delete resource;
+		resource = nullptr;
+	}
+	
+	return loadScript();
+}

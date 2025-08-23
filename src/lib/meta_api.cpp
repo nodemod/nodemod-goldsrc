@@ -43,6 +43,15 @@ META_FUNCTIONS gMetaFunctionTable =
 	GetEngineFunctions_Post,	// pfnGetEngineFunctions_Post	META; called after HL engine
 };
 
+void nodemod_reload_cmd() {
+	g_engfuncs.pfnServerPrint("NodeMod: Manual reload command triggered\n");
+	if (nodeImpl.reload()) {
+		g_engfuncs.pfnServerPrint("NodeMod: JavaScript environment reloaded successfully!\n");
+	} else {
+		g_engfuncs.pfnServerPrint("NodeMod: Failed to reload JavaScript environment!\n");
+	}
+}
+
 C_DLLEXPORT int Meta_Attach(PLUG_LOADTIME now, META_FUNCTIONS *pFunctionTable, meta_globals_t *pMGlobals, gamedll_funcs_t *pGamedllFuncs)
 {
 	gpMetaGlobals = pMGlobals;
@@ -51,7 +60,10 @@ C_DLLEXPORT int Meta_Attach(PLUG_LOADTIME now, META_FUNCTIONS *pFunctionTable, m
 	g_engfuncs.pfnServerPrint("\n################\n# Hello World i am NODEMOD! #\n################\n\n");
 	nodeImpl.Initialize();
 	nodeImpl.loadScript();
-	//g_luaworker = new CLuaWorker();
+	
+	// Register the reload command
+	REG_SVR_COMMAND("nodemod_reload", nodemod_reload_cmd);
+	g_engfuncs.pfnServerPrint("NodeMod: Registered 'nodemod_reload' command\n");
 
 	memcpy(pFunctionTable, &gMetaFunctionTable, sizeof(META_FUNCTIONS));
 	return TRUE;

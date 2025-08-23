@@ -4,9 +4,19 @@
 #include "bindings/bindings.hpp"
 #include "util/convert.hpp"
 #include <filesystem>
+#include <dlfcn.h>
 
 extern void registerDllEvents();
 extern void registerEngineEvents();
+
+static std::string getDllPath() {
+	Dl_info dl_info;
+	if (dladdr((void*)getDllPath, &dl_info) != 0) {
+		std::filesystem::path dll_path = dl_info.dli_fname;
+		return dll_path.parent_path().string();
+	}
+	return ".";
+}
 
 v8::Isolate* GetV8Isolate()
 {
@@ -32,6 +42,9 @@ static node::IsolateData* GetNodeIsolate()
 
 	Resource::~Resource()
 	{
+		if (nodeEnvironment.get()) {
+			Stop();
+		}
 	}
 
 	void Resource::Init()
@@ -90,15 +103,12 @@ static node::IsolateData* GetNodeIsolate()
 		// Get the actual game directory from engine and change to it BEFORE creating environment
 		auto old_cwd = std::filesystem::current_path();
 		
-		// Get game directory from engine
-		std::string gamedir_buffer;
-		gamedir_buffer.resize(256);
-		(*g_engfuncs.pfnGetGameDir)(gamedir_buffer.data());
-		gamedir_buffer.resize(strlen(gamedir_buffer.c_str())); // Trim to actual size
+		// Get the DLL directory and construct plugins path relative to it
+		std::string dll_path = getDllPath();
+		std::filesystem::path plugins_path = std::filesystem::path(dll_path) / ".." / "plugins";
+		std::string nodemod_path = plugins_path.string();
 		
-		std::string nodemod_path = gamedir_buffer + "/addons/nodemod";
-		
-		// Check if the path exists, fallback to current directory if not
+		// Check if the plugins path exists, fallback to current directory if not
 		if (!std::filesystem::exists(nodemod_path)) {
 			nodemod_path = ".";
 		}
@@ -119,12 +129,16 @@ static node::IsolateData* GetNodeIsolate()
 
 	void Resource::Stop()
 	{
+		if (!nodeEnvironment.get()) {
+			return;
+		}
+		
 		v8::Locker locker(GetV8Isolate());
 		v8::Isolate::Scope isolateScope(GetV8Isolate());
-		// v8::Isolate::Scope isolateScope(GetV8Isolate());
 
 		node::Stop(nodeEnvironment.get());
 		node::FreeEnvironment(nodeEnvironment.get());
+		nodeEnvironment.release(); // Release without calling deleter
 		context.Reset();
 	}
 
