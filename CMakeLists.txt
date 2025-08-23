@@ -41,6 +41,10 @@ list(APPEND SOURCES_LIST
 	"src/auto/engine_events.cpp"
 	"src/auto/engine_functions.cpp"
 	"src/structures/entity.cpp"
+	"src/structures/trace_result.cpp"
+	"src/structures/entvars.cpp"
+	"src/structures/cvar.cpp"
+	"src/structures/usercmd.cpp"
 )
 
 # required for proper plugin loading from metamod, don't touch

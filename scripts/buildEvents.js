@@ -41,7 +41,13 @@ function getFunction(func, prefix, type) {
   const customBody = customs[type]?.[func.name]?.event?.body;
   customBody && console.log(func.name, 'YES')
   const eventName = getEventName(func, prefix);
-  const description = `// nodemod.on('${eventName}', (${func.args && func.args.map(v => v.name).join(', ')}) => console.log('${eventName} fired!'));`;
+  
+  // Handle variadic functions specially
+  const hasVariadic = func.args && func.args.some(arg => arg.type === '$rest');
+  const regularArgs = func.args ? func.args.filter(arg => arg.type !== '$rest') : [];
+  
+  const description = `// nodemod.on('${eventName}', (${regularArgs.map(v => v.name).join(', ')}) => console.log('${eventName} fired!'));`;
+  
   if (customBody) {
     func._eventName = `${prefix}_${func.name}`;
     const needsReturn = func.type !== 'NULL' && func.type !== 'void';
@@ -82,6 +88,20 @@ function getFunction(func, prefix, type) {
   const needsReturn = func.type !== 'void';
   const returnStatement = needsReturn ? getReturnStatement(func.type) : '';
   
+  // For variadic functions, only include regular arguments in the event
+  if (hasVariadic) {
+    return `${description}
+  ${func.type} ${prefix}_${func.name} (${regularArgs.map(v => `${v.type} ${v.name}`).join(', ')}, ...) {
+    SET_META_RESULT(MRES_IGNORED);
+    event::findAndCall("${eventName}", [=](v8::Isolate* isolate) {
+      unsigned int v8_argCount = ${regularArgs.length};
+      v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[${regularArgs.length}];
+      ${regularArgs.map((v, i) => `v8_args[${i}] = ${getFixedArgToValue(v)}; // ${v.name} (${v.type})`).join('\n      ')}
+      return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
+    });${returnStatement}
+  }`;
+  }
+  
   return `${description}
   ${func.type} ${prefix}_${func.name} (${func.args.map(v => `${v.type} ${v.name}`).join(', ')}) {
     SET_META_RESULT(MRES_IGNORED);
@@ -121,15 +141,36 @@ function clearByDefines(list) {
 function parseFunction(line) {
   try {
     const prettyLine = line.replace(/[ \t]+/g, ' ');
-    const [, type, name, argsPart] = prettyLine.match(/^([0-9a-z_ *]+) ?\(\*([0-9a-zA-Z_]+) ?\) ?\( ?([\s\S]+) ?\)/) || [];
+    const [, type, name, argsPart] = prettyLine.match(/^([0-9a-z_A-Z *]+) ?\(\*([0-9a-zA-Z_]+) ?\) ?\( ?([\s\S]+) ?\)/) || [];
     if (!type) {
       throw Error(`Invalid: ${prettyLine}`);
     }
 
-    const args = argsPart.split(/, ?/).map(v => v.trim()).filter(v => v !== 'void').map((v, i) => {
+    // Handle function pointer arguments that might span multiple comma-separated parts
+    let processedArgs = [];
+    let currentArg = '';
+    let parenCount = 0;
+    
+    const parts = argsPart.split(',');
+    for (const part of parts) {
+      currentArg += (currentArg ? ',' : '') + part.trim();
+      parenCount += (part.match(/\(/g) || []).length;
+      parenCount -= (part.match(/\)/g) || []).length;
+      
+      if (parenCount === 0) {
+        processedArgs.push(currentArg);
+        currentArg = '';
+      }
+    }
+    
+    const args = processedArgs.filter(v => v !== 'void').map((v, i) => {
       if (v === '...') {
-        throw Error('rest not support');
         return { name: 'args', type: '$rest' };
+      }
+
+      // Handle function pointers like "void (*function) (void)"
+      if (v.includes('(*)')) {
+        return { name: `callback${i}`, type: 'void*' };
       }
 
       if (v.match(/^[a-z_A-Z0-9]+ ?\*?$/)) {
@@ -138,7 +179,8 @@ function parseFunction(line) {
 
       const [, type, name] = v.match(/^([a-z_A-Z0-9 ]+[ \*]+ ?)([a-z_A-Z0-9[\]]*)$/) || [];
       if (!type) {
-        throw Error(`Invalid arg: ${v}`);
+        // Fallback for complex types
+        return { name: `value${i}`, type: 'void*' };
       }
 
       const response = { name: name || `value${i}`, type: type.trim() };
@@ -189,7 +231,8 @@ function parseFunction(line) {
     eng: engineFunctions.filter(v => !v.name.includes('CRC32')).map(v => computeFunction(v, 'eng'))
   };
 
-  await fs.writeFile('./packages/types/@types/index.d.ts', fileMaker.typings.makeIndex(computed));
+  const structureInterfaces = await parseStructureInterfaces();
+  await fs.writeFile('./packages/core/index.d.ts', fileMaker.typings.makeIndex(computed, structureInterfaces));
   const { engineFunctionsFile, dllFunctionsFile } = fileMaker.makeFunctions(computed);
   await fs.writeFile('./src/auto/engine_functions.cpp', engineFunctionsFile);
 
@@ -264,13 +307,182 @@ function parseFunction(line) {
 
 })();
 
+function cTypeToTsType(cType) {
+  const normalizedType = cType.trim();
+  
+  // Basic types - match generator.js TYPE_MAPPINGS.basicTypes
+  if (normalizedType === 'int' || normalizedType === 'unsigned int' || normalizedType === 'byte' || 
+      normalizedType === 'unsigned short' || normalizedType === 'short' || normalizedType === 'char' ||
+      normalizedType === 'unsigned char') {
+    return 'number';
+  }
+  
+  if (normalizedType === 'qboolean') {
+    return 'boolean';
+  }
+  
+  if (normalizedType === 'float' || normalizedType === 'double') {
+    return 'number';
+  }
+  
+  if (normalizedType === 'const char *' || normalizedType === 'const char*' || 
+      normalizedType === 'char *' || normalizedType === 'char*') {
+    return 'string';
+  }
+  
+  if (normalizedType === 'void') {
+    return 'void';
+  }
+  
+  // Enum types - match generator.js enum mappings
+  if (normalizedType === 'ALERT_TYPE' || normalizedType === 'FORCE_TYPE' || normalizedType === 'PRINT_TYPE') {
+    return 'number';
+  }
+  
+  if (normalizedType === 'CRC32_t') {
+    return 'number';
+  }
+  
+  // Vector type - match generator.js vec3_t mapping
+  if (normalizedType === 'vec3_t') {
+    return 'number[]';
+  }
+  
+  // Entity types - match generator.js struct mappings
+  if (normalizedType.includes('edict_t') || normalizedType.includes('edict_s')) {
+    return 'Entity';
+  }
+  
+  // Struct types - match generator.js structMappings
+  if (normalizedType.includes('entvars_s')) {
+    return 'Entvars';
+  }
+  
+  if (normalizedType.includes('clientdata_s')) {
+    return 'ClientData';
+  }
+  
+  if (normalizedType.includes('entity_state_s')) {
+    return 'EntityState';
+  }
+  
+  if (normalizedType.includes('usercmd_s')) {
+    return 'UserCmd';
+  }
+  
+  if (normalizedType.includes('netadr_s')) {
+    return 'NetAdr';
+  }
+  
+  if (normalizedType.includes('weapon_data_s')) {
+    return 'WeaponData';
+  }
+  
+  if (normalizedType.includes('playermove_s')) {
+    return 'PlayerMove';
+  }
+  
+  if (normalizedType.includes('customization_t')) {
+    return 'Customization';
+  }
+  
+  if (normalizedType.includes('KeyValueData')) {
+    return 'KeyValueData';
+  }
+  
+  if (normalizedType.includes('SAVERESTOREDATA')) {
+    return 'SaveRestoreData';
+  }
+  
+  if (normalizedType.includes('TYPEDESCRIPTION')) {
+    return 'TypeDescription';
+  }
+  
+  if (normalizedType.includes('delta_s')) {
+    return 'Delta';
+  }
+  
+  if (normalizedType.includes('cvar_t') || normalizedType.includes('cvar_s')) {
+    return 'Cvar';
+  }
+  
+  if (normalizedType.includes('TraceResult')) {
+    return 'TraceResult';
+  }
+  
+  // Array types - match generator.js pointer mappings
+  if (normalizedType.includes('float *') || normalizedType.includes('const float *')) {
+    return 'number[]';
+  }
+  
+  if (normalizedType.includes('int *') || normalizedType.includes('const int *')) {
+    return 'number[]';
+  }
+  
+  if (normalizedType.includes('unsigned char *') || normalizedType.includes('byte *')) {
+    return 'Uint8Array';
+  }
+  
+  if (normalizedType.includes('char **')) {
+    return 'string[]';
+  }
+  
+  // FILE pointer
+  if (normalizedType === 'FILE *') {
+    return 'FileHandle';
+  }
+  
+  // Function pointers
+  if (normalizedType.includes('(*') || normalizedType.includes('void *function')) {
+    return 'Function';
+  }
+  
+  // Generic void pointer (for private data, buffers, etc)
+  if (normalizedType === 'void*' || normalizedType === 'void *') {
+    return 'ArrayBuffer | null';
+  }
+  
+  // Variadic args
+  if (normalizedType === '$rest') {
+    return '...args: any[]';
+  }
+  
+  // Pointer types default to ArrayBuffer
+  if (normalizedType.includes('*')) {
+    return 'ArrayBuffer | null';
+  }
+  
+  return 'unknown';
+}
+
 function computeFunctionApi(func, source) {
   const jsName = camelize(func.name.replace(/^pfn/, ''));
+  const returnType = cTypeToTsType(func.type);
+  
+  // Handle variadic functions
+  const hasVariadic = func.args && func.args.some(arg => arg.type === '$rest');
+  const regularArgs = func.args ? func.args.filter(arg => arg.type !== '$rest') : [];
+  
+  // Fix reserved keywords in parameter names
+  const paramTypes = regularArgs.map(arg => {
+    let paramName = arg.name;
+    // Replace reserved keywords
+    if (paramName === 'var') paramName = 'variable';
+    if (paramName === 'function') paramName = 'callback';
+    if (paramName === 'class') paramName = 'className';
+    return `${paramName}: ${cTypeToTsType(arg.type)}`;
+  });
+  
+  // Add variadic args if present
+  if (hasVariadic) {
+    paramTypes.push('...args: any[]');
+  }
+  
   return {
     original: func.original,
     definition: `{ "${camelize(func.name.replace(/^pfn/, ''))}", sf_${source}_${func.name} }`,
     body: `// nodemod.eng.${jsName}();\n${generator.generateCppFunction(func, 'g_engfuncs', 'sf_eng')}`,
-    typing: `${jsName}: (${(func.args || []).map(v => v.name).join(', ')}) => unknown`
+    typing: `${jsName}(${paramTypes.join(', ')}): ${returnType}`
   };
 }
 
@@ -292,4 +504,206 @@ function computeFunction(func, source) {
     api: tc(func.original, () => computeFunctionApi(func, source)),
     // event: tc(() => computeFunctionEvent(func, source)),
   };
+}
+
+async function parseStructureInterfaces() {
+  const structureFiles = [
+    { file: 'src/structures/entvars.cpp', name: 'Entvars' },
+    { file: 'src/structures/clientdata.cpp', name: 'ClientData' },
+    { file: 'src/structures/entitystate.cpp', name: 'EntityState' },
+    { file: 'src/structures/usercmd.cpp', name: 'UserCmd' },
+    { file: 'src/structures/netadr.cpp', name: 'NetAdr' },
+    { file: 'src/structures/weapondata.cpp', name: 'WeaponData' },
+    { file: 'src/structures/playermove.cpp', name: 'PlayerMove' },
+    { file: 'src/structures/customization.cpp', name: 'Customization' },
+    { file: 'src/structures/keyvaluedata.cpp', name: 'KeyValueData' },
+    { file: 'src/structures/saverestoredata.cpp', name: 'SaveRestoreData' },
+    { file: 'src/structures/typedescription.cpp', name: 'TypeDescription' },
+    { file: 'src/structures/delta.cpp', name: 'Delta' },
+    { file: 'src/structures/cvar.cpp', name: 'Cvar' },
+    { file: 'src/structures/trace_result.cpp', name: 'TraceResult' }
+  ];
+
+  const interfaces = [];
+
+  for (const { file, name } of structureFiles) {
+    try {
+      const content = await fs.readFile(file, 'utf8');
+      const properties = parseStructureProperties(content, name);
+      interfaces.push({ name, properties });
+    } catch (error) {
+      console.log(`Skipping ${file}: ${error.message}`);
+    }
+  }
+
+  // Add Entity interface manually since it's more complex
+  interfaces.push({
+    name: 'Entity',
+    properties: [
+      'id: number',
+      'classname: string',
+      'globalname: string',
+      'origin: number[]',
+      'oldorigin: number[]',
+      'velocity: number[]',
+      'basevelocity: number[]',
+      'clbasevelocity: number[]',
+      'movedir: number[]',
+      'angles: number[]',
+      'avelocity: number[]',
+      'punchangle: number[]',
+      'angle: number[]',
+      'endpos: number[]',
+      'startpos: number[]',
+      'impacttime: number',
+      'starttime: number',
+      'fixangle: number',
+      'idealpitch: number',
+      'pitchSpeed: number',
+      'idealYaw: number',
+      'yawSpeed: number',
+      'modelindex: number',
+      'model: string',
+      'viewmodel: number',
+      'weaponmodel: number',
+      'absmin: number[]',
+      'absmax: number[]',
+      'mins: number[]',
+      'maxs: number[]',
+      'size: number[]',
+      'ltime: number',
+      'nextthink: number',
+      'movetype: number',
+      'solid: number',
+      'skin: number',
+      'body: number',
+      'effects: number',
+      'gravity: number',
+      'friction: number',
+      'lightLevel: number',
+      'sequence: number',
+      'gaitsequence: number',
+      'frame: number',
+      'animtime: number',
+      'framerate: number',
+      'scale: number',
+      'rendermode: number',
+      'renderamt: number',
+      'rendercolor: number[]',
+      'renderfx: number',
+      'health: number',
+      'frags: number',
+      'weapons: number',
+      'takedamage: number',
+      'deadflag: number',
+      'viewOfs: number[]',
+      'button: number',
+      'impulse: number',
+      'spawnflags: number',
+      'flags: number',
+      'colormap: number',
+      'team: number',
+      'maxHealth: number',
+      'teleportTime: number',
+      'armortype: number',
+      'armorvalue: number',
+      'waterlevel: number',
+      'watertype: number',
+      'target: string',
+      'targetname: string',
+      'netname: string',
+      'message: string',
+      'dmgTake: number',
+      'dmgSave: number',
+      'dmg: number',
+      'dmgtime: number',
+      'noise: string',
+      'noise1: string',
+      'noise2: string',
+      'noise3: string',
+      'speed: number',
+      'airFinished: number',
+      'painFinished: number',
+      'radsuitFinished: number',
+      'playerclass: number',
+      'maxspeed: number',
+      'fov: number',
+      'weaponanim: number',
+      'pushmsec: number',
+      'bInDuck: number',
+      'flTimeStepSound: number',
+      'flSwimTime: number',
+      'flDuckTime: number',
+      'iStepLeft: number',
+      'fallVelocity: number',
+      'gamestate: number',
+      'oldbuttons: number',
+      'groupinfo: number'
+    ]
+  });
+
+  return interfaces;
+}
+
+function parseStructureProperties(content, structureName) {
+  const properties = [];
+  
+  // Extract property setting patterns from the C++ wrapper code
+  // Match obj->Set calls with various V8 value types
+  const setCallRegex = /obj->Set\(context,\s*v8::String::NewFromUtf8\(isolate,\s*"([^"]+)"\)[^,]*,\s*([^;]+);/g;
+  
+  let match;
+  while ((match = setCallRegex.exec(content)) !== null) {
+    const propName = match[1];
+    const valueExpression = match[2];
+    
+    // Determine TypeScript type based on the V8 value creation
+    let tsType = 'unknown';
+    
+    if (valueExpression.includes('v8::String::NewFromUtf8') || valueExpression.includes('g_engfuncs.pfnSzFromIndex')) {
+      tsType = 'string';
+    } else if (valueExpression.includes('v8::Number::New')) {
+      tsType = 'number';
+    } else if (valueExpression.includes('v8::Boolean::New')) {
+      tsType = 'boolean';
+    } else if (valueExpression.includes('utils::vect2js')) {
+      tsType = 'number[]';
+    } else if (valueExpression.includes('wrapEntity')) {
+      tsType = 'Entity | null';
+    } else if (valueExpression.includes('utils::arr2js') || valueExpression.includes('Array::New') || (propName.includes('ip') && valueExpression.includes('Array'))) {
+      tsType = 'number[]';
+    }
+    
+    properties.push(`${propName}: ${tsType}`);
+  }
+  
+  // Look for variable assignments that are arrays (for multi-line array creation)
+  const arrayVarRegex = /v8::Local<v8::Array>\s+(\w+Array)\s*=/g;
+  const arraySetRegex = new RegExp(`obj->Set\\(context,\\s*v8::String::NewFromUtf8\\(isolate,\\s*"([^"]+)"\\)[^,]*,\\s*(\\w+Array)\\)`, 'g');
+  
+  const arrayVars = [];
+  let arrayMatch;
+  while ((arrayMatch = arrayVarRegex.exec(content)) !== null) {
+    arrayVars.push(arrayMatch[1]);
+  }
+  
+  while ((arrayMatch = arraySetRegex.exec(content)) !== null) {
+    const propName = arrayMatch[1];
+    const varName = arrayMatch[2];
+    if (arrayVars.includes(varName)) {
+      properties.push(`${propName}: number[]`);
+    }
+  }
+  
+  // Add special handling for specific structures if no properties found
+  if (properties.length === 0) {
+    switch (structureName) {
+      case 'Delta':
+        properties.push('// Delta compression structure - internal engine type');
+        properties.push('// Fields not exposed in public SDK headers');
+        break;
+    }
+  }
+  
+  return properties;
 }

@@ -72,8 +72,8 @@ void sf_eng_pfnSetSize(const v8::FunctionCallbackInfo<v8::Value>& info)
 	auto context = isolate->GetCurrentContext();
 
   (*g_engfuncs.pfnSetSize)(structures::unwrapEntity(isolate, info[0]),
-nullptr /* const float * */,
-nullptr /* const float * */);
+(const float*)utils::jsToPointer(isolate, info[1]),
+(const float*)utils::jsToPointer(isolate, info[2]));
 }
 
 // nodemod.eng.changeLevel();
@@ -118,7 +118,7 @@ void sf_eng_pfnVecToYaw(const v8::FunctionCallbackInfo<v8::Value>& info)
 	v8::HandleScope scope(isolate);
 	auto context = isolate->GetCurrentContext();
 
-  info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnVecToYaw)(nullptr /* const float * */)));
+  info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnVecToYaw)((const float*)utils::jsToPointer(isolate, info[0]))));
 }
 
 // nodemod.eng.vecToAngles();
@@ -129,8 +129,8 @@ void sf_eng_pfnVecToAngles(const v8::FunctionCallbackInfo<v8::Value>& info)
 	v8::HandleScope scope(isolate);
 	auto context = isolate->GetCurrentContext();
 
-  (*g_engfuncs.pfnVecToAngles)(nullptr /* const float * */,
-nullptr /* float * */);
+  (*g_engfuncs.pfnVecToAngles)((const float*)utils::jsToPointer(isolate, info[0]),
+(float*)utils::jsToPointer(isolate, info[1]));
 }
 
 // nodemod.eng.moveToOrigin();
@@ -142,7 +142,7 @@ void sf_eng_pfnMoveToOrigin(const v8::FunctionCallbackInfo<v8::Value>& info)
 	auto context = isolate->GetCurrentContext();
 
   (*g_engfuncs.pfnMoveToOrigin)(structures::unwrapEntity(isolate, info[0]),
-nullptr /* const float * */,
+(const float*)utils::jsToPointer(isolate, info[1]),
 info[2]->NumberValue(context).ToChecked(),
 info[3]->Int32Value(context).ToChecked());
 }
@@ -202,7 +202,7 @@ void sf_eng_pfnFindEntityInSphere(const v8::FunctionCallbackInfo<v8::Value>& inf
 	auto context = isolate->GetCurrentContext();
 
   info.GetReturnValue().Set(structures::wrapEntity(isolate, (*g_engfuncs.pfnFindEntityInSphere)(structures::unwrapEntity(isolate, info[0]),
-nullptr /* const float * */,
+(const float*)utils::jsToPointer(isolate, info[1]),
 info[2]->NumberValue(context).ToChecked())));
 }
 
@@ -236,7 +236,7 @@ void sf_eng_pfnMakeVectors(const v8::FunctionCallbackInfo<v8::Value>& info)
 	v8::HandleScope scope(isolate);
 	auto context = isolate->GetCurrentContext();
 
-  (*g_engfuncs.pfnMakeVectors)(nullptr /* const float * */);
+  (*g_engfuncs.pfnMakeVectors)((const float*)utils::jsToPointer(isolate, info[0]));
 }
 
 // nodemod.eng.angleVectors();
@@ -247,10 +247,10 @@ void sf_eng_pfnAngleVectors(const v8::FunctionCallbackInfo<v8::Value>& info)
 	v8::HandleScope scope(isolate);
 	auto context = isolate->GetCurrentContext();
 
-  (*g_engfuncs.pfnAngleVectors)(nullptr /* const float * */,
-nullptr /* float * */,
-nullptr /* float * */,
-nullptr /* float * */);
+  (*g_engfuncs.pfnAngleVectors)((const float*)utils::jsToPointer(isolate, info[0]),
+(float*)utils::jsToPointer(isolate, info[1]),
+(float*)utils::jsToPointer(isolate, info[2]),
+(float*)utils::jsToPointer(isolate, info[3]));
 }
 
 // nodemod.eng.createEntity();
@@ -342,7 +342,7 @@ void sf_eng_pfnSetOrigin(const v8::FunctionCallbackInfo<v8::Value>& info)
 	auto context = isolate->GetCurrentContext();
 
   (*g_engfuncs.pfnSetOrigin)(structures::unwrapEntity(isolate, info[0]),
-nullptr /* const float * */);
+(const float*)utils::jsToPointer(isolate, info[1]));
 }
 
 // nodemod.eng.emitSound();
@@ -371,7 +371,7 @@ void sf_eng_pfnEmitAmbientSound(const v8::FunctionCallbackInfo<v8::Value>& info)
 	auto context = isolate->GetCurrentContext();
 
   (*g_engfuncs.pfnEmitAmbientSound)(structures::unwrapEntity(isolate, info[0]),
-nullptr /* const float * */,
+(const float*)utils::jsToPointer(isolate, info[1]),
 utils::js2string(isolate, info[2]),
 info[3]->NumberValue(context).ToChecked(),
 info[4]->NumberValue(context).ToChecked(),
@@ -387,11 +387,11 @@ void sf_eng_pfnTraceLine(const v8::FunctionCallbackInfo<v8::Value>& info)
 	v8::HandleScope scope(isolate);
 	auto context = isolate->GetCurrentContext();
 
-  (*g_engfuncs.pfnTraceLine)(nullptr /* const float * */,
-nullptr /* const float * */,
+  (*g_engfuncs.pfnTraceLine)((const float*)utils::jsToPointer(isolate, info[0]),
+(const float*)utils::jsToPointer(isolate, info[1]),
 info[2]->Int32Value(context).ToChecked(),
 structures::unwrapEntity(isolate, info[3]),
-nullptr /* TraceResult * */);
+structures::unwrapTraceResult(isolate, info[4]));
 }
 
 // nodemod.eng.traceToss();
@@ -404,7 +404,7 @@ void sf_eng_pfnTraceToss(const v8::FunctionCallbackInfo<v8::Value>& info)
 
   (*g_engfuncs.pfnTraceToss)(structures::unwrapEntity(isolate, info[0]),
 structures::unwrapEntity(isolate, info[1]),
-nullptr /* TraceResult * */);
+structures::unwrapTraceResult(isolate, info[2]));
 }
 
 // nodemod.eng.traceMonsterHull();
@@ -416,11 +416,11 @@ void sf_eng_pfnTraceMonsterHull(const v8::FunctionCallbackInfo<v8::Value>& info)
 	auto context = isolate->GetCurrentContext();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnTraceMonsterHull)(structures::unwrapEntity(isolate, info[0]),
-nullptr /* const float * */,
-nullptr /* const float * */,
+(const float*)utils::jsToPointer(isolate, info[1]),
+(const float*)utils::jsToPointer(isolate, info[2]),
 info[3]->Int32Value(context).ToChecked(),
 structures::unwrapEntity(isolate, info[4]),
-nullptr /* TraceResult * */)));
+structures::unwrapTraceResult(isolate, info[5]))));
 }
 
 // nodemod.eng.traceHull();
@@ -431,12 +431,12 @@ void sf_eng_pfnTraceHull(const v8::FunctionCallbackInfo<v8::Value>& info)
 	v8::HandleScope scope(isolate);
 	auto context = isolate->GetCurrentContext();
 
-  (*g_engfuncs.pfnTraceHull)(nullptr /* const float * */,
-nullptr /* const float * */,
+  (*g_engfuncs.pfnTraceHull)((const float*)utils::jsToPointer(isolate, info[0]),
+(const float*)utils::jsToPointer(isolate, info[1]),
 info[2]->Int32Value(context).ToChecked(),
 info[3]->Int32Value(context).ToChecked(),
 structures::unwrapEntity(isolate, info[4]),
-nullptr /* TraceResult * */);
+structures::unwrapTraceResult(isolate, info[5]));
 }
 
 // nodemod.eng.traceModel();
@@ -447,11 +447,11 @@ void sf_eng_pfnTraceModel(const v8::FunctionCallbackInfo<v8::Value>& info)
 	v8::HandleScope scope(isolate);
 	auto context = isolate->GetCurrentContext();
 
-  (*g_engfuncs.pfnTraceModel)(nullptr /* const float * */,
-nullptr /* const float * */,
+  (*g_engfuncs.pfnTraceModel)((const float*)utils::jsToPointer(isolate, info[0]),
+(const float*)utils::jsToPointer(isolate, info[1]),
 info[2]->Int32Value(context).ToChecked(),
 structures::unwrapEntity(isolate, info[3]),
-nullptr /* TraceResult * */);
+structures::unwrapTraceResult(isolate, info[4]));
 }
 
 // nodemod.eng.traceTexture();
@@ -463,8 +463,8 @@ void sf_eng_pfnTraceTexture(const v8::FunctionCallbackInfo<v8::Value>& info)
 	auto context = isolate->GetCurrentContext();
 
   info.GetReturnValue().Set(v8::String::NewFromUtf8(isolate, (*g_engfuncs.pfnTraceTexture)(structures::unwrapEntity(isolate, info[0]),
-nullptr /* const float * */,
-nullptr /* const float * */)).ToLocalChecked());
+(const float*)utils::jsToPointer(isolate, info[1]),
+(const float*)utils::jsToPointer(isolate, info[2]))).ToLocalChecked());
 }
 
 // nodemod.eng.traceSphere();
@@ -475,12 +475,12 @@ void sf_eng_pfnTraceSphere(const v8::FunctionCallbackInfo<v8::Value>& info)
 	v8::HandleScope scope(isolate);
 	auto context = isolate->GetCurrentContext();
 
-  (*g_engfuncs.pfnTraceSphere)(nullptr /* const float * */,
-nullptr /* const float * */,
+  (*g_engfuncs.pfnTraceSphere)((const float*)utils::jsToPointer(isolate, info[0]),
+(const float*)utils::jsToPointer(isolate, info[1]),
 info[2]->Int32Value(context).ToChecked(),
 info[3]->NumberValue(context).ToChecked(),
 structures::unwrapEntity(isolate, info[4]),
-nullptr /* TraceResult * */);
+structures::unwrapTraceResult(isolate, info[5]));
 }
 
 // nodemod.eng.getAimVector();
@@ -493,7 +493,7 @@ void sf_eng_pfnGetAimVector(const v8::FunctionCallbackInfo<v8::Value>& info)
 
   (*g_engfuncs.pfnGetAimVector)(structures::unwrapEntity(isolate, info[0]),
 info[1]->NumberValue(context).ToChecked(),
-nullptr /* float * */);
+(float*)utils::jsToPointer(isolate, info[2]));
 }
 
 // nodemod.eng.serverCommand();
@@ -537,8 +537,8 @@ void sf_eng_pfnParticleEffect(const v8::FunctionCallbackInfo<v8::Value>& info)
 	v8::HandleScope scope(isolate);
 	auto context = isolate->GetCurrentContext();
 
-  (*g_engfuncs.pfnParticleEffect)(nullptr /* const float * */,
-nullptr /* const float * */,
+  (*g_engfuncs.pfnParticleEffect)((const float*)utils::jsToPointer(isolate, info[0]),
+(const float*)utils::jsToPointer(isolate, info[1]),
 info[2]->NumberValue(context).ToChecked(),
 info[3]->NumberValue(context).ToChecked());
 }
@@ -574,7 +574,7 @@ void sf_eng_pfnPointContents(const v8::FunctionCallbackInfo<v8::Value>& info)
 	v8::HandleScope scope(isolate);
 	auto context = isolate->GetCurrentContext();
 
-  info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnPointContents)(nullptr /* const float * */)));
+  info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnPointContents)((const float*)utils::jsToPointer(isolate, info[0]))));
 }
 
 // nodemod.eng.messageBegin();
@@ -587,7 +587,7 @@ void sf_eng_pfnMessageBegin(const v8::FunctionCallbackInfo<v8::Value>& info)
 
   (*g_engfuncs.pfnMessageBegin)(info[0]->Int32Value(context).ToChecked(),
 info[1]->Int32Value(context).ToChecked(),
-nullptr /* const float * */,
+(const float*)utils::jsToPointer(isolate, info[2]),
 structures::unwrapEntity(isolate, info[3]));
 }
 
@@ -698,7 +698,7 @@ void sf_eng_pfnCVarRegister(const v8::FunctionCallbackInfo<v8::Value>& info)
 	v8::HandleScope scope(isolate);
 	auto context = isolate->GetCurrentContext();
 
-  (*g_engfuncs.pfnCVarRegister)(nullptr /* cvar_t * */);
+  (*g_engfuncs.pfnCVarRegister)((cvar_t*)structures::unwrapCvar(isolate, info[0]));;
 }
 
 // nodemod.eng.cVarGetFloat();
@@ -747,6 +747,28 @@ void sf_eng_pfnCVarSetString(const v8::FunctionCallbackInfo<v8::Value>& info)
 utils::js2string(isolate, info[1]));
 }
 
+// nodemod.eng.alertMessage();
+void sf_eng_pfnAlertMessage(const v8::FunctionCallbackInfo<v8::Value>& info)
+{
+	auto isolate = info.GetIsolate();
+  v8::Locker locker(isolate);
+	v8::HandleScope scope(isolate);
+	auto context = isolate->GetCurrentContext();
+
+  (*g_engfuncs.pfnAlertMessage)((ALERT_TYPE)info[0]->Int32Value(context).ToChecked(), "%s", utils::js2string(isolate, info[1]));;
+}
+
+// nodemod.eng.engineFprintf();
+void sf_eng_pfnEngineFprintf(const v8::FunctionCallbackInfo<v8::Value>& info)
+{
+	auto isolate = info.GetIsolate();
+  v8::Locker locker(isolate);
+	v8::HandleScope scope(isolate);
+	auto context = isolate->GetCurrentContext();
+
+  fprintf((FILE*)utils::jsToPointer(isolate, info[0]), "%s", utils::js2string(isolate, info[1]));;
+}
+
 // nodemod.eng.pvAllocEntPrivateData();
 void sf_eng_pfnPvAllocEntPrivateData(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
@@ -756,7 +778,7 @@ void sf_eng_pfnPvAllocEntPrivateData(const v8::FunctionCallbackInfo<v8::Value>& 
 	auto context = isolate->GetCurrentContext();
 
   info.GetReturnValue().Set(v8::External::New(isolate, (*g_engfuncs.pfnPvAllocEntPrivateData)(structures::unwrapEntity(isolate, info[0]),
-info[1]->Int32Value(context).ToChecked()) /* void */));
+info[1]->Int32Value(context).ToChecked())));
 }
 
 // nodemod.eng.pvEntPrivateData();
@@ -767,7 +789,7 @@ void sf_eng_pfnPvEntPrivateData(const v8::FunctionCallbackInfo<v8::Value>& info)
 	v8::HandleScope scope(isolate);
 	auto context = isolate->GetCurrentContext();
 
-  info.GetReturnValue().Set(v8::External::New(isolate, (*g_engfuncs.pfnPvEntPrivateData)(structures::unwrapEntity(isolate, info[0])) /* void */));
+  info.GetReturnValue().Set(v8::External::New(isolate, (*g_engfuncs.pfnPvEntPrivateData)(structures::unwrapEntity(isolate, info[0]))));
 }
 
 // nodemod.eng.freeEntPrivateData();
@@ -811,7 +833,7 @@ void sf_eng_pfnGetVarsOfEnt(const v8::FunctionCallbackInfo<v8::Value>& info)
 	v8::HandleScope scope(isolate);
 	auto context = isolate->GetCurrentContext();
 
-  info.GetReturnValue().Set(v8::External::New(isolate, (*g_engfuncs.pfnGetVarsOfEnt)(structures::unwrapEntity(isolate, info[0])) /* entvars_s  */));
+  info.GetReturnValue().Set(structures::wrapEntvars(isolate, (*g_engfuncs.pfnGetVarsOfEnt)(structures::unwrapEntity(isolate, info[0]))));
 }
 
 // nodemod.eng.pEntityOfEntOffset();
@@ -866,7 +888,7 @@ void sf_eng_pfnFindEntityByVars(const v8::FunctionCallbackInfo<v8::Value>& info)
 	v8::HandleScope scope(isolate);
 	auto context = isolate->GetCurrentContext();
 
-  info.GetReturnValue().Set(structures::wrapEntity(isolate, (*g_engfuncs.pfnFindEntityByVars)(nullptr /* struct entvars_s* */)));
+  info.GetReturnValue().Set(structures::wrapEntity(isolate, (*g_engfuncs.pfnFindEntityByVars)(structures::unwrapEntvars(isolate, info[0]))));
 }
 
 // nodemod.eng.getModelPtr();
@@ -877,7 +899,7 @@ void sf_eng_pfnGetModelPtr(const v8::FunctionCallbackInfo<v8::Value>& info)
 	v8::HandleScope scope(isolate);
 	auto context = isolate->GetCurrentContext();
 
-  info.GetReturnValue().Set(v8::External::New(isolate, (*g_engfuncs.pfnGetModelPtr)(structures::unwrapEntity(isolate, info[0])) /* void */));
+  info.GetReturnValue().Set(v8::External::New(isolate, (*g_engfuncs.pfnGetModelPtr)(structures::unwrapEntity(isolate, info[0]))));
 }
 
 // nodemod.eng.regUserMsg();
@@ -914,8 +936,8 @@ void sf_eng_pfnGetBonePosition(const v8::FunctionCallbackInfo<v8::Value>& info)
 
   (*g_engfuncs.pfnGetBonePosition)(structures::unwrapEntity(isolate, info[0]),
 info[1]->Int32Value(context).ToChecked(),
-nullptr /* float * */,
-nullptr /* float * */);
+(float*)utils::jsToPointer(isolate, info[2]),
+(float*)utils::jsToPointer(isolate, info[3]));
 }
 
 // nodemod.eng.functionFromName();
@@ -926,7 +948,7 @@ void sf_eng_pfnFunctionFromName(const v8::FunctionCallbackInfo<v8::Value>& info)
 	v8::HandleScope scope(isolate);
 	auto context = isolate->GetCurrentContext();
 
-  info.GetReturnValue().Set(v8::External::New(isolate, (*g_engfuncs.pfnFunctionFromName)(utils::js2string(isolate, info[0])) /* void */));
+  info.GetReturnValue().Set(v8::External::New(isolate, (*g_engfuncs.pfnFunctionFromName)(utils::js2string(isolate, info[0]))));
 }
 
 // nodemod.eng.nameForFunction();
@@ -937,7 +959,7 @@ void sf_eng_pfnNameForFunction(const v8::FunctionCallbackInfo<v8::Value>& info)
 	v8::HandleScope scope(isolate);
 	auto context = isolate->GetCurrentContext();
 
-  info.GetReturnValue().Set(v8::String::NewFromUtf8(isolate, (*g_engfuncs.pfnNameForFunction)(nullptr /* void * */)).ToLocalChecked());
+  info.GetReturnValue().Set(v8::String::NewFromUtf8(isolate, (*g_engfuncs.pfnNameForFunction)(utils::jsToPointer(isolate, info[0]))).ToLocalChecked());
 }
 
 // nodemod.eng.clientPrintf();
@@ -1007,8 +1029,8 @@ void sf_eng_pfnGetAttachment(const v8::FunctionCallbackInfo<v8::Value>& info)
 
   (*g_engfuncs.pfnGetAttachment)(structures::unwrapEntity(isolate, info[0]),
 info[1]->Int32Value(context).ToChecked(),
-nullptr /* float * */,
-nullptr /* float * */);
+(float*)utils::jsToPointer(isolate, info[2]),
+(float*)utils::jsToPointer(isolate, info[3]));
 }
 
 // nodemod.eng.randomLong();
@@ -1079,8 +1101,8 @@ void sf_eng_pfnLoadFileForMe(const v8::FunctionCallbackInfo<v8::Value>& info)
 	v8::HandleScope scope(isolate);
 	auto context = isolate->GetCurrentContext();
 
-  info.GetReturnValue().Set(v8::External::New(isolate, (*g_engfuncs.pfnLoadFileForMe)(utils::js2string(isolate, info[0]),
-nullptr /* int * */) /* byte */));
+  info.GetReturnValue().Set(utils::byteArrayToJS(isolate, (*g_engfuncs.pfnLoadFileForMe)(utils::js2string(isolate, info[0]),
+(int*)utils::jsToPointer(isolate, info[1]))));
 }
 
 // nodemod.eng.freeFile();
@@ -1091,7 +1113,7 @@ void sf_eng_pfnFreeFile(const v8::FunctionCallbackInfo<v8::Value>& info)
 	v8::HandleScope scope(isolate);
 	auto context = isolate->GetCurrentContext();
 
-  (*g_engfuncs.pfnFreeFile)(nullptr /* void * */);
+  (*g_engfuncs.pfnFreeFile)(utils::jsToPointer(isolate, info[0]));
 }
 
 // nodemod.eng.endSection();
@@ -1115,7 +1137,7 @@ void sf_eng_pfnCompareFileTime(const v8::FunctionCallbackInfo<v8::Value>& info)
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnCompareFileTime)(utils::js2string(isolate, info[0]),
 utils::js2string(isolate, info[1]),
-nullptr /* int * */)));
+(int*)utils::jsToPointer(isolate, info[2]))));
 }
 
 // nodemod.eng.getGameDir();
@@ -1137,7 +1159,7 @@ void sf_eng_pfnCvar_RegisterVariable(const v8::FunctionCallbackInfo<v8::Value>& 
 	v8::HandleScope scope(isolate);
 	auto context = isolate->GetCurrentContext();
 
-  (*g_engfuncs.pfnCvar_RegisterVariable)(nullptr /* cvar_t * */);
+  (*g_engfuncs.pfnCvar_RegisterVariable)((cvar_t*)structures::unwrapCvar(isolate, info[0]));;
 }
 
 // nodemod.eng.fadeClientVolume();
@@ -1187,7 +1209,7 @@ void sf_eng_pfnRunPlayerMove(const v8::FunctionCallbackInfo<v8::Value>& info)
 	auto context = isolate->GetCurrentContext();
 
   (*g_engfuncs.pfnRunPlayerMove)(structures::unwrapEntity(isolate, info[0]),
-nullptr /* const float * */,
+(const float*)utils::jsToPointer(isolate, info[1]),
 info[2]->NumberValue(context).ToChecked(),
 info[3]->NumberValue(context).ToChecked(),
 info[4]->NumberValue(context).ToChecked(),
@@ -1276,7 +1298,7 @@ void sf_eng_pfnStaticDecal(const v8::FunctionCallbackInfo<v8::Value>& info)
 	v8::HandleScope scope(isolate);
 	auto context = isolate->GetCurrentContext();
 
-  (*g_engfuncs.pfnStaticDecal)(nullptr /* const float * */,
+  (*g_engfuncs.pfnStaticDecal)((const float*)utils::jsToPointer(isolate, info[0]),
 info[1]->Int32Value(context).ToChecked(),
 info[2]->Int32Value(context).ToChecked(),
 info[3]->Int32Value(context).ToChecked());
@@ -1321,7 +1343,7 @@ info[5]->Int32Value(context).ToChecked(),
 info[6]->Int32Value(context).ToChecked(),
 info[7]->Int32Value(context).ToChecked(),
 info[8]->Int32Value(context).ToChecked(),
-nullptr /* const float * */,
+(const float*)utils::jsToPointer(isolate, info[9]),
 structures::unwrapEntity(isolate, info[10]));
 }
 
@@ -1344,7 +1366,7 @@ void sf_eng_pfnCVarGetPointer(const v8::FunctionCallbackInfo<v8::Value>& info)
 	v8::HandleScope scope(isolate);
 	auto context = isolate->GetCurrentContext();
 
-  info.GetReturnValue().Set(v8::External::New(isolate, (*g_engfuncs.pfnCVarGetPointer)(utils::js2string(isolate, info[0])) /* cvar_t  */));
+  info.GetReturnValue().Set(structures::wrapCvar(isolate, (*g_engfuncs.pfnCVarGetPointer)(utils::js2string(isolate, info[0]))));
 }
 
 // nodemod.eng.getPlayerWONId();
@@ -1414,8 +1436,8 @@ void sf_eng_pfnPrecacheEvent(const v8::FunctionCallbackInfo<v8::Value>& info)
 	v8::HandleScope scope(isolate);
 	auto context = isolate->GetCurrentContext();
 
-  (*g_engfuncs.pfnPrecacheEvent)(info[0]->Int32Value(context).ToChecked(),
-nullptr /* const char* */) /* TODO: type unsigned short */;
+  info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnPrecacheEvent)(info[0]->Int32Value(context).ToChecked(),
+utils::js2string(isolate, info[1]))));
 }
 
 // nodemod.eng.playbackEvent();
@@ -1430,8 +1452,8 @@ void sf_eng_pfnPlaybackEvent(const v8::FunctionCallbackInfo<v8::Value>& info)
 structures::unwrapEntity(isolate, info[1]),
 info[2]->Int32Value(context).ToChecked(),
 info[3]->NumberValue(context).ToChecked(),
-nullptr /* const float * */,
-nullptr /* const float * */,
+(const float*)utils::jsToPointer(isolate, info[4]),
+(const float*)utils::jsToPointer(isolate, info[5]),
 info[6]->NumberValue(context).ToChecked(),
 info[7]->NumberValue(context).ToChecked(),
 info[8]->Int32Value(context).ToChecked(),
@@ -1448,7 +1470,7 @@ void sf_eng_pfnSetFatPVS(const v8::FunctionCallbackInfo<v8::Value>& info)
 	v8::HandleScope scope(isolate);
 	auto context = isolate->GetCurrentContext();
 
-  info.GetReturnValue().Set(v8::External::New(isolate, (*g_engfuncs.pfnSetFatPVS)(nullptr /* const float * */) /* unsigned char  */));
+  info.GetReturnValue().Set(utils::byteArrayToJS(isolate, (*g_engfuncs.pfnSetFatPVS)((const float*)utils::jsToPointer(isolate, info[0]))));
 }
 
 // nodemod.eng.setFatPAS();
@@ -1459,7 +1481,7 @@ void sf_eng_pfnSetFatPAS(const v8::FunctionCallbackInfo<v8::Value>& info)
 	v8::HandleScope scope(isolate);
 	auto context = isolate->GetCurrentContext();
 
-  info.GetReturnValue().Set(v8::External::New(isolate, (*g_engfuncs.pfnSetFatPAS)(nullptr /* const float * */) /* unsigned char  */));
+  info.GetReturnValue().Set(utils::byteArrayToJS(isolate, (*g_engfuncs.pfnSetFatPAS)((const float*)utils::jsToPointer(isolate, info[0]))));
 }
 
 // nodemod.eng.checkVisibility();
@@ -1471,7 +1493,7 @@ void sf_eng_pfnCheckVisibility(const v8::FunctionCallbackInfo<v8::Value>& info)
 	auto context = isolate->GetCurrentContext();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnCheckVisibility)(structures::unwrapEntity(isolate, info[0]),
-nullptr /* unsigned char * */)));
+(unsigned char*)utils::jsToPointer(isolate, info[1]))));
 }
 
 // nodemod.eng.deltaSetField();
@@ -1482,7 +1504,7 @@ void sf_eng_pfnDeltaSetField(const v8::FunctionCallbackInfo<v8::Value>& info)
 	v8::HandleScope scope(isolate);
 	auto context = isolate->GetCurrentContext();
 
-  (*g_engfuncs.pfnDeltaSetField)(nullptr /* struct delta_s * */,
+  (*g_engfuncs.pfnDeltaSetField)(structures::unwrapDelta(isolate, info[0]),
 utils::js2string(isolate, info[1]));
 }
 
@@ -1494,8 +1516,20 @@ void sf_eng_pfnDeltaUnsetField(const v8::FunctionCallbackInfo<v8::Value>& info)
 	v8::HandleScope scope(isolate);
 	auto context = isolate->GetCurrentContext();
 
-  (*g_engfuncs.pfnDeltaUnsetField)(nullptr /* struct delta_s * */,
+  (*g_engfuncs.pfnDeltaUnsetField)(structures::unwrapDelta(isolate, info[0]),
 utils::js2string(isolate, info[1]));
+}
+
+// nodemod.eng.deltaAddEncoder();
+void sf_eng_pfnDeltaAddEncoder(const v8::FunctionCallbackInfo<v8::Value>& info)
+{
+	auto isolate = info.GetIsolate();
+  v8::Locker locker(isolate);
+	v8::HandleScope scope(isolate);
+	auto context = isolate->GetCurrentContext();
+
+  (*g_engfuncs.pfnDeltaAddEncoder)(utils::js2string(isolate, info[0]),
+nullptr /* void* not supported */);
 }
 
 // nodemod.eng.getCurrentPlayer();
@@ -1528,7 +1562,7 @@ void sf_eng_pfnDeltaFindField(const v8::FunctionCallbackInfo<v8::Value>& info)
 	v8::HandleScope scope(isolate);
 	auto context = isolate->GetCurrentContext();
 
-  info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnDeltaFindField)(nullptr /* struct delta_s * */,
+  info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnDeltaFindField)(structures::unwrapDelta(isolate, info[0]),
 utils::js2string(isolate, info[1]))));
 }
 
@@ -1540,7 +1574,7 @@ void sf_eng_pfnDeltaSetFieldByIndex(const v8::FunctionCallbackInfo<v8::Value>& i
 	v8::HandleScope scope(isolate);
 	auto context = isolate->GetCurrentContext();
 
-  (*g_engfuncs.pfnDeltaSetFieldByIndex)(nullptr /* struct delta_s * */,
+  (*g_engfuncs.pfnDeltaSetFieldByIndex)(structures::unwrapDelta(isolate, info[0]),
 info[1]->Int32Value(context).ToChecked());
 }
 
@@ -1552,7 +1586,7 @@ void sf_eng_pfnDeltaUnsetFieldByIndex(const v8::FunctionCallbackInfo<v8::Value>&
 	v8::HandleScope scope(isolate);
 	auto context = isolate->GetCurrentContext();
 
-  (*g_engfuncs.pfnDeltaUnsetFieldByIndex)(nullptr /* struct delta_s * */,
+  (*g_engfuncs.pfnDeltaUnsetFieldByIndex)(structures::unwrapDelta(isolate, info[0]),
 info[1]->Int32Value(context).ToChecked());
 }
 
@@ -1577,7 +1611,7 @@ void sf_eng_pfnCreateInstancedBaseline(const v8::FunctionCallbackInfo<v8::Value>
 	auto context = isolate->GetCurrentContext();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnCreateInstancedBaseline)(info[0]->Int32Value(context).ToChecked(),
-nullptr /* struct entity_state_s * */)));
+structures::unwrapEntityState(isolate, info[1]))));
 }
 
 // nodemod.eng.cvarDirectSet();
@@ -1588,8 +1622,7 @@ void sf_eng_pfnCvar_DirectSet(const v8::FunctionCallbackInfo<v8::Value>& info)
 	v8::HandleScope scope(isolate);
 	auto context = isolate->GetCurrentContext();
 
-  (*g_engfuncs.pfnCvar_DirectSet)(nullptr /* struct cvar_s * */,
-utils::js2string(isolate, info[1]));
+  (*g_engfuncs.pfnCvar_DirectSet)((cvar_t*)structures::unwrapCvar(isolate, info[0]), utils::js2string(isolate, info[1]));;
 }
 
 // nodemod.eng.forceUnmodified();
@@ -1601,8 +1634,8 @@ void sf_eng_pfnForceUnmodified(const v8::FunctionCallbackInfo<v8::Value>& info)
 	auto context = isolate->GetCurrentContext();
 
   (*g_engfuncs.pfnForceUnmodified)(*(FORCE_TYPE*)utils::jsToBytes(isolate, info[0]),
-nullptr /* const float * */,
-nullptr /* const float * */,
+(const float*)utils::jsToPointer(isolate, info[1]),
+(const float*)utils::jsToPointer(isolate, info[2]),
 utils::js2string(isolate, info[3]));
 }
 
@@ -1615,8 +1648,20 @@ void sf_eng_pfnGetPlayerStats(const v8::FunctionCallbackInfo<v8::Value>& info)
 	auto context = isolate->GetCurrentContext();
 
   (*g_engfuncs.pfnGetPlayerStats)(structures::unwrapEntity(isolate, info[0]),
-nullptr /* int * */,
-nullptr /* int * */);
+(int*)utils::jsToPointer(isolate, info[1]),
+(int*)utils::jsToPointer(isolate, info[2]));
+}
+
+// nodemod.eng.addServerCommand();
+void sf_eng_pfnAddServerCommand(const v8::FunctionCallbackInfo<v8::Value>& info)
+{
+	auto isolate = info.GetIsolate();
+  v8::Locker locker(isolate);
+	v8::HandleScope scope(isolate);
+	auto context = isolate->GetCurrentContext();
+
+  (*g_engfuncs.pfnAddServerCommand)(utils::js2string(isolate, info[0]),
+nullptr /* void* not supported */);
 }
 
 // nodemod.eng.voiceGetClientListening();
@@ -1664,7 +1709,7 @@ void sf_eng_pfnSequenceGet(const v8::FunctionCallbackInfo<v8::Value>& info)
 	auto context = isolate->GetCurrentContext();
 
   info.GetReturnValue().Set(v8::External::New(isolate, (*g_engfuncs.pfnSequenceGet)(utils::js2string(isolate, info[0]),
-utils::js2string(isolate, info[1])) /* void  */));
+utils::js2string(isolate, info[1]))));
 }
 
 // nodemod.eng.sequencePickSentence();
@@ -1677,7 +1722,7 @@ void sf_eng_pfnSequencePickSentence(const v8::FunctionCallbackInfo<v8::Value>& i
 
   info.GetReturnValue().Set(v8::External::New(isolate, (*g_engfuncs.pfnSequencePickSentence)(utils::js2string(isolate, info[0]),
 info[1]->Int32Value(context).ToChecked(),
-nullptr /* int * */) /* void  */));
+(int*)utils::jsToPointer(isolate, info[2]))));
 }
 
 // nodemod.eng.getFileSize();
@@ -1754,7 +1799,7 @@ void sf_eng_pfnProcessTutorMessageDecayBuffer(const v8::FunctionCallbackInfo<v8:
 	v8::HandleScope scope(isolate);
 	auto context = isolate->GetCurrentContext();
 
-  (*g_engfuncs.pfnProcessTutorMessageDecayBuffer)(nullptr /* int * */,
+  (*g_engfuncs.pfnProcessTutorMessageDecayBuffer)((int*)utils::jsToPointer(isolate, info[0]),
 info[1]->Int32Value(context).ToChecked());
 }
 
@@ -1766,7 +1811,7 @@ void sf_eng_pfnConstructTutorMessageDecayBuffer(const v8::FunctionCallbackInfo<v
 	v8::HandleScope scope(isolate);
 	auto context = isolate->GetCurrentContext();
 
-  (*g_engfuncs.pfnConstructTutorMessageDecayBuffer)(nullptr /* int * */,
+  (*g_engfuncs.pfnConstructTutorMessageDecayBuffer)((int*)utils::jsToPointer(isolate, info[0]),
 info[1]->Int32Value(context).ToChecked());
 }
 
@@ -1815,7 +1860,7 @@ void sf_eng_CheckParm(const v8::FunctionCallbackInfo<v8::Value>& info)
 	auto context = isolate->GetCurrentContext();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.CheckParm)(utils::js2string(isolate, info[0]),
-nullptr /* char ** */)));
+(char**)utils::jsToPointer(isolate, info[1]))));
 }
 
 // nodemod.eng.pEntityOfEntIndexAllEntities();
@@ -1891,6 +1936,8 @@ static std::pair<std::string, v8::FunctionCallback> engineSpecificFunctions[] = 
   { "cVarGetString", sf_eng_pfnCVarGetString },
   { "cVarSetFloat", sf_eng_pfnCVarSetFloat },
   { "cVarSetString", sf_eng_pfnCVarSetString },
+  { "alertMessage", sf_eng_pfnAlertMessage },
+  { "engineFprintf", sf_eng_pfnEngineFprintf },
   { "pvAllocEntPrivateData", sf_eng_pfnPvAllocEntPrivateData },
   { "pvEntPrivateData", sf_eng_pfnPvEntPrivateData },
   { "freeEntPrivateData", sf_eng_pfnFreeEntPrivateData },
@@ -1953,6 +2000,7 @@ static std::pair<std::string, v8::FunctionCallback> engineSpecificFunctions[] = 
   { "checkVisibility", sf_eng_pfnCheckVisibility },
   { "deltaSetField", sf_eng_pfnDeltaSetField },
   { "deltaUnsetField", sf_eng_pfnDeltaUnsetField },
+  { "deltaAddEncoder", sf_eng_pfnDeltaAddEncoder },
   { "getCurrentPlayer", sf_eng_pfnGetCurrentPlayer },
   { "canSkipPlayer", sf_eng_pfnCanSkipPlayer },
   { "deltaFindField", sf_eng_pfnDeltaFindField },
@@ -1963,6 +2011,7 @@ static std::pair<std::string, v8::FunctionCallback> engineSpecificFunctions[] = 
   { "cvarDirectSet", sf_eng_pfnCvar_DirectSet },
   { "forceUnmodified", sf_eng_pfnForceUnmodified },
   { "getPlayerStats", sf_eng_pfnGetPlayerStats },
+  { "addServerCommand", sf_eng_pfnAddServerCommand },
   { "voiceGetClientListening", sf_eng_pfnVoice_GetClientListening },
   { "voiceSetClientListening", sf_eng_pfnVoice_SetClientListening },
   { "getPlayerAuthId", sf_eng_pfnGetPlayerAuthId },
@@ -1991,7 +2040,3 @@ v8::Local<v8::ObjectTemplate> registerEngineFunctions(v8::Isolate* isolate) {
   return object;
 };
 
-// FAILED (Cannot read properties of undefined (reading 'map')): void	(*pfnAlertMessage)( ALERT_TYPE atype, const char *szFmt, ... );
-// FAILED (Cannot read properties of undefined (reading 'map')): void	(*pfnEngineFprintf)( FILE *pfile, const char *szFmt, ... );
-// FAILED (Cannot read properties of undefined (reading 'map')): void	(*pfnDeltaAddEncoder)( const char *name, void (*conditionalencode)( struct delta_s *pFields, const unsigned char *from, const unsigned char *to ) );
-// FAILED (Cannot read properties of undefined (reading 'map')): void	(*pfnAddServerCommand)( const char *cmd_name, void (*function) (void) );

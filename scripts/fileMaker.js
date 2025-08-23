@@ -6,15 +6,22 @@ const fileMaker = {
     return `${prefix} {\n${body.split('\n').map(v => `  ${v}`).join('\n')}\n};`;
   },
   typings: {
-    makeIndex(computed) {
+    makeIndex(computed, structureInterfaces = []) {
+      const interfaceDefinitions = structureInterfaces.map(iface => 
+        `  interface ${iface.name} {\n${iface.properties.map(prop => `    ${prop};`).join('\n')}\n  }`
+      ).join('\n');
+      
       return fileMaker.makeFile(
-        fileMaker.makeBlock(
-          'declare class nodemod',
-          fileMaker.makeBlock(
-            'static eng =',
-            computed.eng.map(v => `/** ${v.api.original} */\n${v.api.typing}`).join(',\n')
-          )
-        )
+        'declare namespace nodemod {',
+        '  interface FileHandle {',
+        '    // Opaque file handle - use with engine file functions',
+        '  }',
+        interfaceDefinitions,
+        `  interface Engine {`,
+        computed.eng.map(v => `    /** ${v.api.original} */\n    ${v.api.typing};`).join('\n'),
+        `  }`,
+        `  const eng: Engine;`,
+        `}`
       );
     }
   },

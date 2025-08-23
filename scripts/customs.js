@@ -11,6 +11,31 @@ export default {
       api: {
         body: `(*g_engfuncs.pfnClientCommand)(structures::unwrapEntity(isolate, info[0]), utils::js2string(isolate, info[1]));`
       }
+    },
+    pfnAlertMessage: {
+      api: {
+        body: `(*g_engfuncs.pfnAlertMessage)((ALERT_TYPE)info[0]->Int32Value(context).ToChecked(), "%s", utils::js2string(isolate, info[1]));`
+      }
+    },
+    pfnCVarRegister: {
+      api: {
+        body: `(*g_engfuncs.pfnCVarRegister)((cvar_t*)structures::unwrapCvar(isolate, info[0]));`
+      }
+    },
+    pfnCvar_RegisterVariable: {
+      api: {
+        body: `(*g_engfuncs.pfnCvar_RegisterVariable)((cvar_t*)structures::unwrapCvar(isolate, info[0]));`
+      }
+    },
+    pfnCvar_DirectSet: {
+      api: {
+        body: `(*g_engfuncs.pfnCvar_DirectSet)((cvar_t*)structures::unwrapCvar(isolate, info[0]), utils::js2string(isolate, info[1]));`
+      }
+    },
+    pfnEngineFprintf: {
+      api: {
+        body: `fprintf((FILE*)utils::jsToPointer(isolate, info[0]), "%s", utils::js2string(isolate, info[1]));`
+      }
     }
   },
   dll: {

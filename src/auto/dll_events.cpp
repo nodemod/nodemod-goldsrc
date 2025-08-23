@@ -79,7 +79,7 @@
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = structures::wrapEntity(isolate, pentKeyvalue); // pentKeyvalue (edict_t *)
-      v8_args[1] = v8::External::New(isolate, pkvd /* KeyValueData  */); // pkvd (KeyValueData *)
+      v8_args[1] = structures::wrapKeyValueData(isolate, pkvd); // pkvd (KeyValueData *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -91,7 +91,7 @@
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = structures::wrapEntity(isolate, pent); // pent (edict_t *)
-      v8_args[1] = v8::External::New(isolate, pSaveData /* SAVERESTOREDATA  */); // pSaveData (SAVERESTOREDATA *)
+      v8_args[1] = structures::wrapSaveRestoreData(isolate, pSaveData); // pSaveData (SAVERESTOREDATA *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -103,7 +103,7 @@
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = structures::wrapEntity(isolate, pent); // pent (edict_t *)
-      v8_args[1] = v8::External::New(isolate, pSaveData /* SAVERESTOREDATA  */); // pSaveData (SAVERESTOREDATA *)
+      v8_args[1] = structures::wrapSaveRestoreData(isolate, pSaveData); // pSaveData (SAVERESTOREDATA *)
       v8_args[2] = v8::Number::New(isolate, globalEntity); // globalEntity (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -127,10 +127,10 @@
     event::findAndCall("dllSaveWriteFields", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 5;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[5];
-      v8_args[0] = v8::External::New(isolate, value0 /* SAVERESTOREDATA */); // value0 (SAVERESTOREDATA*)
+      v8_args[0] = structures::wrapSaveRestoreData(isolate, value0); // value0 (SAVERESTOREDATA*)
       v8_args[1] = v8::String::NewFromUtf8(isolate, value1).ToLocalChecked(); // value1 (const char*)
-      v8_args[2] = v8::External::New(isolate, value2 /* void */); // value2 (void*)
-      v8_args[3] = v8::External::New(isolate, value3 /* TYPEDESCRIPTION */); // value3 (TYPEDESCRIPTION*)
+      v8_args[2] = v8::External::New(isolate, value2); // value2 (void*)
+      v8_args[3] = structures::wrapTypeDescription(isolate, value3); // value3 (TYPEDESCRIPTION*)
       v8_args[4] = v8::Number::New(isolate, value4); // value4 (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -142,10 +142,10 @@
     event::findAndCall("dllSaveReadFields", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 5;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[5];
-      v8_args[0] = v8::External::New(isolate, value0 /* SAVERESTOREDATA */); // value0 (SAVERESTOREDATA*)
+      v8_args[0] = structures::wrapSaveRestoreData(isolate, value0); // value0 (SAVERESTOREDATA*)
       v8_args[1] = v8::String::NewFromUtf8(isolate, value1).ToLocalChecked(); // value1 (const char*)
-      v8_args[2] = v8::External::New(isolate, value2 /* void */); // value2 (void*)
-      v8_args[3] = v8::External::New(isolate, value3 /* TYPEDESCRIPTION */); // value3 (TYPEDESCRIPTION*)
+      v8_args[2] = v8::External::New(isolate, value2); // value2 (void*)
+      v8_args[3] = structures::wrapTypeDescription(isolate, value3); // value3 (TYPEDESCRIPTION*)
       v8_args[4] = v8::Number::New(isolate, value4); // value4 (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -157,7 +157,7 @@
     event::findAndCall("dllSaveGlobalState", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::External::New(isolate, value0 /* SAVERESTOREDATA  */); // value0 (SAVERESTOREDATA *)
+      v8_args[0] = structures::wrapSaveRestoreData(isolate, value0); // value0 (SAVERESTOREDATA *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -168,7 +168,7 @@
     event::findAndCall("dllRestoreGlobalState", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::External::New(isolate, value0 /* SAVERESTOREDATA  */); // value0 (SAVERESTOREDATA *)
+      v8_args[0] = structures::wrapSaveRestoreData(isolate, value0); // value0 (SAVERESTOREDATA *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -331,7 +331,7 @@
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = structures::wrapEntity(isolate, pEntity); // pEntity (edict_t *)
-      v8_args[1] = v8::External::New(isolate, pCustom /* customization_t  */); // pCustom (customization_t *)
+      v8_args[1] = structures::wrapCustomization(isolate, pCustom); // pCustom (customization_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -386,7 +386,7 @@
     event::findAndCall("dllPMMove", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = v8::External::New(isolate, ppmove /* playermove_s  */); // ppmove (struct playermove_s *)
+      v8_args[0] = structures::wrapPlayerMove(isolate, ppmove); // ppmove (struct playermove_s *)
       v8_args[1] = v8::Boolean::New(isolate, server); // server (qboolean)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -398,7 +398,7 @@
     event::findAndCall("dllPMInit", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::External::New(isolate, ppmove /* playermove_s  */); // ppmove (struct playermove_s *)
+      v8_args[0] = structures::wrapPlayerMove(isolate, ppmove); // ppmove (struct playermove_s *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -421,10 +421,10 @@
     event::findAndCall("dllSetupVisibility", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 4;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[4];
-      v8_args[0] = v8::External::New(isolate, pViewEntity /* edict_s  */); // pViewEntity (struct edict_s *)
-      v8_args[1] = v8::External::New(isolate, pClient /* edict_s  */); // pClient (struct edict_s *)
-      v8_args[2] = v8::External::New(isolate, pvs /* unsigned char * */); // pvs (unsigned char **)
-      v8_args[3] = v8::External::New(isolate, pas /* unsigned char * */); // pas (unsigned char **)
+      v8_args[0] = structures::wrapEntity(isolate, pViewEntity); // pViewEntity (struct edict_s *)
+      v8_args[1] = structures::wrapEntity(isolate, pClient); // pClient (struct edict_s *)
+      v8_args[2] = v8::External::New(isolate, pvs); // pvs (unsigned char **)
+      v8_args[3] = v8::External::New(isolate, pas); // pas (unsigned char **)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -435,9 +435,9 @@
     event::findAndCall("dllUpdateClientData", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
-      v8_args[0] = v8::External::New(isolate, (void*)ent /* edict_s  */); // ent (const struct edict_s *)
+      v8_args[0] = structures::wrapEntity(isolate, ent); // ent (const struct edict_s *)
       v8_args[1] = v8::Number::New(isolate, sendweapons); // sendweapons (int)
-      v8_args[2] = v8::External::New(isolate, cd /* clientdata_s  */); // cd (struct clientdata_s *)
+      v8_args[2] = structures::wrapClientData(isolate, cd); // cd (struct clientdata_s *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -448,13 +448,13 @@
     event::findAndCall("dllAddToFullPack", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 7;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[7];
-      v8_args[0] = v8::External::New(isolate, state /* entity_state_s  */); // state (struct entity_state_s *)
+      v8_args[0] = structures::wrapEntityState(isolate, state); // state (struct entity_state_s *)
       v8_args[1] = v8::Number::New(isolate, e); // e (int)
       v8_args[2] = structures::wrapEntity(isolate, ent); // ent (edict_t *)
       v8_args[3] = structures::wrapEntity(isolate, host); // host (edict_t *)
       v8_args[4] = v8::Number::New(isolate, hostflags); // hostflags (int)
       v8_args[5] = v8::Number::New(isolate, player); // player (int)
-      v8_args[6] = v8::External::New(isolate, pSet /* unsigned char  */); // pSet (unsigned char *)
+      v8_args[6] = utils::byteArrayToJS(isolate, pSet); // pSet (unsigned char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -468,8 +468,8 @@
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[7];
       v8_args[0] = v8::Number::New(isolate, player); // player (int)
       v8_args[1] = v8::Number::New(isolate, eindex); // eindex (int)
-      v8_args[2] = v8::External::New(isolate, baseline /* entity_state_s  */); // baseline (struct entity_state_s *)
-      v8_args[3] = v8::External::New(isolate, entity /* edict_s  */); // entity (struct edict_s *)
+      v8_args[2] = structures::wrapEntityState(isolate, baseline); // baseline (struct entity_state_s *)
+      v8_args[3] = structures::wrapEntity(isolate, entity); // entity (struct edict_s *)
       v8_args[4] = v8::Number::New(isolate, playermodelindex); // playermodelindex (int)
       v8_args[5] = utils::vect2js(isolate, player_mins); // player_mins (vec3_t)
       v8_args[6] = utils::vect2js(isolate, player_maxs); // player_maxs (vec3_t)
@@ -489,8 +489,8 @@
     event::findAndCall("dllGetWeaponData", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = v8::External::New(isolate, player /* edict_s  */); // player (struct edict_s *)
-      v8_args[1] = v8::External::New(isolate, info /* weapon_data_s  */); // info (struct weapon_data_s *)
+      v8_args[0] = structures::wrapEntity(isolate, player); // player (struct edict_s *)
+      v8_args[1] = structures::wrapWeaponData(isolate, info); // info (struct weapon_data_s *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -503,7 +503,7 @@
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = structures::wrapEntity(isolate, player); // player (const edict_t *)
-      v8_args[1] = v8::External::New(isolate, (void*)cmd /* usercmd_s  */); // cmd (const struct usercmd_s *)
+      v8_args[1] = structures::wrapUserCmd(isolate, (void*)cmd); // cmd (const struct usercmd_s *)
       v8_args[2] = v8::Number::New(isolate, random_seed); // random_seed (unsigned int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -526,10 +526,10 @@
     event::findAndCall("dllConnectionlessPacket", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 4;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[4];
-      v8_args[0] = v8::External::New(isolate, (void*)net_from /* netadr_s  */); // net_from (const struct netadr_s *)
+      v8_args[0] = structures::wrapNetAdr(isolate, (void*)net_from); // net_from (const struct netadr_s *)
       v8_args[1] = v8::String::NewFromUtf8(isolate, args).ToLocalChecked(); // args (const char *)
       v8_args[2] = v8::String::NewFromUtf8(isolate, response_buffer).ToLocalChecked(); // response_buffer (char *)
-      v8_args[3] = v8::External::New(isolate, response_buffer_size /* int  */); // response_buffer_size (int *)
+      v8_args[3] = utils::intArrayToJS(isolate, response_buffer_size); // response_buffer_size (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -542,8 +542,8 @@
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = v8::Number::New(isolate, hullnumber); // hullnumber (int)
-      v8_args[1] = v8::External::New(isolate, mins /* float  */); // mins (float *)
-      v8_args[2] = v8::External::New(isolate, maxs /* float  */); // maxs (float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, mins); // mins (float *)
+      v8_args[2] = utils::floatArrayToJS(isolate, maxs); // maxs (float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -561,7 +561,7 @@
     event::findAndCall("dllInconsistentFile", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
-      v8_args[0] = v8::External::New(isolate, (void*)player /* edict_s  */); // player (const struct edict_s *)
+      v8_args[0] = structures::wrapEntity(isolate, player); // player (const struct edict_s *)
       v8_args[1] = v8::String::NewFromUtf8(isolate, filename).ToLocalChecked(); // filename (const char *)
       v8_args[2] = v8::String::NewFromUtf8(isolate, disconnect_message).ToLocalChecked(); // disconnect_message (char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
@@ -702,7 +702,7 @@
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = structures::wrapEntity(isolate, pentKeyvalue); // pentKeyvalue (edict_t *)
-      v8_args[1] = v8::External::New(isolate, pkvd /* KeyValueData  */); // pkvd (KeyValueData *)
+      v8_args[1] = structures::wrapKeyValueData(isolate, pkvd); // pkvd (KeyValueData *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -714,7 +714,7 @@
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = structures::wrapEntity(isolate, pent); // pent (edict_t *)
-      v8_args[1] = v8::External::New(isolate, pSaveData /* SAVERESTOREDATA  */); // pSaveData (SAVERESTOREDATA *)
+      v8_args[1] = structures::wrapSaveRestoreData(isolate, pSaveData); // pSaveData (SAVERESTOREDATA *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -726,7 +726,7 @@
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = structures::wrapEntity(isolate, pent); // pent (edict_t *)
-      v8_args[1] = v8::External::New(isolate, pSaveData /* SAVERESTOREDATA  */); // pSaveData (SAVERESTOREDATA *)
+      v8_args[1] = structures::wrapSaveRestoreData(isolate, pSaveData); // pSaveData (SAVERESTOREDATA *)
       v8_args[2] = v8::Number::New(isolate, globalEntity); // globalEntity (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -750,10 +750,10 @@
     event::findAndCall("postDllSaveWriteFields", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 5;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[5];
-      v8_args[0] = v8::External::New(isolate, value0 /* SAVERESTOREDATA */); // value0 (SAVERESTOREDATA*)
+      v8_args[0] = structures::wrapSaveRestoreData(isolate, value0); // value0 (SAVERESTOREDATA*)
       v8_args[1] = v8::String::NewFromUtf8(isolate, value1).ToLocalChecked(); // value1 (const char*)
-      v8_args[2] = v8::External::New(isolate, value2 /* void */); // value2 (void*)
-      v8_args[3] = v8::External::New(isolate, value3 /* TYPEDESCRIPTION */); // value3 (TYPEDESCRIPTION*)
+      v8_args[2] = v8::External::New(isolate, value2); // value2 (void*)
+      v8_args[3] = structures::wrapTypeDescription(isolate, value3); // value3 (TYPEDESCRIPTION*)
       v8_args[4] = v8::Number::New(isolate, value4); // value4 (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -765,10 +765,10 @@
     event::findAndCall("postDllSaveReadFields", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 5;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[5];
-      v8_args[0] = v8::External::New(isolate, value0 /* SAVERESTOREDATA */); // value0 (SAVERESTOREDATA*)
+      v8_args[0] = structures::wrapSaveRestoreData(isolate, value0); // value0 (SAVERESTOREDATA*)
       v8_args[1] = v8::String::NewFromUtf8(isolate, value1).ToLocalChecked(); // value1 (const char*)
-      v8_args[2] = v8::External::New(isolate, value2 /* void */); // value2 (void*)
-      v8_args[3] = v8::External::New(isolate, value3 /* TYPEDESCRIPTION */); // value3 (TYPEDESCRIPTION*)
+      v8_args[2] = v8::External::New(isolate, value2); // value2 (void*)
+      v8_args[3] = structures::wrapTypeDescription(isolate, value3); // value3 (TYPEDESCRIPTION*)
       v8_args[4] = v8::Number::New(isolate, value4); // value4 (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -780,7 +780,7 @@
     event::findAndCall("postDllSaveGlobalState", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::External::New(isolate, value0 /* SAVERESTOREDATA  */); // value0 (SAVERESTOREDATA *)
+      v8_args[0] = structures::wrapSaveRestoreData(isolate, value0); // value0 (SAVERESTOREDATA *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -791,7 +791,7 @@
     event::findAndCall("postDllRestoreGlobalState", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::External::New(isolate, value0 /* SAVERESTOREDATA  */); // value0 (SAVERESTOREDATA *)
+      v8_args[0] = structures::wrapSaveRestoreData(isolate, value0); // value0 (SAVERESTOREDATA *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -954,7 +954,7 @@
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = structures::wrapEntity(isolate, pEntity); // pEntity (edict_t *)
-      v8_args[1] = v8::External::New(isolate, pCustom /* customization_t  */); // pCustom (customization_t *)
+      v8_args[1] = structures::wrapCustomization(isolate, pCustom); // pCustom (customization_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -1009,7 +1009,7 @@
     event::findAndCall("postDllPMMove", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = v8::External::New(isolate, ppmove /* playermove_s  */); // ppmove (struct playermove_s *)
+      v8_args[0] = structures::wrapPlayerMove(isolate, ppmove); // ppmove (struct playermove_s *)
       v8_args[1] = v8::Boolean::New(isolate, server); // server (qboolean)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -1021,7 +1021,7 @@
     event::findAndCall("postDllPMInit", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::External::New(isolate, ppmove /* playermove_s  */); // ppmove (struct playermove_s *)
+      v8_args[0] = structures::wrapPlayerMove(isolate, ppmove); // ppmove (struct playermove_s *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -1044,10 +1044,10 @@
     event::findAndCall("postDllSetupVisibility", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 4;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[4];
-      v8_args[0] = v8::External::New(isolate, pViewEntity /* edict_s  */); // pViewEntity (struct edict_s *)
-      v8_args[1] = v8::External::New(isolate, pClient /* edict_s  */); // pClient (struct edict_s *)
-      v8_args[2] = v8::External::New(isolate, pvs /* unsigned char * */); // pvs (unsigned char **)
-      v8_args[3] = v8::External::New(isolate, pas /* unsigned char * */); // pas (unsigned char **)
+      v8_args[0] = structures::wrapEntity(isolate, pViewEntity); // pViewEntity (struct edict_s *)
+      v8_args[1] = structures::wrapEntity(isolate, pClient); // pClient (struct edict_s *)
+      v8_args[2] = v8::External::New(isolate, pvs); // pvs (unsigned char **)
+      v8_args[3] = v8::External::New(isolate, pas); // pas (unsigned char **)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -1058,9 +1058,9 @@
     event::findAndCall("postDllUpdateClientData", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
-      v8_args[0] = v8::External::New(isolate, (void*)ent /* edict_s  */); // ent (const struct edict_s *)
+      v8_args[0] = structures::wrapEntity(isolate, ent); // ent (const struct edict_s *)
       v8_args[1] = v8::Number::New(isolate, sendweapons); // sendweapons (int)
-      v8_args[2] = v8::External::New(isolate, cd /* clientdata_s  */); // cd (struct clientdata_s *)
+      v8_args[2] = structures::wrapClientData(isolate, cd); // cd (struct clientdata_s *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -1071,13 +1071,13 @@
     event::findAndCall("postDllAddToFullPack", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 7;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[7];
-      v8_args[0] = v8::External::New(isolate, state /* entity_state_s  */); // state (struct entity_state_s *)
+      v8_args[0] = structures::wrapEntityState(isolate, state); // state (struct entity_state_s *)
       v8_args[1] = v8::Number::New(isolate, e); // e (int)
       v8_args[2] = structures::wrapEntity(isolate, ent); // ent (edict_t *)
       v8_args[3] = structures::wrapEntity(isolate, host); // host (edict_t *)
       v8_args[4] = v8::Number::New(isolate, hostflags); // hostflags (int)
       v8_args[5] = v8::Number::New(isolate, player); // player (int)
-      v8_args[6] = v8::External::New(isolate, pSet /* unsigned char  */); // pSet (unsigned char *)
+      v8_args[6] = utils::byteArrayToJS(isolate, pSet); // pSet (unsigned char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -1091,8 +1091,8 @@
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[7];
       v8_args[0] = v8::Number::New(isolate, player); // player (int)
       v8_args[1] = v8::Number::New(isolate, eindex); // eindex (int)
-      v8_args[2] = v8::External::New(isolate, baseline /* entity_state_s  */); // baseline (struct entity_state_s *)
-      v8_args[3] = v8::External::New(isolate, entity /* edict_s  */); // entity (struct edict_s *)
+      v8_args[2] = structures::wrapEntityState(isolate, baseline); // baseline (struct entity_state_s *)
+      v8_args[3] = structures::wrapEntity(isolate, entity); // entity (struct edict_s *)
       v8_args[4] = v8::Number::New(isolate, playermodelindex); // playermodelindex (int)
       v8_args[5] = utils::vect2js(isolate, player_mins); // player_mins (vec3_t)
       v8_args[6] = utils::vect2js(isolate, player_maxs); // player_maxs (vec3_t)
@@ -1112,8 +1112,8 @@
     event::findAndCall("postDllGetWeaponData", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = v8::External::New(isolate, player /* edict_s  */); // player (struct edict_s *)
-      v8_args[1] = v8::External::New(isolate, info /* weapon_data_s  */); // info (struct weapon_data_s *)
+      v8_args[0] = structures::wrapEntity(isolate, player); // player (struct edict_s *)
+      v8_args[1] = structures::wrapWeaponData(isolate, info); // info (struct weapon_data_s *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -1126,7 +1126,7 @@
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = structures::wrapEntity(isolate, player); // player (const edict_t *)
-      v8_args[1] = v8::External::New(isolate, (void*)cmd /* usercmd_s  */); // cmd (const struct usercmd_s *)
+      v8_args[1] = structures::wrapUserCmd(isolate, (void*)cmd); // cmd (const struct usercmd_s *)
       v8_args[2] = v8::Number::New(isolate, random_seed); // random_seed (unsigned int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -1149,10 +1149,10 @@
     event::findAndCall("postDllConnectionlessPacket", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 4;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[4];
-      v8_args[0] = v8::External::New(isolate, (void*)net_from /* netadr_s  */); // net_from (const struct netadr_s *)
+      v8_args[0] = structures::wrapNetAdr(isolate, (void*)net_from); // net_from (const struct netadr_s *)
       v8_args[1] = v8::String::NewFromUtf8(isolate, args).ToLocalChecked(); // args (const char *)
       v8_args[2] = v8::String::NewFromUtf8(isolate, response_buffer).ToLocalChecked(); // response_buffer (char *)
-      v8_args[3] = v8::External::New(isolate, response_buffer_size /* int  */); // response_buffer_size (int *)
+      v8_args[3] = utils::intArrayToJS(isolate, response_buffer_size); // response_buffer_size (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -1165,8 +1165,8 @@
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = v8::Number::New(isolate, hullnumber); // hullnumber (int)
-      v8_args[1] = v8::External::New(isolate, mins /* float  */); // mins (float *)
-      v8_args[2] = v8::External::New(isolate, maxs /* float  */); // maxs (float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, mins); // mins (float *)
+      v8_args[2] = utils::floatArrayToJS(isolate, maxs); // maxs (float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -1184,7 +1184,7 @@
     event::findAndCall("postDllInconsistentFile", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
-      v8_args[0] = v8::External::New(isolate, (void*)player /* edict_s  */); // player (const struct edict_s *)
+      v8_args[0] = structures::wrapEntity(isolate, player); // player (const struct edict_s *)
       v8_args[1] = v8::String::NewFromUtf8(isolate, filename).ToLocalChecked(); // filename (const char *)
       v8_args[2] = v8::String::NewFromUtf8(isolate, disconnect_message).ToLocalChecked(); // disconnect_message (char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);

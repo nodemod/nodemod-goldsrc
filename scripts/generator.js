@@ -1,32 +1,262 @@
 import customs from './customs.js';
 
+// Consolidated type mappings to eliminate redundancy
+const TYPE_MAPPINGS = {
+  // Basic types - js2cpp and cpp2js mappings
+  basicTypes: {
+    'const char *': { 
+      js2cpp: (value) => `utils::js2string(isolate, ${value})`,
+      cpp2js: (value) => `v8::String::NewFromUtf8(isolate, ${value}).ToLocalChecked()`
+    },
+    'const char*': { 
+      js2cpp: (value) => `utils::js2string(isolate, ${value})`,
+      cpp2js: (value) => `v8::String::NewFromUtf8(isolate, ${value}).ToLocalChecked()`
+    },
+    'char *': { 
+      js2cpp: (value) => `utils::js2string(isolate, ${value})`,
+      cpp2js: (value) => `v8::String::NewFromUtf8(isolate, ${value}).ToLocalChecked()`
+    },
+    'char*': { 
+      js2cpp: (value) => `utils::js2string(isolate, ${value})`,
+      cpp2js: (value) => `v8::String::NewFromUtf8(isolate, ${value}).ToLocalChecked()`
+    },
+    'char': { 
+      js2cpp: (value) => `${value}->Int32Value(context).ToChecked()`,
+      cpp2js: (value) => `v8::Number::New(isolate, ${value})`
+    },
+    'int': { 
+      js2cpp: (value) => `${value}->Int32Value(context).ToChecked()`,
+      cpp2js: (value) => `v8::Number::New(isolate, ${value})`
+    },
+    'unsigned int': { 
+      js2cpp: (value) => `${value}->Uint32Value(context).ToChecked()`,
+      cpp2js: (value) => `v8::Number::New(isolate, ${value})`
+    },
+    'float': { 
+      js2cpp: (value) => `${value}->NumberValue(context).ToChecked()`,
+      cpp2js: (value) => `v8::Number::New(isolate, ${value})`
+    },
+    'double': { 
+      js2cpp: (value) => `${value}->NumberValue(context).ToChecked()`,
+      cpp2js: (value) => `v8::Number::New(isolate, ${value})`
+    },
+    'unsigned char': { 
+      js2cpp: (value) => `${value}->Int32Value(context).ToChecked()`,
+      cpp2js: (value) => `v8::Number::New(isolate, ${value})`
+    },
+    'unsigned short': { 
+      js2cpp: (value) => `${value}->Int32Value(context).ToChecked()`,
+      cpp2js: (value) => `v8::Number::New(isolate, ${value})`
+    },
+    'byte': { 
+      js2cpp: (value) => `${value}->Int32Value(context).ToChecked()`,
+      cpp2js: (value) => `v8::Number::New(isolate, ${value})`
+    },
+    'qboolean': { 
+      js2cpp: (value) => `${value}->BooleanValue(isolate)`,
+      cpp2js: (value) => `v8::Boolean::New(isolate, ${value})`
+    },
+    'ALERT_TYPE': { 
+      js2cpp: (value) => `(ALERT_TYPE)${value}->Int32Value(context).ToChecked()`,
+      cpp2js: (value) => `v8::Number::New(isolate, ${value})`
+    },
+    'FORCE_TYPE': { 
+      js2cpp: (value) => `*(FORCE_TYPE*)utils::jsToBytes(isolate, ${value})`,
+      cpp2js: (value) => `v8::Number::New(isolate, ${value})`
+    },
+    'PRINT_TYPE': { 
+      js2cpp: (value) => `*(PRINT_TYPE*)utils::jsToBytes(isolate, ${value})`,
+      cpp2js: (value) => `v8::Number::New(isolate, ${value})`
+    },
+    'CRC32_t': { 
+      js2cpp: (value) => `${value}->Uint32Value(context).ToChecked()`,
+      cpp2js: (value) => `v8::Number::New(isolate, ${value})`
+    },
+    'vec3_t': { 
+      js2cpp: (value) => `utils::js2vect(isolate, ${value})`,
+      cpp2js: (value) => `utils::vect2js(isolate, ${value})`
+    },
+    'TraceResult': { 
+      js2cpp: (value) => `structures::unwrapTraceResult(isolate, ${value})`,
+      cpp2js: (value) => `structures::wrapTraceResult(isolate, &${value})`
+    },
+    'void*': { 
+      js2cpp: (value) => `nullptr /* void* not supported */`,
+      cpp2js: (value) => `v8::External::New(isolate, ${value})`
+    },
+    'FILE *': { 
+      js2cpp: (value) => `nullptr /* FILE* not supported */`,
+      cpp2js: (value) => `v8::External::New(isolate, ${value})`
+    },
+    '$rest': { 
+      js2cpp: (value) => `/* variadic args */`,
+      cpp2js: (value) => `/* variadic args */`
+    },
+    // Direct pointer type matches
+    'int *': { 
+      js2cpp: (value) => `(int*)utils::jsToPointer(isolate, ${value})`,
+      cpp2js: (value) => `utils::intArrayToJS(isolate, ${value})`
+    },
+    'float *': { 
+      js2cpp: (value) => `(float*)utils::jsToPointer(isolate, ${value})`,
+      cpp2js: (value) => `utils::floatArrayToJS(isolate, ${value})`
+    },
+    'const float *': { 
+      js2cpp: (value) => `(const float*)utils::jsToPointer(isolate, ${value})`,
+      cpp2js: (value) => `utils::floatArrayToJS(isolate, ${value})`
+    },
+    'void *': { 
+      js2cpp: (value) => `utils::jsToPointer(isolate, ${value})`,
+      cpp2js: (value) => `v8::External::New(isolate, ${value})`
+    },
+    'unsigned char *': { 
+      js2cpp: (value) => `(unsigned char*)utils::jsToPointer(isolate, ${value})`,
+      cpp2js: (value) => `utils::byteArrayToJS(isolate, ${value})`
+    },
+    'unsigned char **': { 
+      js2cpp: (value) => `(unsigned char**)utils::jsToPointer(isolate, ${value})`,
+      cpp2js: (value) => `v8::External::New(isolate, ${value})`
+    },
+    'char **': { 
+      js2cpp: (value) => `(char**)utils::jsToPointer(isolate, ${value})`,
+      cpp2js: (value) => `utils::stringArrayToJS(isolate, ${value})`
+    },
+    'const struct usercmd_s *': { 
+      js2cpp: (value) => `structures::unwrapUserCmd(isolate, ${value})`,
+      cpp2js: (value) => `structures::wrapUserCmd(isolate, (void*)${value})`
+    },
+    'const struct netadr_s *': { 
+      js2cpp: (value) => `structures::unwrapNetAdr(isolate, ${value})`,
+      cpp2js: (value) => `structures::wrapNetAdr(isolate, (void*)${value})`
+    }
+  },
+
+  // Struct mappings - base name to wrapper functions
+  structMappings: {
+    'edict_t': { unwrap: 'structures::unwrapEntity', wrap: 'structures::wrapEntity' },
+    'edict_s': { unwrap: 'structures::unwrapEntity', wrap: 'structures::wrapEntity' },
+    'entvars_s': { unwrap: 'structures::unwrapEntvars', wrap: 'structures::wrapEntvars' },
+    'clientdata_s': { unwrap: 'structures::unwrapClientData', wrap: 'structures::wrapClientData' },
+    'entity_state_s': { unwrap: 'structures::unwrapEntityState', wrap: 'structures::wrapEntityState' },
+    'usercmd_s': { unwrap: 'structures::unwrapUserCmd', wrap: 'structures::wrapUserCmd' },
+    'netadr_s': { unwrap: 'structures::unwrapNetAdr', wrap: 'structures::wrapNetAdr' },
+    'weapon_data_s': { unwrap: 'structures::unwrapWeaponData', wrap: 'structures::wrapWeaponData' },
+    'playermove_s': { unwrap: 'structures::unwrapPlayerMove', wrap: 'structures::wrapPlayerMove' },
+    'customization_t': { unwrap: 'structures::unwrapCustomization', wrap: 'structures::wrapCustomization' },
+    'KeyValueData': { unwrap: 'structures::unwrapKeyValueData', wrap: 'structures::wrapKeyValueData' },
+    'SAVERESTOREDATA': { unwrap: 'structures::unwrapSaveRestoreData', wrap: 'structures::wrapSaveRestoreData' },
+    'TYPEDESCRIPTION': { unwrap: 'structures::unwrapTypeDescription', wrap: 'structures::wrapTypeDescription' },
+    'delta_s': { unwrap: 'structures::unwrapDelta', wrap: 'structures::wrapDelta' },
+    'cvar_s': { unwrap: 'structures::unwrapCvar', wrap: 'structures::wrapCvar' },
+    'cvar_t': { unwrap: 'structures::unwrapCvar', wrap: 'structures::wrapCvar' },
+    'TraceResult': { unwrap: 'structures::unwrapTraceResult', wrap: 'structures::wrapTraceResult' }
+  },
+
+  // Pointer type mappings
+  pointerMappings: {
+    'float': { 
+      js2cpp: (value) => `(float*)utils::jsToPointer(isolate, ${value})`,
+      cpp2js: (value) => `utils::floatArrayToJS(isolate, ${value})`
+    },
+    'int': { 
+      js2cpp: (value) => `(int*)utils::jsToPointer(isolate, ${value})`,
+      cpp2js: (value) => `utils::intArrayToJS(isolate, ${value})`
+    },
+    'char *': { 
+      js2cpp: (value) => `utils::js2string(isolate, ${value})`,
+      cpp2js: (value) => `v8::String::NewFromUtf8(isolate, ${value}).ToLocalChecked()`
+    },
+    'void': { 
+      js2cpp: (value) => `utils::jsToPointer(isolate, ${value})`,
+      cpp2js: (value) => `v8::External::New(isolate, ${value})`
+    },
+    'CRC32_t': { 
+      js2cpp: (value) => `(CRC32_t*)utils::jsToPointer(isolate, ${value})`,
+      cpp2js: (value) => `v8::External::New(isolate, ${value})`
+    },
+    'unsigned char': { 
+      js2cpp: (value) => `(unsigned char*)utils::jsToPointer(isolate, ${value})`,
+      cpp2js: (value) => `utils::byteArrayToJS(isolate, ${value})`
+    },
+    'byte': { 
+      js2cpp: (value) => `(byte*)utils::jsToPointer(isolate, ${value})`,
+      cpp2js: (value) => `utils::byteArrayToJS(isolate, ${value})`
+    },
+    'FILE': { 
+      js2cpp: (value) => `nullptr /* FILE* not supported */`,
+      cpp2js: (value) => `v8::External::New(isolate, ${value})`
+    }
+  }
+};
+
+// Helper function to normalize type strings
+function normalizeType(type) {
+  return type.trim();
+}
+
+// Helper function to extract struct name from pointer types
+function extractStructName(type) {
+  const match = type.match(/^(?:const\s+)?(?:struct\s+)?(.+?)\s*\*?\s*$/);
+  return match ? match[1].trim() : null;
+}
+
+// Helper function to check if a type is a pointer
+function isPointerType(type) {
+  return type.includes('*');
+}
+
+// Helper function to get struct mapping
+function getStructMapping(type, isJs2Cpp, value) {
+  const structName = extractStructName(type);
+  if (!structName) return null;
+
+  const mapping = TYPE_MAPPINGS.structMappings[structName];
+  if (!mapping) return null;
+
+  if (isJs2Cpp) {
+    return `${mapping.unwrap}(isolate, ${value})`;
+  } else {
+    return `${mapping.wrap}(isolate, ${value})`;
+  }
+}
+
+// Helper function to get pointer mapping
+function getPointerMapping(type, isJs2Cpp, value) {
+  const baseName = extractStructName(type.replace(/\*+$/, ''));
+  if (!baseName) return null;
+
+  const mapping = TYPE_MAPPINGS.pointerMappings[baseName];
+  if (!mapping) return null;
+
+  if (isJs2Cpp) {
+    return mapping.js2cpp(value);
+  } else {
+    return mapping.cpp2js(value);
+  }
+}
+
 // Генератор транслейтов
 const generator = {
   js2cpp(type, value) {
-    const extractorGenerator = {
-      'const char *': `utils::js2string(isolate, ${value})`,
-      'char *': `utils::js2string(isolate, ${value})`,
-      int: `${value}->Int32Value(context).ToChecked()`,
-      float: `${value}->NumberValue(context).ToChecked()`,
-      qboolean: `${value}->BooleanValue(isolate)`,
-      FORCE_TYPE: `*(FORCE_TYPE*)utils::jsToBytes(isolate, ${value})`,
-      PRINT_TYPE: `*(PRINT_TYPE*)utils::jsToBytes(isolate, ${value})`,
-      'unsigned short': `${value}->Int32Value(context).ToChecked()`,
-      'byte': `${value}->Int32Value(context).ToChecked()`,
-    };
+    const normalizedType = normalizeType(type);
 
-    if (extractorGenerator[type]) {
-      return extractorGenerator[type];
+    // Check basic types first
+    const basicMapping = TYPE_MAPPINGS.basicTypes[normalizedType];
+    if (basicMapping) {
+      return basicMapping.js2cpp(value);
     }
 
-    const [_, name] = type.match(/(?:const )?(?:struct )?(.+)\*/) || [];
-    if (name) {
-      const structs = {
-        edict_t: `structures::unwrapEntity(isolate, ${value})`
-      };
+    // Try struct mapping
+    const structMapping = getStructMapping(normalizedType, true, value);
+    if (structMapping) {
+      return structMapping;
+    }
 
-      if (structs[name.trim()]) {
-        return structs[name.trim()];
+    // Try pointer mapping if it's a pointer type
+    if (isPointerType(normalizedType)) {
+      const pointerMapping = getPointerMapping(normalizedType, true, value);
+      if (pointerMapping) {
+        return pointerMapping;
       }
     }
 
@@ -35,35 +265,30 @@ const generator = {
   },
 
   cpp2js(type, value) {
-    const types = {
-      'unsigned int': `v8::Number::New(isolate, ${value})`,
-      int: `v8::Number::New(isolate, ${value})`,
-      float: `v8::Number::New(isolate, ${value})`,
-      qboolean: `v8::Boolean::New(isolate, ${value})`,
-      vec3_t: `utils::vect2js(isolate, ${value})`
-    };
+    const normalizedType = normalizeType(type);
 
-    if (types[type]) {
-      return types[type];
+    // Check basic types first
+    const basicMapping = TYPE_MAPPINGS.basicTypes[normalizedType];
+    if (basicMapping) {
+      return basicMapping.cpp2js(value);
     }
 
-    const [_, name] = type.match(/(?:const )?(?:struct )?(.+)\*/) || [];
-    if (name) {
-      const structs = {
-        edict_t: `structures::wrapEntity(isolate, ${value})`,
-        char: `v8::String::NewFromUtf8(isolate, ${value}).ToLocalChecked()`
-      };
+    // Try struct mapping
+    const structMapping = getStructMapping(normalizedType, false, value);
+    if (structMapping) {
+      return structMapping;
+    }
 
-      if (structs[name.trim()]) {
-        return structs[name.trim()];
+    // Try pointer mapping if it's a pointer type
+    if (isPointerType(normalizedType)) {
+      const pointerMapping = getPointerMapping(normalizedType, false, value);
+      if (pointerMapping) {
+        return pointerMapping;
       }
-
-      console.warn(`Struct ${type} not found: cpp2js`);
-      return `v8::External::New(isolate, ${value} /* ${name} */)`;
     }
 
     console.warn(`Type ${type} not found: cpp2js`);
-    return null;
+    return `v8::External::New(isolate, ${value} /* ${type} */)`;
   },
 
   packReturn(func, value) {
@@ -72,15 +297,13 @@ const generator = {
     }
 
     const generated = this.cpp2js(func.type, value)
-    if (!generated) {
+    if (!generated || generated.includes('/* ') && generated.includes(' */')) {
       console.log(`No ${func.type} type packReturn`);
       if (func.type.includes('*')) {
         return `info.GetReturnValue().Set(v8::External::New(isolate, ${value}));`;
       }
-
       return `${value} /* TODO: type ${func.type} */`;
     }
-
 
     return `info.GetReturnValue().Set(${generated})`;
   },
@@ -94,7 +317,7 @@ const generator = {
 	v8::HandleScope scope(isolate);
 	auto context = isolate->GetCurrentContext();
 
-  ${customBody || this.packReturn(func, `(*${source}.${func.name})(${func.args.map((v, i) => this.js2cpp(v.type, `info[${i}]`)).join(',\n')})`)};
+  ${customBody || this.packReturn(func, `(*${source}.${func.name})(${(func.args || []).map((v, i) => this.js2cpp(v.type, `info[${i}]`)).join(',\n')})`)};
 }`;
   }
 }
