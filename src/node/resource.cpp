@@ -153,7 +153,10 @@ static node::IsolateData* GetNodeIsolate()
 
 		const v8::Local<v8::String>& sourceV8String = v8::String::NewFromUtf8(GetV8Isolate(), source.c_str(), v8::NewStringType::kNormal).ToLocalChecked();
 		v8::Local<v8::Script> script = v8::Script::Compile(_context, sourceV8String).ToLocalChecked();
-		script->Run(_context);
+		v8::MaybeLocal<v8::Value> result = script->Run(_context);
+		if (result.IsEmpty()) {
+			L_ERROR << "Script execution failed in RunCode()";
+		}
 	}
 
 	v8::Local<v8::Value> Resource::AddModule(const std::string& source, const std::string& name)

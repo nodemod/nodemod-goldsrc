@@ -42,3 +42,13 @@ docker run --name "${CONTAINER_NAME}" \
 
 echo "Container run completed. Built files are available in ./output/"
 echo "The compiled libnodemod.so should be in ./output/Debug/bin/"
+
+# Copy the built .so file to the HLDS installation
+if [ -f "./build/Debug/bin/libnodemod.so" ]; then
+    echo "Copying libnodemod.so to HLDS installation..."
+    mkdir -p "/home/stevenlafl/Containers/hlds/hlds/ts/addons/nodemod/dlls/"
+    cp "./build/Debug/bin/libnodemod.so" "/home/stevenlafl/Containers/hlds/hlds/ts/addons/nodemod/dlls/"
+    echo "✓ libnodemod.so copied successfully to /home/stevenlafl/Containers/hlds/hlds/ts/addons/nodemod/dlls/"
+else
+    echo "✗ libnodemod.so not found in ./build/Debug/bin/"
+fi

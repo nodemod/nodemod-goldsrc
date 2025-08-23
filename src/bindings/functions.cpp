@@ -17,6 +17,7 @@ std::vector<std::pair<std::string, v8::FunctionCallback>> nodemodFunctions =
 	{ "clearListeners", event::clearListeners },
 	{ "removeListener", event::remove_listener },
 	{ "removeEventListener", event::remove_listener },
+	{ "fire", event::fire },
 	{ "getUserMsgId", getUserMsgId },
 	{ "getUserMsgName", getUserMsgName },
 	{ "setMetaResult", setMetaResult },

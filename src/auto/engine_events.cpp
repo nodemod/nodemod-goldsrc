@@ -13,7 +13,7 @@
     event::findAndCall("engPrecacheModel", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, s).ToLocalChecked(); // s (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, s ? s : "").ToLocalChecked(); // s (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -25,7 +25,7 @@
     event::findAndCall("engPrecacheSound", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, s).ToLocalChecked(); // s (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, s ? s : "").ToLocalChecked(); // s (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -38,7 +38,7 @@
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = structures::wrapEntity(isolate, e); // e (edict_t *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, m).ToLocalChecked(); // m (const char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, m ? m : "").ToLocalChecked(); // m (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -49,7 +49,7 @@
     event::findAndCall("engModelIndex", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, m).ToLocalChecked(); // m (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, m ? m : "").ToLocalChecked(); // m (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -86,8 +86,8 @@
     event::findAndCall("engChangeLevel", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, s1).ToLocalChecked(); // s1 (const char *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, s2).ToLocalChecked(); // s2 (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, s1 ? s1 : "").ToLocalChecked(); // s1 (const char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, s2 ? s2 : "").ToLocalChecked(); // s2 (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -181,8 +181,8 @@
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = structures::wrapEntity(isolate, pEdictStartSearchAfter); // pEdictStartSearchAfter (edict_t *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, pszField).ToLocalChecked(); // pszField (const char *)
-      v8_args[2] = v8::String::NewFromUtf8(isolate, pszValue).ToLocalChecked(); // pszValue (const char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, pszField ? pszField : "").ToLocalChecked(); // pszField (const char *)
+      v8_args[2] = v8::String::NewFromUtf8(isolate, pszValue ? pszValue : "").ToLocalChecked(); // pszValue (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return nullptr;
@@ -363,7 +363,7 @@
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[7];
       v8_args[0] = structures::wrapEntity(isolate, entity); // entity (edict_t *)
       v8_args[1] = v8::Number::New(isolate, channel); // channel (int)
-      v8_args[2] = v8::String::NewFromUtf8(isolate, sample).ToLocalChecked(); // sample (const char *)
+      v8_args[2] = v8::String::NewFromUtf8(isolate, sample ? sample : "").ToLocalChecked(); // sample (const char *)
       v8_args[3] = v8::Number::New(isolate, volume); // volume (float)
       v8_args[4] = v8::Number::New(isolate, attenuation); // attenuation (float)
       v8_args[5] = v8::Number::New(isolate, fFlags); // fFlags (int)
@@ -380,7 +380,7 @@
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[7];
       v8_args[0] = structures::wrapEntity(isolate, entity); // entity (edict_t *)
       v8_args[1] = utils::floatArrayToJS(isolate, pos); // pos (const float *)
-      v8_args[2] = v8::String::NewFromUtf8(isolate, samp).ToLocalChecked(); // samp (const char *)
+      v8_args[2] = v8::String::NewFromUtf8(isolate, samp ? samp : "").ToLocalChecked(); // samp (const char *)
       v8_args[3] = v8::Number::New(isolate, vol); // vol (float)
       v8_args[4] = v8::Number::New(isolate, attenuation); // attenuation (float)
       v8_args[5] = v8::Number::New(isolate, fFlags); // fFlags (int)
@@ -514,7 +514,7 @@
     event::findAndCall("engServerCommand", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, str).ToLocalChecked(); // str (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, str ? str : "").ToLocalChecked(); // str (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -558,7 +558,7 @@
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = v8::Number::New(isolate, style); // style (int)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, val).ToLocalChecked(); // val (const char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, val ? val : "").ToLocalChecked(); // val (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -569,7 +569,7 @@
     event::findAndCall("engDecalIndex", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, name).ToLocalChecked(); // name (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, name ? name : "").ToLocalChecked(); // name (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -679,7 +679,7 @@
     event::findAndCall("engWriteString", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, sz).ToLocalChecked(); // sz (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, sz ? sz : "").ToLocalChecked(); // sz (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -712,7 +712,7 @@
     event::findAndCall("engCVarGetFloat", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, szVarName).ToLocalChecked(); // szVarName (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, szVarName ? szVarName : "").ToLocalChecked(); // szVarName (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0.0f;
@@ -724,7 +724,7 @@
     event::findAndCall("engCVarGetString", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, szVarName).ToLocalChecked(); // szVarName (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, szVarName ? szVarName : "").ToLocalChecked(); // szVarName (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return nullptr;
@@ -736,7 +736,7 @@
     event::findAndCall("engCVarSetFloat", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, szVarName).ToLocalChecked(); // szVarName (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, szVarName ? szVarName : "").ToLocalChecked(); // szVarName (const char *)
       v8_args[1] = v8::Number::New(isolate, flValue); // flValue (float)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -748,8 +748,8 @@
     event::findAndCall("engCVarSetString", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, szVarName).ToLocalChecked(); // szVarName (const char *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, szValue).ToLocalChecked(); // szValue (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, szVarName ? szVarName : "").ToLocalChecked(); // szVarName (const char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, szValue ? szValue : "").ToLocalChecked(); // szValue (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -761,7 +761,7 @@
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = v8::Number::New(isolate, atype); // atype (ALERT_TYPE)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, szFmt).ToLocalChecked(); // szFmt (const char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, szFmt ? szFmt : "").ToLocalChecked(); // szFmt (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -773,7 +773,7 @@
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = v8::External::New(isolate, pfile); // pfile (FILE *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, szFmt).ToLocalChecked(); // szFmt (const char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, szFmt ? szFmt : "").ToLocalChecked(); // szFmt (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -832,7 +832,7 @@
     event::findAndCall("engAllocString", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, szValue).ToLocalChecked(); // szValue (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, szValue ? szValue : "").ToLocalChecked(); // szValue (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -928,7 +928,7 @@
     event::findAndCall("engRegUserMsg", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, pszName).ToLocalChecked(); // pszName (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, pszName ? pszName : "").ToLocalChecked(); // pszName (const char *)
       v8_args[1] = v8::Number::New(isolate, iSize); // iSize (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -967,7 +967,7 @@
     event::findAndCall("engFunctionFromName", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, pName).ToLocalChecked(); // pName (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, pName ? pName : "").ToLocalChecked(); // pName (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return nullptr;
@@ -993,7 +993,7 @@
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = structures::wrapEntity(isolate, pEdict); // pEdict (edict_t*)
       v8_args[1] = v8::Number::New(isolate, ptype); // ptype (PRINT_TYPE)
-      v8_args[2] = v8::String::NewFromUtf8(isolate, szMsg).ToLocalChecked(); // szMsg (const char *)
+      v8_args[2] = v8::String::NewFromUtf8(isolate, szMsg ? szMsg : "").ToLocalChecked(); // szMsg (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -1004,7 +1004,7 @@
     event::findAndCall("engServerPrint", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, szMsg).ToLocalChecked(); // szMsg (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, szMsg ? szMsg : "").ToLocalChecked(); // szMsg (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -1161,7 +1161,7 @@
     event::findAndCall("engLoadFileForMe", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, filename).ToLocalChecked(); // filename (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, filename ? filename : "").ToLocalChecked(); // filename (const char *)
       v8_args[1] = utils::intArrayToJS(isolate, pLength); // pLength (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -1185,7 +1185,7 @@
     event::findAndCall("engEndSection", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, pszSectionName).ToLocalChecked(); // pszSectionName (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, pszSectionName ? pszSectionName : "").ToLocalChecked(); // pszSectionName (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -1196,8 +1196,8 @@
     event::findAndCall("engCompareFileTime", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, filename1).ToLocalChecked(); // filename1 (char *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, filename2).ToLocalChecked(); // filename2 (char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, filename1 ? filename1 : "").ToLocalChecked(); // filename1 (char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, filename2 ? filename2 : "").ToLocalChecked(); // filename2 (char *)
       v8_args[2] = utils::intArrayToJS(isolate, iCompare); // iCompare (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -1210,7 +1210,7 @@
     event::findAndCall("engGetGameDir", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, szGetGameDir).ToLocalChecked(); // szGetGameDir (char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, szGetGameDir ? szGetGameDir : "").ToLocalChecked(); // szGetGameDir (char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -1259,7 +1259,7 @@
     event::findAndCall("engCreateFakeClient", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, netname).ToLocalChecked(); // netname (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, netname ? netname : "").ToLocalChecked(); // netname (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return nullptr;
@@ -1308,8 +1308,8 @@
     event::findAndCall("engInfoKeyValue", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, infobuffer).ToLocalChecked(); // infobuffer (char *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, key).ToLocalChecked(); // key (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, infobuffer ? infobuffer : "").ToLocalChecked(); // infobuffer (char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, key ? key : "").ToLocalChecked(); // key (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return nullptr;
@@ -1321,9 +1321,9 @@
     event::findAndCall("engSetKeyValue", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, infobuffer).ToLocalChecked(); // infobuffer (char *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, key).ToLocalChecked(); // key (const char *)
-      v8_args[2] = v8::String::NewFromUtf8(isolate, value).ToLocalChecked(); // value (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, infobuffer ? infobuffer : "").ToLocalChecked(); // infobuffer (char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, key ? key : "").ToLocalChecked(); // key (const char *)
+      v8_args[2] = v8::String::NewFromUtf8(isolate, value ? value : "").ToLocalChecked(); // value (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -1335,9 +1335,9 @@
       unsigned int v8_argCount = 4;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[4];
       v8_args[0] = v8::Number::New(isolate, clientIndex); // clientIndex (int)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, infobuffer).ToLocalChecked(); // infobuffer (char *)
-      v8_args[2] = v8::String::NewFromUtf8(isolate, key).ToLocalChecked(); // key (const char *)
-      v8_args[3] = v8::String::NewFromUtf8(isolate, value).ToLocalChecked(); // value (const char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, infobuffer ? infobuffer : "").ToLocalChecked(); // infobuffer (char *)
+      v8_args[2] = v8::String::NewFromUtf8(isolate, key ? key : "").ToLocalChecked(); // key (const char *)
+      v8_args[3] = v8::String::NewFromUtf8(isolate, value ? value : "").ToLocalChecked(); // value (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -1348,7 +1348,7 @@
     event::findAndCall("engIsMapValid", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, filename).ToLocalChecked(); // filename (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, filename ? filename : "").ToLocalChecked(); // filename (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -1374,7 +1374,7 @@
     event::findAndCall("engPrecacheGeneric", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, s).ToLocalChecked(); // s (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, s ? s : "").ToLocalChecked(); // s (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -1400,7 +1400,7 @@
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[11];
       v8_args[0] = structures::wrapEntity(isolate, entity); // entity (edict_t *)
       v8_args[1] = v8::Number::New(isolate, channel); // channel (int)
-      v8_args[2] = v8::String::NewFromUtf8(isolate, sample).ToLocalChecked(); // sample (const char *)
+      v8_args[2] = v8::String::NewFromUtf8(isolate, sample ? sample : "").ToLocalChecked(); // sample (const char *)
       v8_args[3] = v8::Number::New(isolate, volume); // volume (float)
       v8_args[4] = v8::Number::New(isolate, attenuation); // attenuation (float)
       v8_args[5] = v8::Number::New(isolate, fFlags); // fFlags (int)
@@ -1426,7 +1426,7 @@
     event::findAndCall("engCVarGetPointer", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, szVarName).ToLocalChecked(); // szVarName (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, szVarName ? szVarName : "").ToLocalChecked(); // szVarName (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return nullptr;
@@ -1450,8 +1450,8 @@
     event::findAndCall("engInfoRemoveKey", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, s).ToLocalChecked(); // s (char *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, key).ToLocalChecked(); // key (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, s ? s : "").ToLocalChecked(); // s (char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, key ? key : "").ToLocalChecked(); // key (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -1463,7 +1463,7 @@
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = structures::wrapEntity(isolate, pClient); // pClient (const edict_t *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, key).ToLocalChecked(); // key (const char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, key ? key : "").ToLocalChecked(); // key (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return nullptr;
@@ -1476,8 +1476,8 @@
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = structures::wrapEntity(isolate, pClient); // pClient (const edict_t *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, key).ToLocalChecked(); // key (const char *)
-      v8_args[2] = v8::String::NewFromUtf8(isolate, value).ToLocalChecked(); // value (const char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, key ? key : "").ToLocalChecked(); // key (const char *)
+      v8_args[2] = v8::String::NewFromUtf8(isolate, value ? value : "").ToLocalChecked(); // value (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -1501,7 +1501,7 @@
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = v8::Number::New(isolate, type); // type (int)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, psz).ToLocalChecked(); // psz (const char*)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, psz ? psz : "").ToLocalChecked(); // psz (const char*)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -1573,7 +1573,7 @@
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = structures::wrapDelta(isolate, pFields); // pFields (struct delta_s *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, fieldname).ToLocalChecked(); // fieldname (const char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, fieldname ? fieldname : "").ToLocalChecked(); // fieldname (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -1585,7 +1585,7 @@
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = structures::wrapDelta(isolate, pFields); // pFields (struct delta_s *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, fieldname).ToLocalChecked(); // fieldname (const char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, fieldname ? fieldname : "").ToLocalChecked(); // fieldname (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -1596,7 +1596,7 @@
     event::findAndCall("engDeltaAddEncoder", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, name).ToLocalChecked(); // name (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, name ? name : "").ToLocalChecked(); // name (const char *)
       v8_args[1] = v8::External::New(isolate, value1); // value1 (void*)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -1628,7 +1628,7 @@
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = structures::wrapDelta(isolate, pFields); // pFields (struct delta_s *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, fieldname).ToLocalChecked(); // fieldname (const char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, fieldname ? fieldname : "").ToLocalChecked(); // fieldname (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -1690,7 +1690,7 @@
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = structures::wrapCvar(isolate, var); // var (struct cvar_s *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, value).ToLocalChecked(); // value (const char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, value ? value : "").ToLocalChecked(); // value (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -1704,7 +1704,7 @@
       v8_args[0] = v8::Number::New(isolate, type); // type (FORCE_TYPE)
       v8_args[1] = utils::floatArrayToJS(isolate, mins); // mins (const float *)
       v8_args[2] = utils::floatArrayToJS(isolate, maxs); // maxs (const float *)
-      v8_args[3] = v8::String::NewFromUtf8(isolate, filename).ToLocalChecked(); // filename (const char *)
+      v8_args[3] = v8::String::NewFromUtf8(isolate, filename ? filename : "").ToLocalChecked(); // filename (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -1728,7 +1728,7 @@
     event::findAndCall("engAddServerCommand", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, cmd_name).ToLocalChecked(); // cmd_name (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, cmd_name ? cmd_name : "").ToLocalChecked(); // cmd_name (const char *)
       v8_args[1] = v8::External::New(isolate, value1); // value1 (void*)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -1779,8 +1779,8 @@
     event::findAndCall("engSequenceGet", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, fileName).ToLocalChecked(); // fileName (const char *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, entryName).ToLocalChecked(); // entryName (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, fileName ? fileName : "").ToLocalChecked(); // fileName (const char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, entryName ? entryName : "").ToLocalChecked(); // entryName (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return nullptr;
@@ -1792,7 +1792,7 @@
     event::findAndCall("engSequencePickSentence", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, groupName).ToLocalChecked(); // groupName (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, groupName ? groupName : "").ToLocalChecked(); // groupName (const char *)
       v8_args[1] = v8::Number::New(isolate, pickMethod); // pickMethod (int)
       v8_args[2] = utils::intArrayToJS(isolate, picked); // picked (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
@@ -1806,7 +1806,7 @@
     event::findAndCall("engGetFileSize", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, filename).ToLocalChecked(); // filename (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, filename ? filename : "").ToLocalChecked(); // filename (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -1818,7 +1818,7 @@
     event::findAndCall("engGetApproxWavePlayLen", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, filepath).ToLocalChecked(); // filepath (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, filepath ? filepath : "").ToLocalChecked(); // filepath (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -1837,7 +1837,7 @@
     event::findAndCall("engGetLocalizedStringLength", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, label).ToLocalChecked(); // label (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, label ? label : "").ToLocalChecked(); // label (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -1903,7 +1903,7 @@
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = structures::wrapEntity(isolate, player); // player (const edict_t *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, cvarName).ToLocalChecked(); // cvarName (const char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, cvarName ? cvarName : "").ToLocalChecked(); // cvarName (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -1915,7 +1915,7 @@
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = structures::wrapEntity(isolate, player); // player (const edict_t *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, cvarName).ToLocalChecked(); // cvarName (const char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, cvarName ? cvarName : "").ToLocalChecked(); // cvarName (const char *)
       v8_args[2] = v8::Number::New(isolate, requestID); // requestID (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -1927,7 +1927,7 @@
     event::findAndCall("engCheckParm", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, parm).ToLocalChecked(); // parm (char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, parm ? parm : "").ToLocalChecked(); // parm (char *)
       v8_args[1] = utils::stringArrayToJS(isolate, ppnext); // ppnext (char **)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -2115,7 +2115,7 @@
     event::findAndCall("postEngPrecacheModel", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, s).ToLocalChecked(); // s (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, s ? s : "").ToLocalChecked(); // s (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -2127,7 +2127,7 @@
     event::findAndCall("postEngPrecacheSound", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, s).ToLocalChecked(); // s (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, s ? s : "").ToLocalChecked(); // s (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -2140,7 +2140,7 @@
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = structures::wrapEntity(isolate, e); // e (edict_t *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, m).ToLocalChecked(); // m (const char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, m ? m : "").ToLocalChecked(); // m (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -2151,7 +2151,7 @@
     event::findAndCall("postEngModelIndex", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, m).ToLocalChecked(); // m (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, m ? m : "").ToLocalChecked(); // m (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -2188,8 +2188,8 @@
     event::findAndCall("postEngChangeLevel", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, s1).ToLocalChecked(); // s1 (const char *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, s2).ToLocalChecked(); // s2 (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, s1 ? s1 : "").ToLocalChecked(); // s1 (const char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, s2 ? s2 : "").ToLocalChecked(); // s2 (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -2283,8 +2283,8 @@
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = structures::wrapEntity(isolate, pEdictStartSearchAfter); // pEdictStartSearchAfter (edict_t *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, pszField).ToLocalChecked(); // pszField (const char *)
-      v8_args[2] = v8::String::NewFromUtf8(isolate, pszValue).ToLocalChecked(); // pszValue (const char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, pszField ? pszField : "").ToLocalChecked(); // pszField (const char *)
+      v8_args[2] = v8::String::NewFromUtf8(isolate, pszValue ? pszValue : "").ToLocalChecked(); // pszValue (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return nullptr;
@@ -2465,7 +2465,7 @@
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[7];
       v8_args[0] = structures::wrapEntity(isolate, entity); // entity (edict_t *)
       v8_args[1] = v8::Number::New(isolate, channel); // channel (int)
-      v8_args[2] = v8::String::NewFromUtf8(isolate, sample).ToLocalChecked(); // sample (const char *)
+      v8_args[2] = v8::String::NewFromUtf8(isolate, sample ? sample : "").ToLocalChecked(); // sample (const char *)
       v8_args[3] = v8::Number::New(isolate, volume); // volume (float)
       v8_args[4] = v8::Number::New(isolate, attenuation); // attenuation (float)
       v8_args[5] = v8::Number::New(isolate, fFlags); // fFlags (int)
@@ -2482,7 +2482,7 @@
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[7];
       v8_args[0] = structures::wrapEntity(isolate, entity); // entity (edict_t *)
       v8_args[1] = utils::floatArrayToJS(isolate, pos); // pos (const float *)
-      v8_args[2] = v8::String::NewFromUtf8(isolate, samp).ToLocalChecked(); // samp (const char *)
+      v8_args[2] = v8::String::NewFromUtf8(isolate, samp ? samp : "").ToLocalChecked(); // samp (const char *)
       v8_args[3] = v8::Number::New(isolate, vol); // vol (float)
       v8_args[4] = v8::Number::New(isolate, attenuation); // attenuation (float)
       v8_args[5] = v8::Number::New(isolate, fFlags); // fFlags (int)
@@ -2616,7 +2616,7 @@
     event::findAndCall("postEngServerCommand", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, str).ToLocalChecked(); // str (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, str ? str : "").ToLocalChecked(); // str (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -2660,7 +2660,7 @@
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = v8::Number::New(isolate, style); // style (int)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, val).ToLocalChecked(); // val (const char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, val ? val : "").ToLocalChecked(); // val (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -2671,7 +2671,7 @@
     event::findAndCall("postEngDecalIndex", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, name).ToLocalChecked(); // name (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, name ? name : "").ToLocalChecked(); // name (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -2781,7 +2781,7 @@
     event::findAndCall("postEngWriteString", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, sz).ToLocalChecked(); // sz (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, sz ? sz : "").ToLocalChecked(); // sz (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -2814,7 +2814,7 @@
     event::findAndCall("postEngCVarGetFloat", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, szVarName).ToLocalChecked(); // szVarName (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, szVarName ? szVarName : "").ToLocalChecked(); // szVarName (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0.0f;
@@ -2826,7 +2826,7 @@
     event::findAndCall("postEngCVarGetString", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, szVarName).ToLocalChecked(); // szVarName (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, szVarName ? szVarName : "").ToLocalChecked(); // szVarName (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return nullptr;
@@ -2838,7 +2838,7 @@
     event::findAndCall("postEngCVarSetFloat", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, szVarName).ToLocalChecked(); // szVarName (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, szVarName ? szVarName : "").ToLocalChecked(); // szVarName (const char *)
       v8_args[1] = v8::Number::New(isolate, flValue); // flValue (float)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -2850,8 +2850,8 @@
     event::findAndCall("postEngCVarSetString", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, szVarName).ToLocalChecked(); // szVarName (const char *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, szValue).ToLocalChecked(); // szValue (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, szVarName ? szVarName : "").ToLocalChecked(); // szVarName (const char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, szValue ? szValue : "").ToLocalChecked(); // szValue (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -2863,7 +2863,7 @@
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = v8::Number::New(isolate, atype); // atype (ALERT_TYPE)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, szFmt).ToLocalChecked(); // szFmt (const char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, szFmt ? szFmt : "").ToLocalChecked(); // szFmt (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -2875,7 +2875,7 @@
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = v8::External::New(isolate, pfile); // pfile (FILE *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, szFmt).ToLocalChecked(); // szFmt (const char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, szFmt ? szFmt : "").ToLocalChecked(); // szFmt (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -2934,7 +2934,7 @@
     event::findAndCall("postEngAllocString", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, szValue).ToLocalChecked(); // szValue (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, szValue ? szValue : "").ToLocalChecked(); // szValue (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -3030,7 +3030,7 @@
     event::findAndCall("postEngRegUserMsg", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, pszName).ToLocalChecked(); // pszName (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, pszName ? pszName : "").ToLocalChecked(); // pszName (const char *)
       v8_args[1] = v8::Number::New(isolate, iSize); // iSize (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -3069,7 +3069,7 @@
     event::findAndCall("postEngFunctionFromName", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, pName).ToLocalChecked(); // pName (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, pName ? pName : "").ToLocalChecked(); // pName (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return nullptr;
@@ -3095,7 +3095,7 @@
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = structures::wrapEntity(isolate, pEdict); // pEdict (edict_t*)
       v8_args[1] = v8::Number::New(isolate, ptype); // ptype (PRINT_TYPE)
-      v8_args[2] = v8::String::NewFromUtf8(isolate, szMsg).ToLocalChecked(); // szMsg (const char *)
+      v8_args[2] = v8::String::NewFromUtf8(isolate, szMsg ? szMsg : "").ToLocalChecked(); // szMsg (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -3106,7 +3106,7 @@
     event::findAndCall("postEngServerPrint", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, szMsg).ToLocalChecked(); // szMsg (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, szMsg ? szMsg : "").ToLocalChecked(); // szMsg (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -3263,7 +3263,7 @@
     event::findAndCall("postEngLoadFileForMe", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, filename).ToLocalChecked(); // filename (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, filename ? filename : "").ToLocalChecked(); // filename (const char *)
       v8_args[1] = utils::intArrayToJS(isolate, pLength); // pLength (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -3287,7 +3287,7 @@
     event::findAndCall("postEngEndSection", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, pszSectionName).ToLocalChecked(); // pszSectionName (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, pszSectionName ? pszSectionName : "").ToLocalChecked(); // pszSectionName (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -3298,8 +3298,8 @@
     event::findAndCall("postEngCompareFileTime", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, filename1).ToLocalChecked(); // filename1 (char *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, filename2).ToLocalChecked(); // filename2 (char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, filename1 ? filename1 : "").ToLocalChecked(); // filename1 (char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, filename2 ? filename2 : "").ToLocalChecked(); // filename2 (char *)
       v8_args[2] = utils::intArrayToJS(isolate, iCompare); // iCompare (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -3312,7 +3312,7 @@
     event::findAndCall("postEngGetGameDir", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, szGetGameDir).ToLocalChecked(); // szGetGameDir (char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, szGetGameDir ? szGetGameDir : "").ToLocalChecked(); // szGetGameDir (char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -3361,7 +3361,7 @@
     event::findAndCall("postEngCreateFakeClient", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, netname).ToLocalChecked(); // netname (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, netname ? netname : "").ToLocalChecked(); // netname (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return nullptr;
@@ -3410,8 +3410,8 @@
     event::findAndCall("postEngInfoKeyValue", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, infobuffer).ToLocalChecked(); // infobuffer (char *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, key).ToLocalChecked(); // key (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, infobuffer ? infobuffer : "").ToLocalChecked(); // infobuffer (char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, key ? key : "").ToLocalChecked(); // key (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return nullptr;
@@ -3423,9 +3423,9 @@
     event::findAndCall("postEngSetKeyValue", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, infobuffer).ToLocalChecked(); // infobuffer (char *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, key).ToLocalChecked(); // key (const char *)
-      v8_args[2] = v8::String::NewFromUtf8(isolate, value).ToLocalChecked(); // value (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, infobuffer ? infobuffer : "").ToLocalChecked(); // infobuffer (char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, key ? key : "").ToLocalChecked(); // key (const char *)
+      v8_args[2] = v8::String::NewFromUtf8(isolate, value ? value : "").ToLocalChecked(); // value (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -3437,9 +3437,9 @@
       unsigned int v8_argCount = 4;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[4];
       v8_args[0] = v8::Number::New(isolate, clientIndex); // clientIndex (int)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, infobuffer).ToLocalChecked(); // infobuffer (char *)
-      v8_args[2] = v8::String::NewFromUtf8(isolate, key).ToLocalChecked(); // key (const char *)
-      v8_args[3] = v8::String::NewFromUtf8(isolate, value).ToLocalChecked(); // value (const char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, infobuffer ? infobuffer : "").ToLocalChecked(); // infobuffer (char *)
+      v8_args[2] = v8::String::NewFromUtf8(isolate, key ? key : "").ToLocalChecked(); // key (const char *)
+      v8_args[3] = v8::String::NewFromUtf8(isolate, value ? value : "").ToLocalChecked(); // value (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -3450,7 +3450,7 @@
     event::findAndCall("postEngIsMapValid", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, filename).ToLocalChecked(); // filename (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, filename ? filename : "").ToLocalChecked(); // filename (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -3476,7 +3476,7 @@
     event::findAndCall("postEngPrecacheGeneric", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, s).ToLocalChecked(); // s (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, s ? s : "").ToLocalChecked(); // s (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -3502,7 +3502,7 @@
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[11];
       v8_args[0] = structures::wrapEntity(isolate, entity); // entity (edict_t *)
       v8_args[1] = v8::Number::New(isolate, channel); // channel (int)
-      v8_args[2] = v8::String::NewFromUtf8(isolate, sample).ToLocalChecked(); // sample (const char *)
+      v8_args[2] = v8::String::NewFromUtf8(isolate, sample ? sample : "").ToLocalChecked(); // sample (const char *)
       v8_args[3] = v8::Number::New(isolate, volume); // volume (float)
       v8_args[4] = v8::Number::New(isolate, attenuation); // attenuation (float)
       v8_args[5] = v8::Number::New(isolate, fFlags); // fFlags (int)
@@ -3528,7 +3528,7 @@
     event::findAndCall("postEngCVarGetPointer", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, szVarName).ToLocalChecked(); // szVarName (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, szVarName ? szVarName : "").ToLocalChecked(); // szVarName (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return nullptr;
@@ -3552,8 +3552,8 @@
     event::findAndCall("postEngInfoRemoveKey", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, s).ToLocalChecked(); // s (char *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, key).ToLocalChecked(); // key (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, s ? s : "").ToLocalChecked(); // s (char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, key ? key : "").ToLocalChecked(); // key (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -3565,7 +3565,7 @@
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = structures::wrapEntity(isolate, pClient); // pClient (const edict_t *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, key).ToLocalChecked(); // key (const char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, key ? key : "").ToLocalChecked(); // key (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return nullptr;
@@ -3578,8 +3578,8 @@
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = structures::wrapEntity(isolate, pClient); // pClient (const edict_t *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, key).ToLocalChecked(); // key (const char *)
-      v8_args[2] = v8::String::NewFromUtf8(isolate, value).ToLocalChecked(); // value (const char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, key ? key : "").ToLocalChecked(); // key (const char *)
+      v8_args[2] = v8::String::NewFromUtf8(isolate, value ? value : "").ToLocalChecked(); // value (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -3603,7 +3603,7 @@
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = v8::Number::New(isolate, type); // type (int)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, psz).ToLocalChecked(); // psz (const char*)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, psz ? psz : "").ToLocalChecked(); // psz (const char*)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -3675,7 +3675,7 @@
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = structures::wrapDelta(isolate, pFields); // pFields (struct delta_s *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, fieldname).ToLocalChecked(); // fieldname (const char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, fieldname ? fieldname : "").ToLocalChecked(); // fieldname (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -3687,7 +3687,7 @@
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = structures::wrapDelta(isolate, pFields); // pFields (struct delta_s *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, fieldname).ToLocalChecked(); // fieldname (const char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, fieldname ? fieldname : "").ToLocalChecked(); // fieldname (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -3698,7 +3698,7 @@
     event::findAndCall("postEngDeltaAddEncoder", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, name).ToLocalChecked(); // name (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, name ? name : "").ToLocalChecked(); // name (const char *)
       v8_args[1] = v8::External::New(isolate, value1); // value1 (void*)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -3730,7 +3730,7 @@
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = structures::wrapDelta(isolate, pFields); // pFields (struct delta_s *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, fieldname).ToLocalChecked(); // fieldname (const char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, fieldname ? fieldname : "").ToLocalChecked(); // fieldname (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -3792,7 +3792,7 @@
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = structures::wrapCvar(isolate, var); // var (struct cvar_s *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, value).ToLocalChecked(); // value (const char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, value ? value : "").ToLocalChecked(); // value (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -3806,7 +3806,7 @@
       v8_args[0] = v8::Number::New(isolate, type); // type (FORCE_TYPE)
       v8_args[1] = utils::floatArrayToJS(isolate, mins); // mins (const float *)
       v8_args[2] = utils::floatArrayToJS(isolate, maxs); // maxs (const float *)
-      v8_args[3] = v8::String::NewFromUtf8(isolate, filename).ToLocalChecked(); // filename (const char *)
+      v8_args[3] = v8::String::NewFromUtf8(isolate, filename ? filename : "").ToLocalChecked(); // filename (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -3830,7 +3830,7 @@
     event::findAndCall("postEngAddServerCommand", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, cmd_name).ToLocalChecked(); // cmd_name (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, cmd_name ? cmd_name : "").ToLocalChecked(); // cmd_name (const char *)
       v8_args[1] = v8::External::New(isolate, value1); // value1 (void*)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -3881,8 +3881,8 @@
     event::findAndCall("postEngSequenceGet", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, fileName).ToLocalChecked(); // fileName (const char *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, entryName).ToLocalChecked(); // entryName (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, fileName ? fileName : "").ToLocalChecked(); // fileName (const char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, entryName ? entryName : "").ToLocalChecked(); // entryName (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return nullptr;
@@ -3894,7 +3894,7 @@
     event::findAndCall("postEngSequencePickSentence", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, groupName).ToLocalChecked(); // groupName (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, groupName ? groupName : "").ToLocalChecked(); // groupName (const char *)
       v8_args[1] = v8::Number::New(isolate, pickMethod); // pickMethod (int)
       v8_args[2] = utils::intArrayToJS(isolate, picked); // picked (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
@@ -3908,7 +3908,7 @@
     event::findAndCall("postEngGetFileSize", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, filename).ToLocalChecked(); // filename (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, filename ? filename : "").ToLocalChecked(); // filename (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -3920,7 +3920,7 @@
     event::findAndCall("postEngGetApproxWavePlayLen", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, filepath).ToLocalChecked(); // filepath (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, filepath ? filepath : "").ToLocalChecked(); // filepath (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -3939,7 +3939,7 @@
     event::findAndCall("postEngGetLocalizedStringLength", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, label).ToLocalChecked(); // label (const char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, label ? label : "").ToLocalChecked(); // label (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -4005,7 +4005,7 @@
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = structures::wrapEntity(isolate, player); // player (const edict_t *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, cvarName).ToLocalChecked(); // cvarName (const char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, cvarName ? cvarName : "").ToLocalChecked(); // cvarName (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -4017,7 +4017,7 @@
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = structures::wrapEntity(isolate, player); // player (const edict_t *)
-      v8_args[1] = v8::String::NewFromUtf8(isolate, cvarName).ToLocalChecked(); // cvarName (const char *)
+      v8_args[1] = v8::String::NewFromUtf8(isolate, cvarName ? cvarName : "").ToLocalChecked(); // cvarName (const char *)
       v8_args[2] = v8::Number::New(isolate, requestID); // requestID (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -4029,7 +4029,7 @@
     event::findAndCall("postEngCheckParm", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = v8::String::NewFromUtf8(isolate, parm).ToLocalChecked(); // parm (char *)
+      v8_args[0] = v8::String::NewFromUtf8(isolate, parm ? parm : "").ToLocalChecked(); // parm (char *)
       v8_args[1] = utils::stringArrayToJS(isolate, ppnext); // ppnext (char **)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });

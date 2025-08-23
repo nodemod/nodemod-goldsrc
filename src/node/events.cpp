@@ -274,7 +274,6 @@
 			v8::Local<v8::Function> function = listener.function.Get(isolate);
 			function->Call(ctx, ctx->Global(), argCount, args);
 
-			if (argCount > 0) delete[] args;
 
 			if (eh.HasCaught())
 			{
@@ -284,6 +283,8 @@
 				L_ERROR << "Event handling function in resource: " << *str << "\nstack:\n" << *stack << "\n";
 			}
 		}
+
+		if (argCount > 0) delete[] args;
 	}
 
 void event::call(argument_collector_t collectArguments)
@@ -317,7 +318,6 @@ void event::call(argument_collector_t collectArguments)
 			v8::Local<v8::Function> function = listener.function.Get(isolate);
 			function->Call(ctx, ctx->Global(), argCount, args);
 
-			if (argCount > 0) delete[] args;
 
 			if (eh.HasCaught())
 			{

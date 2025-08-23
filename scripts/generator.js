@@ -6,19 +6,19 @@ const TYPE_MAPPINGS = {
   basicTypes: {
     'const char *': { 
       js2cpp: (value) => `utils::js2string(isolate, ${value})`,
-      cpp2js: (value) => `v8::String::NewFromUtf8(isolate, ${value}).ToLocalChecked()`
+      cpp2js: (value) => `v8::String::NewFromUtf8(isolate, ${value} ? ${value} : "").ToLocalChecked()`
     },
     'const char*': { 
       js2cpp: (value) => `utils::js2string(isolate, ${value})`,
-      cpp2js: (value) => `v8::String::NewFromUtf8(isolate, ${value}).ToLocalChecked()`
+      cpp2js: (value) => `v8::String::NewFromUtf8(isolate, ${value} ? ${value} : "").ToLocalChecked()`
     },
     'char *': { 
       js2cpp: (value) => `utils::js2string(isolate, ${value})`,
-      cpp2js: (value) => `v8::String::NewFromUtf8(isolate, ${value}).ToLocalChecked()`
+      cpp2js: (value) => `v8::String::NewFromUtf8(isolate, ${value} ? ${value} : "").ToLocalChecked()`
     },
     'char*': { 
       js2cpp: (value) => `utils::js2string(isolate, ${value})`,
-      cpp2js: (value) => `v8::String::NewFromUtf8(isolate, ${value}).ToLocalChecked()`
+      cpp2js: (value) => `v8::String::NewFromUtf8(isolate, ${value} ? ${value} : "").ToLocalChecked()`
     },
     'char': { 
       js2cpp: (value) => `${value}->Int32Value(context).ToChecked()`,
@@ -164,7 +164,7 @@ const TYPE_MAPPINGS = {
     },
     'char *': { 
       js2cpp: (value) => `utils::js2string(isolate, ${value})`,
-      cpp2js: (value) => `v8::String::NewFromUtf8(isolate, ${value}).ToLocalChecked()`
+      cpp2js: (value) => `v8::String::NewFromUtf8(isolate, ${value} ? ${value} : "").ToLocalChecked()`
     },
     'void': { 
       js2cpp: (value) => `utils::jsToPointer(isolate, ${value})`,
@@ -305,18 +305,38 @@ const generator = {
       return `${value} /* TODO: type ${func.type} */`;
     }
 
+    // For string types, use a temporary variable to avoid calling the function twice
+    if ((func.type.includes('char *') || func.type.includes('char*')) && generated.includes('?')) {
+      return `const char* temp_str = ${value};
+  info.GetReturnValue().Set(v8::String::NewFromUtf8(isolate, temp_str ? temp_str : "").ToLocalChecked())`;
+    }
+
     return `info.GetReturnValue().Set(${generated})`;
   },
 
   generateCppFunction(func, source, prefix) {
     const customBody = customs[prefix.split('_')[1]]?.[func.name]?.api?.body;
+    
+    // Generate null checks for pointer parameters
+    const nullChecks = (func.args || []).map((arg, i) => {
+      if (arg.type.includes('*') && !arg.type.includes('char')) {
+        return `if (!info[${i}]->IsExternal()) {
+    info.GetReturnValue().Set(${func.type === 'void' ? 'v8::Undefined(isolate)' : (func.type.includes('*') ? 'v8::Null(isolate)' : 'v8::Number::New(isolate, 0)')});
+    return;
+  }`;
+      }
+      return '';
+    }).filter(check => check).join('\n  ');
+    
+    const nullCheckSection = nullChecks ? `\n  ${nullChecks}\n` : '';
+    
     return `void ${prefix}_${func.name}(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
 	auto isolate = info.GetIsolate();
   v8::Locker locker(isolate);
 	v8::HandleScope scope(isolate);
 	auto context = isolate->GetCurrentContext();
-
+${nullCheckSection}
   ${customBody || this.packReturn(func, `(*${source}.${func.name})(${(func.args || []).map((v, i) => this.js2cpp(v.type, `info[${i}]`)).join(',\n')})`)};
 }`;
   }

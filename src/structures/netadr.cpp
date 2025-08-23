@@ -30,8 +30,14 @@ void createNetAdrTemplate(v8::Isolate* isolate) {
     v8::Local<v8::ObjectTemplate> templ = v8::ObjectTemplate::New(isolate);
     templ->SetInternalFieldCount(1);
     
-    // Type field (netadrtype_t enum)
-    ACCESSOR_T(netadr_s, unwrapNetAdr_internal, templ, "type", type, GETN, SETINT);
+    // Type field (netadrtype_t enum) - need custom setter for enum cast
+    templ->SetNativeDataProperty(v8::String::NewFromUtf8(isolate, "type").ToLocalChecked(),
+        GETTER_T(netadr_s, unwrapNetAdr_internal, type, GETN),
+        [](v8::Local<v8::Name> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void> &info) {
+            netadr_s *obj = unwrapNetAdr_internal(info.GetIsolate(), info.Holder());
+            if (obj == NULL) return;
+            obj->type = static_cast<netadrtype_t>(value->Int32Value(info.GetIsolate()->GetCurrentContext()).ToChecked());
+        });
     
     // Port field
     ACCESSOR_T(netadr_s, unwrapNetAdr_internal, templ, "port", port, GETN, SETINT);
