@@ -38,12 +38,6 @@ docker run --name "${CONTAINER_NAME}" \
         
         echo 'Building xash3d-nodemod...'
         cmake --build . --config Debug
-        
-        echo 'Build completed successfully!'
-        echo 'Copying built files to output directory...'
-        mkdir -p /app/output
-        cp -r . /app/output/
-        echo 'Build artifacts copied to ./output/ directory'
     "
 
 echo "Container run completed. Built files are available in ./output/"

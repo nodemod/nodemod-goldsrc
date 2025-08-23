@@ -16,6 +16,7 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, s).ToLocalChecked(); // s (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('engPrecacheSound', (s) => console.log('engPrecacheSound fired!'));
@@ -27,6 +28,7 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, s).ToLocalChecked(); // s (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('engSetModel', (e, m) => console.log('engSetModel fired!'));
@@ -50,6 +52,7 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, m).ToLocalChecked(); // m (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('engModelFrames', (modelIndex) => console.log('engModelFrames fired!'));
@@ -61,6 +64,7 @@
       v8_args[0] = v8::Number::New(isolate, modelIndex); // modelIndex (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('engSetSize', (e, rgflMin, rgflMax) => console.log('engSetSize fired!'));
@@ -70,8 +74,8 @@
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = structures::wrapEntity(isolate, e); // e (edict_t *)
-      v8_args[1] = v8::External::New(isolate, rgflMin /* float  */); // rgflMin (const float *)
-      v8_args[2] = v8::External::New(isolate, rgflMax /* float  */); // rgflMax (const float *)
+      v8_args[1] = v8::External::New(isolate, (void*)rgflMin /* float  */); // rgflMin (const float *)
+      v8_args[2] = v8::External::New(isolate, (void*)rgflMax /* float  */); // rgflMax (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -116,9 +120,10 @@
     event::findAndCall("engVecToYaw", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::External::New(isolate, rgflVector /* float  */); // rgflVector (const float *)
+      v8_args[0] = v8::External::New(isolate, (void*)rgflVector /* float  */); // rgflVector (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0.0f;
   }
 
 // nodemod.on('engVecToAngles', (rgflVectorIn, rgflVectorOut) => console.log('engVecToAngles fired!'));
@@ -127,7 +132,7 @@
     event::findAndCall("engVecToAngles", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = v8::External::New(isolate, rgflVectorIn /* float  */); // rgflVectorIn (const float *)
+      v8_args[0] = v8::External::New(isolate, (void*)rgflVectorIn /* float  */); // rgflVectorIn (const float *)
       v8_args[1] = v8::External::New(isolate, rgflVectorOut /* float  */); // rgflVectorOut (float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -140,7 +145,7 @@
       unsigned int v8_argCount = 4;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[4];
       v8_args[0] = structures::wrapEntity(isolate, ent); // ent (edict_t *)
-      v8_args[1] = v8::External::New(isolate, pflGoal /* float  */); // pflGoal (const float *)
+      v8_args[1] = v8::External::New(isolate, (void*)pflGoal /* float  */); // pflGoal (const float *)
       v8_args[2] = v8::Number::New(isolate, dist); // dist (float)
       v8_args[3] = v8::Number::New(isolate, iMoveType); // iMoveType (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
@@ -180,6 +185,7 @@
       v8_args[2] = v8::String::NewFromUtf8(isolate, pszValue).ToLocalChecked(); // pszValue (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('engGetEntityIllum', (pEnt) => console.log('engGetEntityIllum fired!'));
@@ -191,6 +197,7 @@
       v8_args[0] = structures::wrapEntity(isolate, pEnt); // pEnt (edict_t*)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('engFindEntityInSphere', (pEdictStartSearchAfter, org, rad) => console.log('engFindEntityInSphere fired!'));
@@ -200,10 +207,11 @@
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = structures::wrapEntity(isolate, pEdictStartSearchAfter); // pEdictStartSearchAfter (edict_t *)
-      v8_args[1] = v8::External::New(isolate, org /* float  */); // org (const float *)
+      v8_args[1] = v8::External::New(isolate, (void*)org /* float  */); // org (const float *)
       v8_args[2] = v8::Number::New(isolate, rad); // rad (float)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('engFindClientInPVS', (pEdict) => console.log('engFindClientInPVS fired!'));
@@ -215,6 +223,7 @@
       v8_args[0] = structures::wrapEntity(isolate, pEdict); // pEdict (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('engEntitiesInPVS', (pplayer) => console.log('engEntitiesInPVS fired!'));
@@ -226,6 +235,7 @@
       v8_args[0] = structures::wrapEntity(isolate, pplayer); // pplayer (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('engMakeVectors', (rgflVector) => console.log('engMakeVectors fired!'));
@@ -234,7 +244,7 @@
     event::findAndCall("engMakeVectors", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::External::New(isolate, rgflVector /* float  */); // rgflVector (const float *)
+      v8_args[0] = v8::External::New(isolate, (void*)rgflVector /* float  */); // rgflVector (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -245,7 +255,7 @@
     event::findAndCall("engAngleVectors", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 4;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[4];
-      v8_args[0] = v8::External::New(isolate, rgflVector /* float  */); // rgflVector (const float *)
+      v8_args[0] = v8::External::New(isolate, (void*)rgflVector /* float  */); // rgflVector (const float *)
       v8_args[1] = v8::External::New(isolate, forward /* float  */); // forward (float *)
       v8_args[2] = v8::External::New(isolate, right /* float  */); // right (float *)
       v8_args[3] = v8::External::New(isolate, up /* float  */); // up (float *)
@@ -257,6 +267,7 @@
   edict_t* eng_pfnCreateEntity () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("engCreateEntity", nullptr, 0);
+    return nullptr;
   }
 
 // nodemod.on('engRemoveEntity', (e) => console.log('engRemoveEntity fired!'));
@@ -279,6 +290,7 @@
       v8_args[0] = v8::Number::New(isolate, className); // className (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('engMakeStatic', (ent) => console.log('engMakeStatic fired!'));
@@ -301,6 +313,7 @@
       v8_args[0] = structures::wrapEntity(isolate, e); // e (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('engDropToFloor', (e) => console.log('engDropToFloor fired!'));
@@ -312,6 +325,7 @@
       v8_args[0] = structures::wrapEntity(isolate, e); // e (edict_t*)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('engWalkMove', (ent, yaw, dist, iMode) => console.log('engWalkMove fired!'));
@@ -326,6 +340,7 @@
       v8_args[3] = v8::Number::New(isolate, iMode); // iMode (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('engSetOrigin', (e, rgflOrigin) => console.log('engSetOrigin fired!'));
@@ -335,7 +350,7 @@
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = structures::wrapEntity(isolate, e); // e (edict_t *)
-      v8_args[1] = v8::External::New(isolate, rgflOrigin /* float  */); // rgflOrigin (const float *)
+      v8_args[1] = v8::External::New(isolate, (void*)rgflOrigin /* float  */); // rgflOrigin (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -364,7 +379,7 @@
       unsigned int v8_argCount = 7;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[7];
       v8_args[0] = structures::wrapEntity(isolate, entity); // entity (edict_t *)
-      v8_args[1] = v8::External::New(isolate, pos /* float  */); // pos (const float *)
+      v8_args[1] = v8::External::New(isolate, (void*)pos /* float  */); // pos (const float *)
       v8_args[2] = v8::String::NewFromUtf8(isolate, samp).ToLocalChecked(); // samp (const char *)
       v8_args[3] = v8::Number::New(isolate, vol); // vol (float)
       v8_args[4] = v8::Number::New(isolate, attenuation); // attenuation (float)
@@ -380,8 +395,8 @@
     event::findAndCall("engTraceLine", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 5;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[5];
-      v8_args[0] = v8::External::New(isolate, v1 /* float  */); // v1 (const float *)
-      v8_args[1] = v8::External::New(isolate, v2 /* float  */); // v2 (const float *)
+      v8_args[0] = v8::External::New(isolate, (void*)v1 /* float  */); // v1 (const float *)
+      v8_args[1] = v8::External::New(isolate, (void*)v2 /* float  */); // v2 (const float *)
       v8_args[2] = v8::Number::New(isolate, fNoMonsters); // fNoMonsters (int)
       v8_args[3] = structures::wrapEntity(isolate, pentToSkip); // pentToSkip (edict_t *)
       v8_args[4] = v8::External::New(isolate, ptr /* TraceResult  */); // ptr (TraceResult *)
@@ -409,13 +424,14 @@
       unsigned int v8_argCount = 6;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[6];
       v8_args[0] = structures::wrapEntity(isolate, pEdict); // pEdict (edict_t *)
-      v8_args[1] = v8::External::New(isolate, v1 /* float  */); // v1 (const float *)
-      v8_args[2] = v8::External::New(isolate, v2 /* float  */); // v2 (const float *)
+      v8_args[1] = v8::External::New(isolate, (void*)v1 /* float  */); // v1 (const float *)
+      v8_args[2] = v8::External::New(isolate, (void*)v2 /* float  */); // v2 (const float *)
       v8_args[3] = v8::Number::New(isolate, fNoMonsters); // fNoMonsters (int)
       v8_args[4] = structures::wrapEntity(isolate, pentToSkip); // pentToSkip (edict_t *)
       v8_args[5] = v8::External::New(isolate, ptr /* TraceResult  */); // ptr (TraceResult *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('engTraceHull', (v1, v2, fNoMonsters, hullNumber, pentToSkip, ptr) => console.log('engTraceHull fired!'));
@@ -424,8 +440,8 @@
     event::findAndCall("engTraceHull", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 6;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[6];
-      v8_args[0] = v8::External::New(isolate, v1 /* float  */); // v1 (const float *)
-      v8_args[1] = v8::External::New(isolate, v2 /* float  */); // v2 (const float *)
+      v8_args[0] = v8::External::New(isolate, (void*)v1 /* float  */); // v1 (const float *)
+      v8_args[1] = v8::External::New(isolate, (void*)v2 /* float  */); // v2 (const float *)
       v8_args[2] = v8::Number::New(isolate, fNoMonsters); // fNoMonsters (int)
       v8_args[3] = v8::Number::New(isolate, hullNumber); // hullNumber (int)
       v8_args[4] = structures::wrapEntity(isolate, pentToSkip); // pentToSkip (edict_t *)
@@ -440,8 +456,8 @@
     event::findAndCall("engTraceModel", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 5;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[5];
-      v8_args[0] = v8::External::New(isolate, v1 /* float  */); // v1 (const float *)
-      v8_args[1] = v8::External::New(isolate, v2 /* float  */); // v2 (const float *)
+      v8_args[0] = v8::External::New(isolate, (void*)v1 /* float  */); // v1 (const float *)
+      v8_args[1] = v8::External::New(isolate, (void*)v2 /* float  */); // v2 (const float *)
       v8_args[2] = v8::Number::New(isolate, hullNumber); // hullNumber (int)
       v8_args[3] = structures::wrapEntity(isolate, pent); // pent (edict_t *)
       v8_args[4] = v8::External::New(isolate, ptr /* TraceResult  */); // ptr (TraceResult *)
@@ -456,10 +472,11 @@
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = structures::wrapEntity(isolate, pTextureEntity); // pTextureEntity (edict_t *)
-      v8_args[1] = v8::External::New(isolate, v1 /* float  */); // v1 (const float *)
-      v8_args[2] = v8::External::New(isolate, v2 /* float  */); // v2 (const float *)
+      v8_args[1] = v8::External::New(isolate, (void*)v1 /* float  */); // v1 (const float *)
+      v8_args[2] = v8::External::New(isolate, (void*)v2 /* float  */); // v2 (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('engTraceSphere', (v1, v2, fNoMonsters, radius, pentToSkip, ptr) => console.log('engTraceSphere fired!'));
@@ -468,8 +485,8 @@
     event::findAndCall("engTraceSphere", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 6;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[6];
-      v8_args[0] = v8::External::New(isolate, v1 /* float  */); // v1 (const float *)
-      v8_args[1] = v8::External::New(isolate, v2 /* float  */); // v2 (const float *)
+      v8_args[0] = v8::External::New(isolate, (void*)v1 /* float  */); // v1 (const float *)
+      v8_args[1] = v8::External::New(isolate, (void*)v2 /* float  */); // v2 (const float *)
       v8_args[2] = v8::Number::New(isolate, fNoMonsters); // fNoMonsters (int)
       v8_args[3] = v8::Number::New(isolate, radius); // radius (float)
       v8_args[4] = structures::wrapEntity(isolate, pentToSkip); // pentToSkip (edict_t *)
@@ -526,8 +543,8 @@
     event::findAndCall("engParticleEffect", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 4;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[4];
-      v8_args[0] = v8::External::New(isolate, org /* float  */); // org (const float *)
-      v8_args[1] = v8::External::New(isolate, dir /* float  */); // dir (const float *)
+      v8_args[0] = v8::External::New(isolate, (void*)org /* float  */); // org (const float *)
+      v8_args[1] = v8::External::New(isolate, (void*)dir /* float  */); // dir (const float *)
       v8_args[2] = v8::Number::New(isolate, color); // color (float)
       v8_args[3] = v8::Number::New(isolate, count); // count (float)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
@@ -555,6 +572,7 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, name).ToLocalChecked(); // name (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('engPointContents', (rgflVector) => console.log('engPointContents fired!'));
@@ -563,9 +581,10 @@
     event::findAndCall("engPointContents", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::External::New(isolate, rgflVector /* float  */); // rgflVector (const float *)
+      v8_args[0] = v8::External::New(isolate, (void*)rgflVector /* float  */); // rgflVector (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('engMessageBegin', (msg_dest, msg_type, pOrigin, ed) => console.log('engMessageBegin fired!'));
@@ -576,7 +595,7 @@
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[4];
       v8_args[0] = v8::Number::New(isolate, msg_dest); // msg_dest (int)
       v8_args[1] = v8::Number::New(isolate, msg_type); // msg_type (int)
-      v8_args[2] = v8::External::New(isolate, pOrigin /* float  */); // pOrigin (const float *)
+      v8_args[2] = v8::External::New(isolate, (void*)pOrigin /* float  */); // pOrigin (const float *)
       v8_args[3] = structures::wrapEntity(isolate, ed); // ed (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -696,6 +715,7 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, szVarName).ToLocalChecked(); // szVarName (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0.0f;
   }
 
 // nodemod.on('engCVarGetString', (szVarName) => console.log('engCVarGetString fired!'));
@@ -707,6 +727,7 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, szVarName).ToLocalChecked(); // szVarName (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('engCVarSetFloat', (szVarName, flValue) => console.log('engCVarSetFloat fired!'));
@@ -747,6 +768,7 @@
       v8_args[1] = v8::Number::New(isolate, cb); // cb (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('engPvEntPrivateData', (pEdict) => console.log('engPvEntPrivateData fired!'));
@@ -758,6 +780,7 @@
       v8_args[0] = structures::wrapEntity(isolate, pEdict); // pEdict (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('engFreeEntPrivateData', (pEdict) => console.log('engFreeEntPrivateData fired!'));
@@ -780,6 +803,7 @@
       v8_args[0] = v8::Number::New(isolate, iString); // iString (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('engAllocString', (szValue) => console.log('engAllocString fired!'));
@@ -791,6 +815,7 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, szValue).ToLocalChecked(); // szValue (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('engGetVarsOfEnt', (pEdict) => console.log('engGetVarsOfEnt fired!'));
@@ -802,6 +827,7 @@
       v8_args[0] = structures::wrapEntity(isolate, pEdict); // pEdict (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('engPEntityOfEntOffset', (iEntOffset) => console.log('engPEntityOfEntOffset fired!'));
@@ -813,6 +839,7 @@
       v8_args[0] = v8::Number::New(isolate, iEntOffset); // iEntOffset (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('engEntOffsetOfPEntity', (pEdict) => console.log('engEntOffsetOfPEntity fired!'));
@@ -824,6 +851,7 @@
       v8_args[0] = structures::wrapEntity(isolate, pEdict); // pEdict (const edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('engIndexOfEdict', (pEdict) => console.log('engIndexOfEdict fired!'));
@@ -835,6 +863,7 @@
       v8_args[0] = structures::wrapEntity(isolate, pEdict); // pEdict (const edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('engPEntityOfEntIndex', (iEntIndex) => console.log('engPEntityOfEntIndex fired!'));
@@ -846,6 +875,7 @@
       v8_args[0] = v8::Number::New(isolate, iEntIndex); // iEntIndex (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('engFindEntityByVars', (pvars) => console.log('engFindEntityByVars fired!'));
@@ -857,6 +887,7 @@
       v8_args[0] = v8::External::New(isolate, pvars /* entvars_s */); // pvars (struct entvars_s*)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('engGetModelPtr', (pEdict) => console.log('engGetModelPtr fired!'));
@@ -868,6 +899,7 @@
       v8_args[0] = structures::wrapEntity(isolate, pEdict); // pEdict (edict_t*)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('engRegUserMsg', (pszName, iSize) => console.log('engRegUserMsg fired!'));
@@ -880,6 +912,7 @@
       v8_args[1] = v8::Number::New(isolate, iSize); // iSize (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('engAnimationAutomove', (pEdict, flTime) => console.log('engAnimationAutomove fired!'));
@@ -917,6 +950,7 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, pName).ToLocalChecked(); // pName (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('engNameForFunction', (function) => console.log('engNameForFunction fired!'));
@@ -928,6 +962,7 @@
       v8_args[0] = v8::External::New(isolate, function /* void  */); // function (void *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('engClientPrintf', (pEdict, ptype, szMsg) => console.log('engClientPrintf fired!'));
@@ -958,6 +993,7 @@
   const char * eng_pfnCmd_Args () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("engCmdArgs", nullptr, 0);
+    return nullptr;
   }
 
 // nodemod.on('engCmdArgv', (argc) => console.log('engCmdArgv fired!'));
@@ -969,12 +1005,14 @@
       v8_args[0] = v8::Number::New(isolate, argc); // argc (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('engCmdArgc', () => console.log('engCmdArgc fired!'));
   int eng_pfnCmd_Argc () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("engCmdArgc", nullptr, 0);
+    return 0;
   }
 
 // nodemod.on('engGetAttachment', (pEdict, iAttachment, rgflOrigin, rgflAngles) => console.log('engGetAttachment fired!'));
@@ -1039,6 +1077,7 @@
       v8_args[1] = v8::Number::New(isolate, lHigh); // lHigh (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('engRandomFloat', (flLow, flHigh) => console.log('engRandomFloat fired!'));
@@ -1051,6 +1090,7 @@
       v8_args[1] = v8::Number::New(isolate, flHigh); // flHigh (float)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0.0f;
   }
 
 // nodemod.on('engSetView', (pClient, pViewent) => console.log('engSetView fired!'));
@@ -1069,6 +1109,7 @@
   float eng_pfnTime () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("engTime", nullptr, 0);
+    return 0.0f;
   }
 
 // nodemod.on('engCrosshairAngle', (pClient, pitch, yaw) => console.log('engCrosshairAngle fired!'));
@@ -1094,6 +1135,7 @@
       v8_args[1] = v8::External::New(isolate, pLength /* int  */); // pLength (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('engFreeFile', (buffer) => console.log('engFreeFile fired!'));
@@ -1129,6 +1171,7 @@
       v8_args[2] = v8::External::New(isolate, iCompare /* int  */); // iCompare (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('engGetGameDir', (szGetGameDir) => console.log('engGetGameDir fired!'));
@@ -1189,6 +1232,7 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, netname).ToLocalChecked(); // netname (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('engRunPlayerMove', (fakeclient, viewangles, forwardmove, sidemove, upmove, buttons, impulse, msec) => console.log('engRunPlayerMove fired!'));
@@ -1198,7 +1242,7 @@
       unsigned int v8_argCount = 8;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[8];
       v8_args[0] = structures::wrapEntity(isolate, fakeclient); // fakeclient (edict_t *)
-      v8_args[1] = v8::External::New(isolate, viewangles /* float  */); // viewangles (const float *)
+      v8_args[1] = v8::External::New(isolate, (void*)viewangles /* float  */); // viewangles (const float *)
       v8_args[2] = v8::Number::New(isolate, forwardmove); // forwardmove (float)
       v8_args[3] = v8::Number::New(isolate, sidemove); // sidemove (float)
       v8_args[4] = v8::Number::New(isolate, upmove); // upmove (float)
@@ -1213,6 +1257,7 @@
   int eng_pfnNumberOfEntities () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("engNumberOfEntities", nullptr, 0);
+    return 0;
   }
 
 // nodemod.on('engGetInfoKeyBuffer', (e) => console.log('engGetInfoKeyBuffer fired!'));
@@ -1224,6 +1269,7 @@
       v8_args[0] = structures::wrapEntity(isolate, e); // e (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('engInfoKeyValue', (infobuffer, key) => console.log('engInfoKeyValue fired!'));
@@ -1236,6 +1282,7 @@
       v8_args[1] = v8::String::NewFromUtf8(isolate, key).ToLocalChecked(); // key (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('engSetKeyValue', (infobuffer, key, value) => console.log('engSetKeyValue fired!'));
@@ -1274,6 +1321,7 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, filename).ToLocalChecked(); // filename (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('engStaticDecal', (origin, decalIndex, entityIndex, modelIndex) => console.log('engStaticDecal fired!'));
@@ -1282,7 +1330,7 @@
     event::findAndCall("engStaticDecal", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 4;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[4];
-      v8_args[0] = v8::External::New(isolate, origin /* float  */); // origin (const float *)
+      v8_args[0] = v8::External::New(isolate, (void*)origin /* float  */); // origin (const float *)
       v8_args[1] = v8::Number::New(isolate, decalIndex); // decalIndex (int)
       v8_args[2] = v8::Number::New(isolate, entityIndex); // entityIndex (int)
       v8_args[3] = v8::Number::New(isolate, modelIndex); // modelIndex (int)
@@ -1299,6 +1347,7 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, s).ToLocalChecked(); // s (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('engGetPlayerUserId', (e) => console.log('engGetPlayerUserId fired!'));
@@ -1310,6 +1359,7 @@
       v8_args[0] = structures::wrapEntity(isolate, e); // e (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('engBuildSoundMsg', (entity, channel, sample, volume, attenuation, fFlags, pitch, msg_dest, msg_type, pOrigin, ed) => console.log('engBuildSoundMsg fired!'));
@@ -1327,7 +1377,7 @@
       v8_args[6] = v8::Number::New(isolate, pitch); // pitch (int)
       v8_args[7] = v8::Number::New(isolate, msg_dest); // msg_dest (int)
       v8_args[8] = v8::Number::New(isolate, msg_type); // msg_type (int)
-      v8_args[9] = v8::External::New(isolate, pOrigin /* float  */); // pOrigin (const float *)
+      v8_args[9] = v8::External::New(isolate, (void*)pOrigin /* float  */); // pOrigin (const float *)
       v8_args[10] = structures::wrapEntity(isolate, ed); // ed (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -1337,6 +1387,7 @@
   int eng_pfnIsDedicatedServer () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("engIsDedicatedServer", nullptr, 0);
+    return 0;
   }
 
 // nodemod.on('engCVarGetPointer', (szVarName) => console.log('engCVarGetPointer fired!'));
@@ -1348,6 +1399,7 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, szVarName).ToLocalChecked(); // szVarName (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('engGetPlayerWONId', (e) => console.log('engGetPlayerWONId fired!'));
@@ -1359,6 +1411,7 @@
       v8_args[0] = structures::wrapEntity(isolate, e); // e (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('engInfoRemoveKey', (s, key) => console.log('engInfoRemoveKey fired!'));
@@ -1383,6 +1436,7 @@
       v8_args[1] = v8::String::NewFromUtf8(isolate, key).ToLocalChecked(); // key (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('engSetPhysicsKeyValue', (pClient, key, value) => console.log('engSetPhysicsKeyValue fired!'));
@@ -1407,6 +1461,7 @@
       v8_args[0] = structures::wrapEntity(isolate, pClient); // pClient (const edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('engPrecacheEvent', (type, psz) => console.log('engPrecacheEvent fired!'));
@@ -1419,6 +1474,7 @@
       v8_args[1] = v8::String::NewFromUtf8(isolate, psz).ToLocalChecked(); // psz (const char*)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('engPlaybackEvent', (flags, pInvoker, eventindex, delay, origin, angles, fparam1, fparam2, iparam1, iparam2, bparam1, bparam2) => console.log('engPlaybackEvent fired!'));
@@ -1431,8 +1487,8 @@
       v8_args[1] = structures::wrapEntity(isolate, pInvoker); // pInvoker (const edict_t *)
       v8_args[2] = v8::Boolean::New(isolate, false); // eventindex (unsigned short)
       v8_args[3] = v8::Number::New(isolate, delay); // delay (float)
-      v8_args[4] = v8::External::New(isolate, origin /* float  */); // origin (const float *)
-      v8_args[5] = v8::External::New(isolate, angles /* float  */); // angles (const float *)
+      v8_args[4] = v8::External::New(isolate, (void*)origin /* float  */); // origin (const float *)
+      v8_args[5] = v8::External::New(isolate, (void*)angles /* float  */); // angles (const float *)
       v8_args[6] = v8::Number::New(isolate, fparam1); // fparam1 (float)
       v8_args[7] = v8::Number::New(isolate, fparam2); // fparam2 (float)
       v8_args[8] = v8::Number::New(isolate, iparam1); // iparam1 (int)
@@ -1449,9 +1505,10 @@
     event::findAndCall("engSetFatPVS", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::External::New(isolate, org /* float  */); // org (const float *)
+      v8_args[0] = v8::External::New(isolate, (void*)org /* float  */); // org (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('engSetFatPAS', (org) => console.log('engSetFatPAS fired!'));
@@ -1460,9 +1517,10 @@
     event::findAndCall("engSetFatPAS", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::External::New(isolate, org /* float  */); // org (const float *)
+      v8_args[0] = v8::External::New(isolate, (void*)org /* float  */); // org (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('engCheckVisibility', (entity, pset) => console.log('engCheckVisibility fired!'));
@@ -1475,6 +1533,7 @@
       v8_args[1] = v8::External::New(isolate, pset /* unsigned char  */); // pset (unsigned char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('engDeltaSetField', (pFields, fieldname) => console.log('engDeltaSetField fired!'));
@@ -1507,6 +1566,7 @@
   int eng_pfnGetCurrentPlayer () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("engGetCurrentPlayer", nullptr, 0);
+    return 0;
   }
 
 // nodemod.on('engCanSkipPlayer', (player) => console.log('engCanSkipPlayer fired!'));
@@ -1518,6 +1578,7 @@
       v8_args[0] = structures::wrapEntity(isolate, player); // player (const edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('engDeltaFindField', (pFields, fieldname) => console.log('engDeltaFindField fired!'));
@@ -1530,6 +1591,7 @@
       v8_args[1] = v8::String::NewFromUtf8(isolate, fieldname).ToLocalChecked(); // fieldname (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('engDeltaSetFieldByIndex', (pFields, fieldNumber) => console.log('engDeltaSetFieldByIndex fired!'));
@@ -1578,6 +1640,7 @@
       v8_args[1] = v8::External::New(isolate, baseline /* entity_state_s  */); // baseline (struct entity_state_s *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('engCvarDirectSet', (var, value) => console.log('engCvarDirectSet fired!'));
@@ -1599,8 +1662,8 @@
       unsigned int v8_argCount = 4;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[4];
       v8_args[0] = v8::Boolean::New(isolate, false); // type (FORCE_TYPE)
-      v8_args[1] = v8::External::New(isolate, mins /* float  */); // mins (const float *)
-      v8_args[2] = v8::External::New(isolate, maxs /* float  */); // maxs (const float *)
+      v8_args[1] = v8::External::New(isolate, (void*)mins /* float  */); // mins (const float *)
+      v8_args[2] = v8::External::New(isolate, (void*)maxs /* float  */); // maxs (const float *)
       v8_args[3] = v8::String::NewFromUtf8(isolate, filename).ToLocalChecked(); // filename (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -1631,6 +1694,7 @@
       v8_args[1] = v8::Number::New(isolate, iSender); // iSender (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('engVoiceSetClientListening', (iReceiver, iSender, bListen) => console.log('engVoiceSetClientListening fired!'));
@@ -1644,6 +1708,7 @@
       v8_args[2] = v8::Boolean::New(isolate, bListen); // bListen (qboolean)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('engGetPlayerAuthId', (e) => console.log('engGetPlayerAuthId fired!'));
@@ -1655,6 +1720,7 @@
       v8_args[0] = structures::wrapEntity(isolate, e); // e (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('engSequenceGet', (fileName, entryName) => console.log('engSequenceGet fired!'));
@@ -1667,6 +1733,7 @@
       v8_args[1] = v8::String::NewFromUtf8(isolate, entryName).ToLocalChecked(); // entryName (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('engSequencePickSentence', (groupName, pickMethod, picked) => console.log('engSequencePickSentence fired!'));
@@ -1680,6 +1747,7 @@
       v8_args[2] = v8::External::New(isolate, picked /* int  */); // picked (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('engGetFileSize', (filename) => console.log('engGetFileSize fired!'));
@@ -1691,6 +1759,7 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, filename).ToLocalChecked(); // filename (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('engGetApproxWavePlayLen', (filepath) => console.log('engGetApproxWavePlayLen fired!'));
@@ -1702,12 +1771,14 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, filepath).ToLocalChecked(); // filepath (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('engIsCareerMatch', () => console.log('engIsCareerMatch fired!'));
   int eng_pfnIsCareerMatch () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("engIsCareerMatch", nullptr, 0);
+    return 0;
   }
 
 // nodemod.on('engGetLocalizedStringLength', (label) => console.log('engGetLocalizedStringLength fired!'));
@@ -1719,6 +1790,7 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, label).ToLocalChecked(); // label (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('engRegisterTutorMessageShown', (mid) => console.log('engRegisterTutorMessageShown fired!'));
@@ -1741,6 +1813,7 @@
       v8_args[0] = v8::Number::New(isolate, mid); // mid (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('engProcessTutorMessageDecayBuffer', (buffer, bufferLength) => console.log('engProcessTutorMessageDecayBuffer fired!'));
@@ -1808,6 +1881,7 @@
       v8_args[1] = v8::External::New(isolate, ppnext /* char * */); // ppnext (char **)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('engPEntityOfEntIndexAllEntities', (iEntIndex) => console.log('engPEntityOfEntIndexAllEntities fired!'));
@@ -1819,6 +1893,7 @@
       v8_args[0] = v8::Number::New(isolate, iEntIndex); // iEntIndex (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
     enginefuncs_t g_EngineFunctionsTable = {
@@ -1993,6 +2068,7 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, s).ToLocalChecked(); // s (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('postEngPrecacheSound', (s) => console.log('postEngPrecacheSound fired!'));
@@ -2004,6 +2080,7 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, s).ToLocalChecked(); // s (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('postEngSetModel', (e, m) => console.log('postEngSetModel fired!'));
@@ -2027,6 +2104,7 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, m).ToLocalChecked(); // m (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('postEngModelFrames', (modelIndex) => console.log('postEngModelFrames fired!'));
@@ -2038,6 +2116,7 @@
       v8_args[0] = v8::Number::New(isolate, modelIndex); // modelIndex (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('postEngSetSize', (e, rgflMin, rgflMax) => console.log('postEngSetSize fired!'));
@@ -2047,8 +2126,8 @@
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = structures::wrapEntity(isolate, e); // e (edict_t *)
-      v8_args[1] = v8::External::New(isolate, rgflMin /* float  */); // rgflMin (const float *)
-      v8_args[2] = v8::External::New(isolate, rgflMax /* float  */); // rgflMax (const float *)
+      v8_args[1] = v8::External::New(isolate, (void*)rgflMin /* float  */); // rgflMin (const float *)
+      v8_args[2] = v8::External::New(isolate, (void*)rgflMax /* float  */); // rgflMax (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -2093,9 +2172,10 @@
     event::findAndCall("postEngVecToYaw", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::External::New(isolate, rgflVector /* float  */); // rgflVector (const float *)
+      v8_args[0] = v8::External::New(isolate, (void*)rgflVector /* float  */); // rgflVector (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0.0f;
   }
 
 // nodemod.on('postEngVecToAngles', (rgflVectorIn, rgflVectorOut) => console.log('postEngVecToAngles fired!'));
@@ -2104,7 +2184,7 @@
     event::findAndCall("postEngVecToAngles", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = v8::External::New(isolate, rgflVectorIn /* float  */); // rgflVectorIn (const float *)
+      v8_args[0] = v8::External::New(isolate, (void*)rgflVectorIn /* float  */); // rgflVectorIn (const float *)
       v8_args[1] = v8::External::New(isolate, rgflVectorOut /* float  */); // rgflVectorOut (float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -2117,7 +2197,7 @@
       unsigned int v8_argCount = 4;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[4];
       v8_args[0] = structures::wrapEntity(isolate, ent); // ent (edict_t *)
-      v8_args[1] = v8::External::New(isolate, pflGoal /* float  */); // pflGoal (const float *)
+      v8_args[1] = v8::External::New(isolate, (void*)pflGoal /* float  */); // pflGoal (const float *)
       v8_args[2] = v8::Number::New(isolate, dist); // dist (float)
       v8_args[3] = v8::Number::New(isolate, iMoveType); // iMoveType (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
@@ -2157,6 +2237,7 @@
       v8_args[2] = v8::String::NewFromUtf8(isolate, pszValue).ToLocalChecked(); // pszValue (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('postEngGetEntityIllum', (pEnt) => console.log('postEngGetEntityIllum fired!'));
@@ -2168,6 +2249,7 @@
       v8_args[0] = structures::wrapEntity(isolate, pEnt); // pEnt (edict_t*)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('postEngFindEntityInSphere', (pEdictStartSearchAfter, org, rad) => console.log('postEngFindEntityInSphere fired!'));
@@ -2177,10 +2259,11 @@
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = structures::wrapEntity(isolate, pEdictStartSearchAfter); // pEdictStartSearchAfter (edict_t *)
-      v8_args[1] = v8::External::New(isolate, org /* float  */); // org (const float *)
+      v8_args[1] = v8::External::New(isolate, (void*)org /* float  */); // org (const float *)
       v8_args[2] = v8::Number::New(isolate, rad); // rad (float)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('postEngFindClientInPVS', (pEdict) => console.log('postEngFindClientInPVS fired!'));
@@ -2192,6 +2275,7 @@
       v8_args[0] = structures::wrapEntity(isolate, pEdict); // pEdict (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('postEngEntitiesInPVS', (pplayer) => console.log('postEngEntitiesInPVS fired!'));
@@ -2203,6 +2287,7 @@
       v8_args[0] = structures::wrapEntity(isolate, pplayer); // pplayer (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('postEngMakeVectors', (rgflVector) => console.log('postEngMakeVectors fired!'));
@@ -2211,7 +2296,7 @@
     event::findAndCall("postEngMakeVectors", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::External::New(isolate, rgflVector /* float  */); // rgflVector (const float *)
+      v8_args[0] = v8::External::New(isolate, (void*)rgflVector /* float  */); // rgflVector (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -2222,7 +2307,7 @@
     event::findAndCall("postEngAngleVectors", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 4;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[4];
-      v8_args[0] = v8::External::New(isolate, rgflVector /* float  */); // rgflVector (const float *)
+      v8_args[0] = v8::External::New(isolate, (void*)rgflVector /* float  */); // rgflVector (const float *)
       v8_args[1] = v8::External::New(isolate, forward /* float  */); // forward (float *)
       v8_args[2] = v8::External::New(isolate, right /* float  */); // right (float *)
       v8_args[3] = v8::External::New(isolate, up /* float  */); // up (float *)
@@ -2234,6 +2319,7 @@
   edict_t* postEng_pfnCreateEntity () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("postEngCreateEntity", nullptr, 0);
+    return nullptr;
   }
 
 // nodemod.on('postEngRemoveEntity', (e) => console.log('postEngRemoveEntity fired!'));
@@ -2256,6 +2342,7 @@
       v8_args[0] = v8::Number::New(isolate, className); // className (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('postEngMakeStatic', (ent) => console.log('postEngMakeStatic fired!'));
@@ -2278,6 +2365,7 @@
       v8_args[0] = structures::wrapEntity(isolate, e); // e (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('postEngDropToFloor', (e) => console.log('postEngDropToFloor fired!'));
@@ -2289,6 +2377,7 @@
       v8_args[0] = structures::wrapEntity(isolate, e); // e (edict_t*)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('postEngWalkMove', (ent, yaw, dist, iMode) => console.log('postEngWalkMove fired!'));
@@ -2303,6 +2392,7 @@
       v8_args[3] = v8::Number::New(isolate, iMode); // iMode (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('postEngSetOrigin', (e, rgflOrigin) => console.log('postEngSetOrigin fired!'));
@@ -2312,7 +2402,7 @@
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = structures::wrapEntity(isolate, e); // e (edict_t *)
-      v8_args[1] = v8::External::New(isolate, rgflOrigin /* float  */); // rgflOrigin (const float *)
+      v8_args[1] = v8::External::New(isolate, (void*)rgflOrigin /* float  */); // rgflOrigin (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -2341,7 +2431,7 @@
       unsigned int v8_argCount = 7;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[7];
       v8_args[0] = structures::wrapEntity(isolate, entity); // entity (edict_t *)
-      v8_args[1] = v8::External::New(isolate, pos /* float  */); // pos (const float *)
+      v8_args[1] = v8::External::New(isolate, (void*)pos /* float  */); // pos (const float *)
       v8_args[2] = v8::String::NewFromUtf8(isolate, samp).ToLocalChecked(); // samp (const char *)
       v8_args[3] = v8::Number::New(isolate, vol); // vol (float)
       v8_args[4] = v8::Number::New(isolate, attenuation); // attenuation (float)
@@ -2357,8 +2447,8 @@
     event::findAndCall("postEngTraceLine", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 5;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[5];
-      v8_args[0] = v8::External::New(isolate, v1 /* float  */); // v1 (const float *)
-      v8_args[1] = v8::External::New(isolate, v2 /* float  */); // v2 (const float *)
+      v8_args[0] = v8::External::New(isolate, (void*)v1 /* float  */); // v1 (const float *)
+      v8_args[1] = v8::External::New(isolate, (void*)v2 /* float  */); // v2 (const float *)
       v8_args[2] = v8::Number::New(isolate, fNoMonsters); // fNoMonsters (int)
       v8_args[3] = structures::wrapEntity(isolate, pentToSkip); // pentToSkip (edict_t *)
       v8_args[4] = v8::External::New(isolate, ptr /* TraceResult  */); // ptr (TraceResult *)
@@ -2386,13 +2476,14 @@
       unsigned int v8_argCount = 6;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[6];
       v8_args[0] = structures::wrapEntity(isolate, pEdict); // pEdict (edict_t *)
-      v8_args[1] = v8::External::New(isolate, v1 /* float  */); // v1 (const float *)
-      v8_args[2] = v8::External::New(isolate, v2 /* float  */); // v2 (const float *)
+      v8_args[1] = v8::External::New(isolate, (void*)v1 /* float  */); // v1 (const float *)
+      v8_args[2] = v8::External::New(isolate, (void*)v2 /* float  */); // v2 (const float *)
       v8_args[3] = v8::Number::New(isolate, fNoMonsters); // fNoMonsters (int)
       v8_args[4] = structures::wrapEntity(isolate, pentToSkip); // pentToSkip (edict_t *)
       v8_args[5] = v8::External::New(isolate, ptr /* TraceResult  */); // ptr (TraceResult *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('postEngTraceHull', (v1, v2, fNoMonsters, hullNumber, pentToSkip, ptr) => console.log('postEngTraceHull fired!'));
@@ -2401,8 +2492,8 @@
     event::findAndCall("postEngTraceHull", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 6;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[6];
-      v8_args[0] = v8::External::New(isolate, v1 /* float  */); // v1 (const float *)
-      v8_args[1] = v8::External::New(isolate, v2 /* float  */); // v2 (const float *)
+      v8_args[0] = v8::External::New(isolate, (void*)v1 /* float  */); // v1 (const float *)
+      v8_args[1] = v8::External::New(isolate, (void*)v2 /* float  */); // v2 (const float *)
       v8_args[2] = v8::Number::New(isolate, fNoMonsters); // fNoMonsters (int)
       v8_args[3] = v8::Number::New(isolate, hullNumber); // hullNumber (int)
       v8_args[4] = structures::wrapEntity(isolate, pentToSkip); // pentToSkip (edict_t *)
@@ -2417,8 +2508,8 @@
     event::findAndCall("postEngTraceModel", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 5;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[5];
-      v8_args[0] = v8::External::New(isolate, v1 /* float  */); // v1 (const float *)
-      v8_args[1] = v8::External::New(isolate, v2 /* float  */); // v2 (const float *)
+      v8_args[0] = v8::External::New(isolate, (void*)v1 /* float  */); // v1 (const float *)
+      v8_args[1] = v8::External::New(isolate, (void*)v2 /* float  */); // v2 (const float *)
       v8_args[2] = v8::Number::New(isolate, hullNumber); // hullNumber (int)
       v8_args[3] = structures::wrapEntity(isolate, pent); // pent (edict_t *)
       v8_args[4] = v8::External::New(isolate, ptr /* TraceResult  */); // ptr (TraceResult *)
@@ -2433,10 +2524,11 @@
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = structures::wrapEntity(isolate, pTextureEntity); // pTextureEntity (edict_t *)
-      v8_args[1] = v8::External::New(isolate, v1 /* float  */); // v1 (const float *)
-      v8_args[2] = v8::External::New(isolate, v2 /* float  */); // v2 (const float *)
+      v8_args[1] = v8::External::New(isolate, (void*)v1 /* float  */); // v1 (const float *)
+      v8_args[2] = v8::External::New(isolate, (void*)v2 /* float  */); // v2 (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('postEngTraceSphere', (v1, v2, fNoMonsters, radius, pentToSkip, ptr) => console.log('postEngTraceSphere fired!'));
@@ -2445,8 +2537,8 @@
     event::findAndCall("postEngTraceSphere", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 6;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[6];
-      v8_args[0] = v8::External::New(isolate, v1 /* float  */); // v1 (const float *)
-      v8_args[1] = v8::External::New(isolate, v2 /* float  */); // v2 (const float *)
+      v8_args[0] = v8::External::New(isolate, (void*)v1 /* float  */); // v1 (const float *)
+      v8_args[1] = v8::External::New(isolate, (void*)v2 /* float  */); // v2 (const float *)
       v8_args[2] = v8::Number::New(isolate, fNoMonsters); // fNoMonsters (int)
       v8_args[3] = v8::Number::New(isolate, radius); // radius (float)
       v8_args[4] = structures::wrapEntity(isolate, pentToSkip); // pentToSkip (edict_t *)
@@ -2503,8 +2595,8 @@
     event::findAndCall("postEngParticleEffect", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 4;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[4];
-      v8_args[0] = v8::External::New(isolate, org /* float  */); // org (const float *)
-      v8_args[1] = v8::External::New(isolate, dir /* float  */); // dir (const float *)
+      v8_args[0] = v8::External::New(isolate, (void*)org /* float  */); // org (const float *)
+      v8_args[1] = v8::External::New(isolate, (void*)dir /* float  */); // dir (const float *)
       v8_args[2] = v8::Number::New(isolate, color); // color (float)
       v8_args[3] = v8::Number::New(isolate, count); // count (float)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
@@ -2532,6 +2624,7 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, name).ToLocalChecked(); // name (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('postEngPointContents', (rgflVector) => console.log('postEngPointContents fired!'));
@@ -2540,9 +2633,10 @@
     event::findAndCall("postEngPointContents", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::External::New(isolate, rgflVector /* float  */); // rgflVector (const float *)
+      v8_args[0] = v8::External::New(isolate, (void*)rgflVector /* float  */); // rgflVector (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('postEngMessageBegin', (msg_dest, msg_type, pOrigin, ed) => console.log('postEngMessageBegin fired!'));
@@ -2553,7 +2647,7 @@
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[4];
       v8_args[0] = v8::Number::New(isolate, msg_dest); // msg_dest (int)
       v8_args[1] = v8::Number::New(isolate, msg_type); // msg_type (int)
-      v8_args[2] = v8::External::New(isolate, pOrigin /* float  */); // pOrigin (const float *)
+      v8_args[2] = v8::External::New(isolate, (void*)pOrigin /* float  */); // pOrigin (const float *)
       v8_args[3] = structures::wrapEntity(isolate, ed); // ed (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -2673,6 +2767,7 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, szVarName).ToLocalChecked(); // szVarName (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0.0f;
   }
 
 // nodemod.on('postEngCVarGetString', (szVarName) => console.log('postEngCVarGetString fired!'));
@@ -2684,6 +2779,7 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, szVarName).ToLocalChecked(); // szVarName (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('postEngCVarSetFloat', (szVarName, flValue) => console.log('postEngCVarSetFloat fired!'));
@@ -2724,6 +2820,7 @@
       v8_args[1] = v8::Number::New(isolate, cb); // cb (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('postEngPvEntPrivateData', (pEdict) => console.log('postEngPvEntPrivateData fired!'));
@@ -2735,6 +2832,7 @@
       v8_args[0] = structures::wrapEntity(isolate, pEdict); // pEdict (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('postEngFreeEntPrivateData', (pEdict) => console.log('postEngFreeEntPrivateData fired!'));
@@ -2757,6 +2855,7 @@
       v8_args[0] = v8::Number::New(isolate, iString); // iString (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('postEngAllocString', (szValue) => console.log('postEngAllocString fired!'));
@@ -2768,6 +2867,7 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, szValue).ToLocalChecked(); // szValue (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('postEngGetVarsOfEnt', (pEdict) => console.log('postEngGetVarsOfEnt fired!'));
@@ -2779,6 +2879,7 @@
       v8_args[0] = structures::wrapEntity(isolate, pEdict); // pEdict (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('postEngPEntityOfEntOffset', (iEntOffset) => console.log('postEngPEntityOfEntOffset fired!'));
@@ -2790,6 +2891,7 @@
       v8_args[0] = v8::Number::New(isolate, iEntOffset); // iEntOffset (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('postEngEntOffsetOfPEntity', (pEdict) => console.log('postEngEntOffsetOfPEntity fired!'));
@@ -2801,6 +2903,7 @@
       v8_args[0] = structures::wrapEntity(isolate, pEdict); // pEdict (const edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('postEngIndexOfEdict', (pEdict) => console.log('postEngIndexOfEdict fired!'));
@@ -2812,6 +2915,7 @@
       v8_args[0] = structures::wrapEntity(isolate, pEdict); // pEdict (const edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('postEngPEntityOfEntIndex', (iEntIndex) => console.log('postEngPEntityOfEntIndex fired!'));
@@ -2823,6 +2927,7 @@
       v8_args[0] = v8::Number::New(isolate, iEntIndex); // iEntIndex (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('postEngFindEntityByVars', (pvars) => console.log('postEngFindEntityByVars fired!'));
@@ -2834,6 +2939,7 @@
       v8_args[0] = v8::External::New(isolate, pvars /* entvars_s */); // pvars (struct entvars_s*)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('postEngGetModelPtr', (pEdict) => console.log('postEngGetModelPtr fired!'));
@@ -2845,6 +2951,7 @@
       v8_args[0] = structures::wrapEntity(isolate, pEdict); // pEdict (edict_t*)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('postEngRegUserMsg', (pszName, iSize) => console.log('postEngRegUserMsg fired!'));
@@ -2857,6 +2964,7 @@
       v8_args[1] = v8::Number::New(isolate, iSize); // iSize (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('postEngAnimationAutomove', (pEdict, flTime) => console.log('postEngAnimationAutomove fired!'));
@@ -2894,6 +3002,7 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, pName).ToLocalChecked(); // pName (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('postEngNameForFunction', (function) => console.log('postEngNameForFunction fired!'));
@@ -2905,6 +3014,7 @@
       v8_args[0] = v8::External::New(isolate, function /* void  */); // function (void *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('postEngClientPrintf', (pEdict, ptype, szMsg) => console.log('postEngClientPrintf fired!'));
@@ -2935,6 +3045,7 @@
   const char * postEng_pfnCmd_Args () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("postEngCmdArgs", nullptr, 0);
+    return nullptr;
   }
 
 // nodemod.on('postEngCmdArgv', (argc) => console.log('postEngCmdArgv fired!'));
@@ -2946,12 +3057,14 @@
       v8_args[0] = v8::Number::New(isolate, argc); // argc (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('postEngCmdArgc', () => console.log('postEngCmdArgc fired!'));
   int postEng_pfnCmd_Argc () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("postEngCmdArgc", nullptr, 0);
+    return 0;
   }
 
 // nodemod.on('postEngGetAttachment', (pEdict, iAttachment, rgflOrigin, rgflAngles) => console.log('postEngGetAttachment fired!'));
@@ -3016,6 +3129,7 @@
       v8_args[1] = v8::Number::New(isolate, lHigh); // lHigh (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('postEngRandomFloat', (flLow, flHigh) => console.log('postEngRandomFloat fired!'));
@@ -3028,6 +3142,7 @@
       v8_args[1] = v8::Number::New(isolate, flHigh); // flHigh (float)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0.0f;
   }
 
 // nodemod.on('postEngSetView', (pClient, pViewent) => console.log('postEngSetView fired!'));
@@ -3046,6 +3161,7 @@
   float postEng_pfnTime () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("postEngTime", nullptr, 0);
+    return 0.0f;
   }
 
 // nodemod.on('postEngCrosshairAngle', (pClient, pitch, yaw) => console.log('postEngCrosshairAngle fired!'));
@@ -3071,6 +3187,7 @@
       v8_args[1] = v8::External::New(isolate, pLength /* int  */); // pLength (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('postEngFreeFile', (buffer) => console.log('postEngFreeFile fired!'));
@@ -3106,6 +3223,7 @@
       v8_args[2] = v8::External::New(isolate, iCompare /* int  */); // iCompare (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('postEngGetGameDir', (szGetGameDir) => console.log('postEngGetGameDir fired!'));
@@ -3166,6 +3284,7 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, netname).ToLocalChecked(); // netname (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('postEngRunPlayerMove', (fakeclient, viewangles, forwardmove, sidemove, upmove, buttons, impulse, msec) => console.log('postEngRunPlayerMove fired!'));
@@ -3175,7 +3294,7 @@
       unsigned int v8_argCount = 8;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[8];
       v8_args[0] = structures::wrapEntity(isolate, fakeclient); // fakeclient (edict_t *)
-      v8_args[1] = v8::External::New(isolate, viewangles /* float  */); // viewangles (const float *)
+      v8_args[1] = v8::External::New(isolate, (void*)viewangles /* float  */); // viewangles (const float *)
       v8_args[2] = v8::Number::New(isolate, forwardmove); // forwardmove (float)
       v8_args[3] = v8::Number::New(isolate, sidemove); // sidemove (float)
       v8_args[4] = v8::Number::New(isolate, upmove); // upmove (float)
@@ -3190,6 +3309,7 @@
   int postEng_pfnNumberOfEntities () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("postEngNumberOfEntities", nullptr, 0);
+    return 0;
   }
 
 // nodemod.on('postEngGetInfoKeyBuffer', (e) => console.log('postEngGetInfoKeyBuffer fired!'));
@@ -3201,6 +3321,7 @@
       v8_args[0] = structures::wrapEntity(isolate, e); // e (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('postEngInfoKeyValue', (infobuffer, key) => console.log('postEngInfoKeyValue fired!'));
@@ -3213,6 +3334,7 @@
       v8_args[1] = v8::String::NewFromUtf8(isolate, key).ToLocalChecked(); // key (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('postEngSetKeyValue', (infobuffer, key, value) => console.log('postEngSetKeyValue fired!'));
@@ -3251,6 +3373,7 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, filename).ToLocalChecked(); // filename (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('postEngStaticDecal', (origin, decalIndex, entityIndex, modelIndex) => console.log('postEngStaticDecal fired!'));
@@ -3259,7 +3382,7 @@
     event::findAndCall("postEngStaticDecal", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 4;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[4];
-      v8_args[0] = v8::External::New(isolate, origin /* float  */); // origin (const float *)
+      v8_args[0] = v8::External::New(isolate, (void*)origin /* float  */); // origin (const float *)
       v8_args[1] = v8::Number::New(isolate, decalIndex); // decalIndex (int)
       v8_args[2] = v8::Number::New(isolate, entityIndex); // entityIndex (int)
       v8_args[3] = v8::Number::New(isolate, modelIndex); // modelIndex (int)
@@ -3276,6 +3399,7 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, s).ToLocalChecked(); // s (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('postEngGetPlayerUserId', (e) => console.log('postEngGetPlayerUserId fired!'));
@@ -3287,6 +3411,7 @@
       v8_args[0] = structures::wrapEntity(isolate, e); // e (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('postEngBuildSoundMsg', (entity, channel, sample, volume, attenuation, fFlags, pitch, msg_dest, msg_type, pOrigin, ed) => console.log('postEngBuildSoundMsg fired!'));
@@ -3304,7 +3429,7 @@
       v8_args[6] = v8::Number::New(isolate, pitch); // pitch (int)
       v8_args[7] = v8::Number::New(isolate, msg_dest); // msg_dest (int)
       v8_args[8] = v8::Number::New(isolate, msg_type); // msg_type (int)
-      v8_args[9] = v8::External::New(isolate, pOrigin /* float  */); // pOrigin (const float *)
+      v8_args[9] = v8::External::New(isolate, (void*)pOrigin /* float  */); // pOrigin (const float *)
       v8_args[10] = structures::wrapEntity(isolate, ed); // ed (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -3314,6 +3439,7 @@
   int postEng_pfnIsDedicatedServer () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("postEngIsDedicatedServer", nullptr, 0);
+    return 0;
   }
 
 // nodemod.on('postEngCVarGetPointer', (szVarName) => console.log('postEngCVarGetPointer fired!'));
@@ -3325,6 +3451,7 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, szVarName).ToLocalChecked(); // szVarName (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('postEngGetPlayerWONId', (e) => console.log('postEngGetPlayerWONId fired!'));
@@ -3336,6 +3463,7 @@
       v8_args[0] = structures::wrapEntity(isolate, e); // e (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('postEngInfoRemoveKey', (s, key) => console.log('postEngInfoRemoveKey fired!'));
@@ -3360,6 +3488,7 @@
       v8_args[1] = v8::String::NewFromUtf8(isolate, key).ToLocalChecked(); // key (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('postEngSetPhysicsKeyValue', (pClient, key, value) => console.log('postEngSetPhysicsKeyValue fired!'));
@@ -3384,6 +3513,7 @@
       v8_args[0] = structures::wrapEntity(isolate, pClient); // pClient (const edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('postEngPrecacheEvent', (type, psz) => console.log('postEngPrecacheEvent fired!'));
@@ -3396,6 +3526,7 @@
       v8_args[1] = v8::String::NewFromUtf8(isolate, psz).ToLocalChecked(); // psz (const char*)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('postEngPlaybackEvent', (flags, pInvoker, eventindex, delay, origin, angles, fparam1, fparam2, iparam1, iparam2, bparam1, bparam2) => console.log('postEngPlaybackEvent fired!'));
@@ -3408,8 +3539,8 @@
       v8_args[1] = structures::wrapEntity(isolate, pInvoker); // pInvoker (const edict_t *)
       v8_args[2] = v8::Boolean::New(isolate, false); // eventindex (unsigned short)
       v8_args[3] = v8::Number::New(isolate, delay); // delay (float)
-      v8_args[4] = v8::External::New(isolate, origin /* float  */); // origin (const float *)
-      v8_args[5] = v8::External::New(isolate, angles /* float  */); // angles (const float *)
+      v8_args[4] = v8::External::New(isolate, (void*)origin /* float  */); // origin (const float *)
+      v8_args[5] = v8::External::New(isolate, (void*)angles /* float  */); // angles (const float *)
       v8_args[6] = v8::Number::New(isolate, fparam1); // fparam1 (float)
       v8_args[7] = v8::Number::New(isolate, fparam2); // fparam2 (float)
       v8_args[8] = v8::Number::New(isolate, iparam1); // iparam1 (int)
@@ -3426,9 +3557,10 @@
     event::findAndCall("postEngSetFatPVS", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::External::New(isolate, org /* float  */); // org (const float *)
+      v8_args[0] = v8::External::New(isolate, (void*)org /* float  */); // org (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('postEngSetFatPAS', (org) => console.log('postEngSetFatPAS fired!'));
@@ -3437,9 +3569,10 @@
     event::findAndCall("postEngSetFatPAS", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = v8::External::New(isolate, org /* float  */); // org (const float *)
+      v8_args[0] = v8::External::New(isolate, (void*)org /* float  */); // org (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('postEngCheckVisibility', (entity, pset) => console.log('postEngCheckVisibility fired!'));
@@ -3452,6 +3585,7 @@
       v8_args[1] = v8::External::New(isolate, pset /* unsigned char  */); // pset (unsigned char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('postEngDeltaSetField', (pFields, fieldname) => console.log('postEngDeltaSetField fired!'));
@@ -3484,6 +3618,7 @@
   int postEng_pfnGetCurrentPlayer () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("postEngGetCurrentPlayer", nullptr, 0);
+    return 0;
   }
 
 // nodemod.on('postEngCanSkipPlayer', (player) => console.log('postEngCanSkipPlayer fired!'));
@@ -3495,6 +3630,7 @@
       v8_args[0] = structures::wrapEntity(isolate, player); // player (const edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('postEngDeltaFindField', (pFields, fieldname) => console.log('postEngDeltaFindField fired!'));
@@ -3507,6 +3643,7 @@
       v8_args[1] = v8::String::NewFromUtf8(isolate, fieldname).ToLocalChecked(); // fieldname (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('postEngDeltaSetFieldByIndex', (pFields, fieldNumber) => console.log('postEngDeltaSetFieldByIndex fired!'));
@@ -3555,6 +3692,7 @@
       v8_args[1] = v8::External::New(isolate, baseline /* entity_state_s  */); // baseline (struct entity_state_s *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('postEngCvarDirectSet', (var, value) => console.log('postEngCvarDirectSet fired!'));
@@ -3576,8 +3714,8 @@
       unsigned int v8_argCount = 4;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[4];
       v8_args[0] = v8::Boolean::New(isolate, false); // type (FORCE_TYPE)
-      v8_args[1] = v8::External::New(isolate, mins /* float  */); // mins (const float *)
-      v8_args[2] = v8::External::New(isolate, maxs /* float  */); // maxs (const float *)
+      v8_args[1] = v8::External::New(isolate, (void*)mins /* float  */); // mins (const float *)
+      v8_args[2] = v8::External::New(isolate, (void*)maxs /* float  */); // maxs (const float *)
       v8_args[3] = v8::String::NewFromUtf8(isolate, filename).ToLocalChecked(); // filename (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -3608,6 +3746,7 @@
       v8_args[1] = v8::Number::New(isolate, iSender); // iSender (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('postEngVoiceSetClientListening', (iReceiver, iSender, bListen) => console.log('postEngVoiceSetClientListening fired!'));
@@ -3621,6 +3760,7 @@
       v8_args[2] = v8::Boolean::New(isolate, bListen); // bListen (qboolean)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('postEngGetPlayerAuthId', (e) => console.log('postEngGetPlayerAuthId fired!'));
@@ -3632,6 +3772,7 @@
       v8_args[0] = structures::wrapEntity(isolate, e); // e (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('postEngSequenceGet', (fileName, entryName) => console.log('postEngSequenceGet fired!'));
@@ -3644,6 +3785,7 @@
       v8_args[1] = v8::String::NewFromUtf8(isolate, entryName).ToLocalChecked(); // entryName (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('postEngSequencePickSentence', (groupName, pickMethod, picked) => console.log('postEngSequencePickSentence fired!'));
@@ -3657,6 +3799,7 @@
       v8_args[2] = v8::External::New(isolate, picked /* int  */); // picked (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
 // nodemod.on('postEngGetFileSize', (filename) => console.log('postEngGetFileSize fired!'));
@@ -3668,6 +3811,7 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, filename).ToLocalChecked(); // filename (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('postEngGetApproxWavePlayLen', (filepath) => console.log('postEngGetApproxWavePlayLen fired!'));
@@ -3679,12 +3823,14 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, filepath).ToLocalChecked(); // filepath (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('postEngIsCareerMatch', () => console.log('postEngIsCareerMatch fired!'));
   int postEng_pfnIsCareerMatch () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("postEngIsCareerMatch", nullptr, 0);
+    return 0;
   }
 
 // nodemod.on('postEngGetLocalizedStringLength', (label) => console.log('postEngGetLocalizedStringLength fired!'));
@@ -3696,6 +3842,7 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, label).ToLocalChecked(); // label (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('postEngRegisterTutorMessageShown', (mid) => console.log('postEngRegisterTutorMessageShown fired!'));
@@ -3718,6 +3865,7 @@
       v8_args[0] = v8::Number::New(isolate, mid); // mid (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('postEngProcessTutorMessageDecayBuffer', (buffer, bufferLength) => console.log('postEngProcessTutorMessageDecayBuffer fired!'));
@@ -3785,6 +3933,7 @@
       v8_args[1] = v8::External::New(isolate, ppnext /* char * */); // ppnext (char **)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return 0;
   }
 
 // nodemod.on('postEngPEntityOfEntIndexAllEntities', (iEntIndex) => console.log('postEngPEntityOfEntIndexAllEntities fired!'));
@@ -3796,6 +3945,7 @@
       v8_args[0] = v8::Number::New(isolate, iEntIndex); // iEntIndex (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    return nullptr;
   }
 
     enginefuncs_t g_EngineFunctionsTable_Post = {

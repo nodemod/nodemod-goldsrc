@@ -15,7 +15,7 @@ cd "$NODE_DIR"
 # Apply OpenSSL patches - they are needed for Node.js v24.6.0 32-bit assembly
 echo "Applying OpenSSL assembly patches for 32-bit compatibility..."
 for f in $(find deps/openssl -type f -name '*.S'); do 
-    echo "Patching $f"
+    #echo "Patching $f"
     sed -i "s/%ifdef/#ifdef/" "$f"
     sed -i "s/%endif/#endif/" "$f"
 done

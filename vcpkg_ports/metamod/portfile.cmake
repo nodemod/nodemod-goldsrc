@@ -1,20 +1,30 @@
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
-    REPO alliedmodders/metamod-hl1
-    REF 18a10db686702e8ae9e0fcb5b5febf8881dc9c2d
-    SHA512 a16d78cf8dcd41d6aaa7e006ba4078544c6b034f7843c3052706f96d75fe83a914b2692a014071e797c6abafc8d5361492e20a713a55708d6c835d4a0622344a
-    HEAD_REF master
-    PATCHES
-        add-missing-include.patch
+    REPO rehlds/Metamod-R
+    REF 603a2574e937171aa5e737bd5e7b4a07f74e88ee
+    SHA512 118967cab0489be00878100c7ec5e04da84e5f43b6f6f6ffc580f8eb9684587ecd42559a164eaaf6f2e3b2ea5f4f273ad9f5b40022696988b0ce4fbedbfc3a87
+    HEAD_REF 1.3.0.149
 )
 
-file(INSTALL "${SOURCE_PATH}/GPL.txt" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}" RENAME copyright)
+file(INSTALL "${SOURCE_PATH}/LICENSE" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}" RENAME copyright)
 file(INSTALL 
-    "${SOURCE_PATH}/metamod" 
+    DIRECTORY "${SOURCE_PATH}/metamod/include/" 
     DESTINATION "${CURRENT_PACKAGES_DIR}/include/${PORT}/"
     FILES_MATCHING PATTERN "*.h")
 
-# remove empty & unused directories
+# Install main metamod headers needed for plugin development
+file(INSTALL 
+    "${SOURCE_PATH}/metamod/src/meta_api.h"
+    "${SOURCE_PATH}/metamod/src/dllapi.h"
+    "${SOURCE_PATH}/metamod/src/engine_api.h"
+    "${SOURCE_PATH}/metamod/src/h_export.h"
+    DESTINATION "${CURRENT_PACKAGES_DIR}/include/${PORT}/")
+
+# Install example headers that contain required definitions
+file(INSTALL 
+    DIRECTORY "${SOURCE_PATH}/metamod/extra/example/include/metamod/" 
+    DESTINATION "${CURRENT_PACKAGES_DIR}/include/${PORT}/"
+    FILES_MATCHING PATTERN "*.h")
+
 file(REMOVE_RECURSE 
-    "${CURRENT_PACKAGES_DIR}/include/${PORT}/metamod/ents" 
     "${CURRENT_PACKAGES_DIR}/include/${PORT}/metamod/msvc")

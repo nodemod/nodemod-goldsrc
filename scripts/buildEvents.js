@@ -10,6 +10,29 @@ function argToValue(arg) {
   //return generator(arg.name);
 }
 
+function getFixedArgToValue(arg) {
+  const value = generator.cpp2js(arg.type, arg.name) || 'v8::Boolean::New(isolate, false)';
+  // Fix const void* to void* cast for v8::External::New  
+  if (value.includes('v8::External::New(isolate, ') && arg.type.includes('const')) {
+    return value.replace('v8::External::New(isolate, ', 'v8::External::New(isolate, (void*)');
+  }
+  return value;
+}
+
+function getReturnStatement(type) {
+  if (type.includes('*')) {
+    return '\n    return nullptr;';
+  } else if (type === 'int' || type === 'qboolean' || type === 'unsigned int') {
+    return '\n    return 0;';
+  } else if (type === 'float') {
+    return '\n    return 0.0f;';
+  } else if (type === 'double') {
+    return '\n    return 0.0;';
+  } else {
+    return '\n    return 0;';
+  }
+}
+
 function getEventName(func, prefix) {
   return camelize(`${prefix}${func.name.replace(/^pfn/, '')}`);
 }
@@ -21,13 +44,15 @@ function getFunction(func, prefix, type) {
   const description = `// nodemod.on('${eventName}', (${func.args && func.args.map(v => v.name).join(', ')}) => console.log('${eventName} fired!'));`;
   if (customBody) {
     func._eventName = `${prefix}_${func.name}`;
+    const needsReturn = func.type !== 'NULL' && func.type !== 'void';
+    const returnStatement = needsReturn ? getReturnStatement(func.type) : '';
     return `${description}
   ${func.type === 'NULL' ? 'void' : func.type} ${prefix}_${func.name} (${customs[type]?.[func.name]?.event?.argsString || func.args.map(v => `${v.type} ${v.name}`).join(', ')}) {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("${eventName}", [=](v8::Isolate* isolate) {
       ${customBody}
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
-    });
+    });${returnStatement}
   }`;
   }
 
@@ -44,23 +69,28 @@ function getFunction(func, prefix, type) {
   }
 
   if (func.args.length === 0) {
+    const needsReturn = func.type !== 'void';
+    const returnStatement = needsReturn ? getReturnStatement(func.type) : '';
     return `${description}
   ${func.type} ${prefix}_${func.name} () {
     SET_META_RESULT(MRES_IGNORED);
-    event::findAndCall("${eventName}", nullptr, 0);
+    event::findAndCall("${eventName}", nullptr, 0);${returnStatement}
   }`;
   }
 
 
+  const needsReturn = func.type !== 'void';
+  const returnStatement = needsReturn ? getReturnStatement(func.type) : '';
+  
   return `${description}
   ${func.type} ${prefix}_${func.name} (${func.args.map(v => `${v.type} ${v.name}`).join(', ')}) {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("${eventName}", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = ${func.args.length};
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[${func.args.length}];
-      ${func.args.map((v, i) => `v8_args[${i}] = ${argToValue(v)}; // ${v.name} (${v.type})`).join('\n      ')}
+      ${func.args.map((v, i) => `v8_args[${i}] = ${getFixedArgToValue(v)}; // ${v.name} (${v.type})`).join('\n      ')}
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
-    });
+    });${returnStatement}
   }`;
 }
 
@@ -142,7 +172,7 @@ function parseFunction(line) {
 }
 
 (async () => {
-  const eifaceContent = await fs.readFile('./deps/hlsdk/engine/eiface.h').then(v => v.toString());
+  const eifaceContent = await fs.readFile('./build/vcpkg_installed/x86-linux/include/hlsdk/engine/eiface.h').then(v => v.toString());
   const [_, dllFunctionsPart] = eifaceContent.match(/#endif\n\ntypedef struct \n{\n([\s\S]+)\n} DLL_FUNCTIONS;/m);
   const dllFunctionsLines = dllFunctionsPart.split('\n').map(v => v.trim().replace(/\/\*.+\*\//g, '')).filter(v => v && !v.startsWith('//'));
   const dllFunctions = dllFunctionsLines.map(parseFunction);

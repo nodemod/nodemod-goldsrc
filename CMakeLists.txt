@@ -51,7 +51,7 @@ endif()
 add_library(${PROJECT_NAME} SHARED ${SOURCES_LIST})
 
 find_path(HLSDK_DIRECTORY "cl_dll/GameStudioModelRenderer.h" PATH_SUFFIXES "hlsdk")
-find_path(METAMOD_DIRECTORY "metamod/api_info.h" PATH_SUFFIXES "metamod")
+find_path(METAMOD_DIRECTORY "common/BaseSystemModule.h" PATH_SUFFIXES "metamod")
 
 target_include_directories(${PROJECT_NAME} PRIVATE
 	"${HLSDK_DIRECTORY}/common"
@@ -60,7 +60,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 	"${HLSDK_DIRECTORY}/game_shared"
 	"${HLSDK_DIRECTORY}/pm_shared"
 	"${HLSDK_DIRECTORY}/public"
-	"${METAMOD_DIRECTORY}/metamod"
+	"${METAMOD_DIRECTORY}"
 	"src"
 	"deps/node/src"
 	"deps/node/deps/v8/include"
