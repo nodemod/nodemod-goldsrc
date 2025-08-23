@@ -650,12 +650,12 @@ function parseStructureProperties(content, structureName) {
   
   // Extract property setting patterns from the C++ wrapper code
   // Match obj->Set calls with various V8 value types
-  const setCallRegex = /obj->Set\(context,\s*v8::String::NewFromUtf8\(isolate,\s*"([^"]+)"\)[^,]*,\s*([^;]+);/g;
+  const setCallRegex = /obj->Set\([^,]*,\s*(?:v8::String::NewFromUtf8\(isolate,\s*"([^"]+)"\)|convert::str2js\(isolate,\s*"([^"]+)"\))[^,]*,\s*([^;]+);/g;
   
   let match;
   while ((match = setCallRegex.exec(content)) !== null) {
-    const propName = match[1];
-    const valueExpression = match[2];
+    const propName = match[1] || match[2]; // Either v8::String or convert::str2js captured the name
+    const valueExpression = match[3];
     
     // Determine TypeScript type based on the V8 value creation
     let tsType = 'unknown';

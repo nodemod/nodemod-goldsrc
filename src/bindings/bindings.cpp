@@ -71,7 +71,7 @@ namespace bindings
           v8::Locker locker(isolate);
           v8::HandleScope scope(isolate);
 
-          info.GetReturnValue().Set(convert::strid2js(isolate, gpGlobals->time));
+          info.GetReturnValue().Set(v8::Number::New(isolate, gpGlobals->time));
         });
 
     global->Set(convert::str2js(isolate, "nodemod"), nodemodObject);
