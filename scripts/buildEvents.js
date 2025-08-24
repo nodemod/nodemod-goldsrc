@@ -232,7 +232,30 @@ function parseFunction(line) {
   };
 
   const structureInterfaces = await parseStructureInterfaces();
-  await fs.writeFile('./packages/core/index.d.ts', fileMaker.typings.makeIndex(computed, structureInterfaces));
+  
+  // Collect all event names from DLL and Engine functions
+  const eventNames = [
+    ...dllFunctions.map(v => getEventName(v, 'dll')),
+    ...dllFunctions.map(v => getEventName(v, 'postDll')),
+    ...engineFunctions.map(v => getEventName(v, 'eng')),  
+    ...engineFunctions.map(v => getEventName(v, 'postEng'))
+  ];
+
+  // Generate event interfaces  
+  const eventInterfaces = [
+    ...dllFunctions.map(v => computeEventInterface(v, 'dll')),
+    ...dllFunctions.map(v => computeEventInterface(v, 'postDll')),
+    ...engineFunctions.filter(v => !v.name.includes('CRC32')).map(v => computeEventInterface(v, 'eng')),
+    ...engineFunctions.filter(v => !v.name.includes('CRC32')).map(v => computeEventInterface(v, 'postEng'))
+  ];
+
+  // Generate split type files
+  const typeFiles = fileMaker.typings.makeIndex(computed, structureInterfaces, eventNames, eventInterfaces);
+  
+  // Write each type file
+  for (const [filename, content] of Object.entries(typeFiles)) {
+    await fs.writeFile(`./packages/core/src/${filename}`, content);
+  }
   const { engineFunctionsFile, dllFunctionsFile } = fileMaker.makeFunctions(computed);
   await fs.writeFile('./src/auto/engine_functions.cpp', engineFunctionsFile);
 
@@ -497,6 +520,63 @@ function tc(original, f) {
       original
     };
   }
+}
+
+function computeEventInterface(func, prefix) {
+  const eventName = getEventName(func, prefix);
+  
+  // Check for custom TypeScript definitions in customs.js
+  const sourceType = prefix.startsWith('post') ? prefix.replace('post', '').toLowerCase() : prefix;
+  const customImpl = customs[sourceType] && customs[sourceType][func.name];
+  
+  if (customImpl && customImpl.typescript && customImpl.typescript.parameters) {
+    const parameters = customImpl.typescript.parameters;
+    const paramSignature = parameters.map(p => `${p.name}: ${p.type}`).join(', ');
+    const signature = `(${paramSignature}) => void`;
+    
+    return {
+      name: eventName,
+      parameters,
+      signature,
+      hasVariadic: false
+    };
+  }
+  
+  // Fall back to original function signature parsing
+  const hasVariadic = func.args && func.args.some(arg => arg.type === '$rest');
+  const regularArgs = func.args ? func.args.filter(arg => arg.type !== '$rest') : [];
+  
+  if (regularArgs.length === 0) {
+    return {
+      name: eventName,
+      parameters: [],
+      signature: '() => void'
+    };
+  }
+
+  const parameters = regularArgs.map(arg => {
+    let paramName = arg.name;
+    // Replace reserved keywords
+    if (paramName === 'var') paramName = 'variable';
+    if (paramName === 'function') paramName = 'callback';
+    if (paramName === 'class') paramName = 'className';
+    
+    return {
+      name: paramName,
+      type: cTypeToTsType(arg.type),
+      originalType: arg.type
+    };
+  });
+
+  const paramSignature = parameters.map(p => `${p.name}: ${p.type}`).join(', ');
+  const signature = hasVariadic ? `(${paramSignature}, ...args: any[]) => void` : `(${paramSignature}) => void`;
+  
+  return {
+    name: eventName,
+    parameters,
+    signature,
+    hasVariadic
+  };
 }
 
 function computeFunction(func, source) {

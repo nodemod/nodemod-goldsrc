@@ -8,6 +8,12 @@ export default {
   v8_args[0] = structures::wrapEntity(isolate, ed);
   v8_args[1] = v8::String::NewFromUtf8(isolate, CMD_ARGS()).ToLocalChecked();`
       },
+      typescript: {
+        parameters: [
+          { name: 'entity', type: 'Entity', originalType: 'edict_t *' },
+          { name: 'commandArgs', type: 'string', originalType: 'string' }
+        ]
+      },
       api: {
         body: `(*g_engfuncs.pfnClientCommand)(structures::unwrapEntity(isolate, info[0]), utils::js2string(isolate, info[1]));`
       }
@@ -54,6 +60,12 @@ export default {
   } else {
     v8_args[1] = v8::String::NewFromUtf8(isolate, CMD_ARGV(0)).ToLocalChecked();
   }`
+      },
+      typescript: {
+        parameters: [
+          { name: 'client', type: 'Entity', originalType: 'edict_t *' },
+          { name: 'commandText', type: 'string', originalType: 'string' }
+        ]
       }
     }
   }
