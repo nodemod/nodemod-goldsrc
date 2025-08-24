@@ -63,6 +63,7 @@ void NodeImpl::Tick()
 		v8::Context::Scope contextScope(_context);
 
 		uv_run(nodeLoop->GetLoop(), UV_RUN_NOWAIT);
+		v8Isolate->PerformMicrotaskCheckpoint();
 	}
 }
 

@@ -3,6 +3,12 @@
 #include "v8.h"
 #include "extdll.h"
 #include "node/utils.hpp"
+
+#define V8_STUFF() v8::Isolate* isolate = info.GetIsolate(); \
+  v8::Locker locker(isolate); \
+  v8::HandleScope scope(isolate); \
+  v8::Local<v8::Context> context = isolate->GetCurrentContext()
+
 #include "structures/structures.hpp"
 
 extern enginefuncs_t	 g_engfuncs;
@@ -10,10 +16,7 @@ extern enginefuncs_t	 g_engfuncs;
 // nodemod.eng.precacheModel();
 void sf_eng_pfnPrecacheModel(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnPrecacheModel)(utils::js2string(isolate, info[0]))));
 }
@@ -21,10 +24,7 @@ void sf_eng_pfnPrecacheModel(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.precacheSound();
 void sf_eng_pfnPrecacheSound(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnPrecacheSound)(utils::js2string(isolate, info[0]))));
 }
@@ -32,15 +32,7 @@ void sf_eng_pfnPrecacheSound(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.setModel();
 void sf_eng_pfnSetModel(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
+  V8_STUFF();
 
   (*g_engfuncs.pfnSetModel)(structures::unwrapEntity(isolate, info[0]),
 utils::js2string(isolate, info[1]));
@@ -49,10 +41,7 @@ utils::js2string(isolate, info[1]));
 // nodemod.eng.modelIndex();
 void sf_eng_pfnModelIndex(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnModelIndex)(utils::js2string(isolate, info[0]))));
 }
@@ -60,10 +49,7 @@ void sf_eng_pfnModelIndex(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.modelFrames();
 void sf_eng_pfnModelFrames(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnModelFrames)(info[0]->Int32Value(context).ToChecked())));
 }
@@ -71,22 +57,13 @@ void sf_eng_pfnModelFrames(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.setSize();
 void sf_eng_pfnSetSize(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
   if (!info[1]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnSetSize parameter 1 (const float *) is not External, using nullptr\n");
   }
   if (!info[2]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnSetSize parameter 2 (const float *) is not External, using nullptr\n");
   }
 
   (*g_engfuncs.pfnSetSize)(structures::unwrapEntity(isolate, info[0]),
@@ -97,10 +74,7 @@ void sf_eng_pfnSetSize(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.changeLevel();
 void sf_eng_pfnChangeLevel(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   (*g_engfuncs.pfnChangeLevel)(utils::js2string(isolate, info[0]),
 utils::js2string(isolate, info[1]));
@@ -109,15 +83,7 @@ utils::js2string(isolate, info[1]));
 // nodemod.eng.getSpawnParms();
 void sf_eng_pfnGetSpawnParms(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
+  V8_STUFF();
 
   (*g_engfuncs.pfnGetSpawnParms)(structures::unwrapEntity(isolate, info[0]));
 }
@@ -125,15 +91,7 @@ void sf_eng_pfnGetSpawnParms(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.saveSpawnParms();
 void sf_eng_pfnSaveSpawnParms(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
+  V8_STUFF();
 
   (*g_engfuncs.pfnSaveSpawnParms)(structures::unwrapEntity(isolate, info[0]));
 }
@@ -141,14 +99,10 @@ void sf_eng_pfnSaveSpawnParms(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.vecToYaw();
 void sf_eng_pfnVecToYaw(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Number::New(isolate, 0));
-    return;
+    printf("Warning: pfnVecToYaw parameter 0 (const float *) is not External, using nullptr\n");
   }
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnVecToYaw)((const float*)utils::jsToPointer(isolate, info[0]))));
@@ -157,18 +111,13 @@ void sf_eng_pfnVecToYaw(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.vecToAngles();
 void sf_eng_pfnVecToAngles(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnVecToAngles parameter 0 (const float *) is not External, using nullptr\n");
   }
   if (!info[1]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnVecToAngles parameter 1 (float *) is not External, using nullptr\n");
   }
 
   (*g_engfuncs.pfnVecToAngles)((const float*)utils::jsToPointer(isolate, info[0]),
@@ -178,18 +127,10 @@ void sf_eng_pfnVecToAngles(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.moveToOrigin();
 void sf_eng_pfnMoveToOrigin(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
   if (!info[1]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnMoveToOrigin parameter 1 (const float *) is not External, using nullptr\n");
   }
 
   (*g_engfuncs.pfnMoveToOrigin)(structures::unwrapEntity(isolate, info[0]),
@@ -201,15 +142,7 @@ info[3]->Int32Value(context).ToChecked());
 // nodemod.eng.changeYaw();
 void sf_eng_pfnChangeYaw(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
+  V8_STUFF();
 
   (*g_engfuncs.pfnChangeYaw)(structures::unwrapEntity(isolate, info[0]));
 }
@@ -217,15 +150,7 @@ void sf_eng_pfnChangeYaw(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.changePitch();
 void sf_eng_pfnChangePitch(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
+  V8_STUFF();
 
   (*g_engfuncs.pfnChangePitch)(structures::unwrapEntity(isolate, info[0]));
 }
@@ -233,15 +158,7 @@ void sf_eng_pfnChangePitch(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.findEntityByString();
 void sf_eng_pfnFindEntityByString(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Null(isolate));
-    return;
-  }
+  V8_STUFF();
 
   info.GetReturnValue().Set(structures::wrapEntity(isolate, (*g_engfuncs.pfnFindEntityByString)(structures::unwrapEntity(isolate, info[0]),
 utils::js2string(isolate, info[1]),
@@ -251,15 +168,7 @@ utils::js2string(isolate, info[2]))));
 // nodemod.eng.getEntityIllum();
 void sf_eng_pfnGetEntityIllum(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Number::New(isolate, 0));
-    return;
-  }
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnGetEntityIllum)(structures::unwrapEntity(isolate, info[0]))));
 }
@@ -267,18 +176,10 @@ void sf_eng_pfnGetEntityIllum(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.findEntityInSphere();
 void sf_eng_pfnFindEntityInSphere(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Null(isolate));
-    return;
-  }
   if (!info[1]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Null(isolate));
-    return;
+    printf("Warning: pfnFindEntityInSphere parameter 1 (const float *) is not External, using nullptr\n");
   }
 
   info.GetReturnValue().Set(structures::wrapEntity(isolate, (*g_engfuncs.pfnFindEntityInSphere)(structures::unwrapEntity(isolate, info[0]),
@@ -289,15 +190,7 @@ info[2]->NumberValue(context).ToChecked())));
 // nodemod.eng.findClientInPVS();
 void sf_eng_pfnFindClientInPVS(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Null(isolate));
-    return;
-  }
+  V8_STUFF();
 
   info.GetReturnValue().Set(structures::wrapEntity(isolate, (*g_engfuncs.pfnFindClientInPVS)(structures::unwrapEntity(isolate, info[0]))));
 }
@@ -305,15 +198,7 @@ void sf_eng_pfnFindClientInPVS(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.entitiesInPVS();
 void sf_eng_pfnEntitiesInPVS(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Null(isolate));
-    return;
-  }
+  V8_STUFF();
 
   info.GetReturnValue().Set(structures::wrapEntity(isolate, (*g_engfuncs.pfnEntitiesInPVS)(structures::unwrapEntity(isolate, info[0]))));
 }
@@ -321,14 +206,10 @@ void sf_eng_pfnEntitiesInPVS(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.makeVectors();
 void sf_eng_pfnMakeVectors(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnMakeVectors parameter 0 (const float *) is not External, using nullptr\n");
   }
 
   (*g_engfuncs.pfnMakeVectors)((const float*)utils::jsToPointer(isolate, info[0]));
@@ -337,26 +218,19 @@ void sf_eng_pfnMakeVectors(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.angleVectors();
 void sf_eng_pfnAngleVectors(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnAngleVectors parameter 0 (const float *) is not External, using nullptr\n");
   }
   if (!info[1]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnAngleVectors parameter 1 (float *) is not External, using nullptr\n");
   }
   if (!info[2]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnAngleVectors parameter 2 (float *) is not External, using nullptr\n");
   }
   if (!info[3]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnAngleVectors parameter 3 (float *) is not External, using nullptr\n");
   }
 
   (*g_engfuncs.pfnAngleVectors)((const float*)utils::jsToPointer(isolate, info[0]),
@@ -368,10 +242,7 @@ void sf_eng_pfnAngleVectors(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.createEntity();
 void sf_eng_pfnCreateEntity(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   info.GetReturnValue().Set(structures::wrapEntity(isolate, (*g_engfuncs.pfnCreateEntity)()));
 }
@@ -379,15 +250,7 @@ void sf_eng_pfnCreateEntity(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.removeEntity();
 void sf_eng_pfnRemoveEntity(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
+  V8_STUFF();
 
   (*g_engfuncs.pfnRemoveEntity)(structures::unwrapEntity(isolate, info[0]));
 }
@@ -395,10 +258,7 @@ void sf_eng_pfnRemoveEntity(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.createNamedEntity();
 void sf_eng_pfnCreateNamedEntity(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   info.GetReturnValue().Set(structures::wrapEntity(isolate, (*g_engfuncs.pfnCreateNamedEntity)(info[0]->Int32Value(context).ToChecked())));
 }
@@ -406,15 +266,7 @@ void sf_eng_pfnCreateNamedEntity(const v8::FunctionCallbackInfo<v8::Value>& info
 // nodemod.eng.makeStatic();
 void sf_eng_pfnMakeStatic(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
+  V8_STUFF();
 
   (*g_engfuncs.pfnMakeStatic)(structures::unwrapEntity(isolate, info[0]));
 }
@@ -422,15 +274,7 @@ void sf_eng_pfnMakeStatic(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.entIsOnFloor();
 void sf_eng_pfnEntIsOnFloor(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Number::New(isolate, 0));
-    return;
-  }
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnEntIsOnFloor)(structures::unwrapEntity(isolate, info[0]))));
 }
@@ -438,15 +282,7 @@ void sf_eng_pfnEntIsOnFloor(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.dropToFloor();
 void sf_eng_pfnDropToFloor(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Number::New(isolate, 0));
-    return;
-  }
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnDropToFloor)(structures::unwrapEntity(isolate, info[0]))));
 }
@@ -454,15 +290,7 @@ void sf_eng_pfnDropToFloor(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.walkMove();
 void sf_eng_pfnWalkMove(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Number::New(isolate, 0));
-    return;
-  }
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnWalkMove)(structures::unwrapEntity(isolate, info[0]),
 info[1]->NumberValue(context).ToChecked(),
@@ -473,18 +301,10 @@ info[3]->Int32Value(context).ToChecked())));
 // nodemod.eng.setOrigin();
 void sf_eng_pfnSetOrigin(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
   if (!info[1]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnSetOrigin parameter 1 (const float *) is not External, using nullptr\n");
   }
 
   (*g_engfuncs.pfnSetOrigin)(structures::unwrapEntity(isolate, info[0]),
@@ -494,15 +314,7 @@ void sf_eng_pfnSetOrigin(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.emitSound();
 void sf_eng_pfnEmitSound(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
+  V8_STUFF();
 
   (*g_engfuncs.pfnEmitSound)(structures::unwrapEntity(isolate, info[0]),
 info[1]->Int32Value(context).ToChecked(),
@@ -516,18 +328,10 @@ info[6]->Int32Value(context).ToChecked());
 // nodemod.eng.emitAmbientSound();
 void sf_eng_pfnEmitAmbientSound(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
   if (!info[1]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnEmitAmbientSound parameter 1 (const float *) is not External, using nullptr\n");
   }
 
   (*g_engfuncs.pfnEmitAmbientSound)(structures::unwrapEntity(isolate, info[0]),
@@ -542,26 +346,13 @@ info[6]->Int32Value(context).ToChecked());
 // nodemod.eng.traceLine();
 void sf_eng_pfnTraceLine(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnTraceLine parameter 0 (const float *) is not External, using nullptr\n");
   }
   if (!info[1]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
-  if (!info[3]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
-  if (!info[4]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnTraceLine parameter 1 (const float *) is not External, using nullptr\n");
   }
 
   (*g_engfuncs.pfnTraceLine)((const float*)utils::jsToPointer(isolate, info[0]),
@@ -574,23 +365,7 @@ structures::unwrapTraceResult(isolate, info[4]));
 // nodemod.eng.traceToss();
 void sf_eng_pfnTraceToss(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
-  if (!info[1]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
-  if (!info[2]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
+  V8_STUFF();
 
   (*g_engfuncs.pfnTraceToss)(structures::unwrapEntity(isolate, info[0]),
 structures::unwrapEntity(isolate, info[1]),
@@ -600,30 +375,13 @@ structures::unwrapTraceResult(isolate, info[2]));
 // nodemod.eng.traceMonsterHull();
 void sf_eng_pfnTraceMonsterHull(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Number::New(isolate, 0));
-    return;
-  }
   if (!info[1]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Number::New(isolate, 0));
-    return;
+    printf("Warning: pfnTraceMonsterHull parameter 1 (const float *) is not External, using nullptr\n");
   }
   if (!info[2]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Number::New(isolate, 0));
-    return;
-  }
-  if (!info[4]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Number::New(isolate, 0));
-    return;
-  }
-  if (!info[5]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Number::New(isolate, 0));
-    return;
+    printf("Warning: pfnTraceMonsterHull parameter 2 (const float *) is not External, using nullptr\n");
   }
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnTraceMonsterHull)(structures::unwrapEntity(isolate, info[0]),
@@ -637,26 +395,13 @@ structures::unwrapTraceResult(isolate, info[5]))));
 // nodemod.eng.traceHull();
 void sf_eng_pfnTraceHull(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnTraceHull parameter 0 (const float *) is not External, using nullptr\n");
   }
   if (!info[1]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
-  if (!info[4]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
-  if (!info[5]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnTraceHull parameter 1 (const float *) is not External, using nullptr\n");
   }
 
   (*g_engfuncs.pfnTraceHull)((const float*)utils::jsToPointer(isolate, info[0]),
@@ -670,26 +415,13 @@ structures::unwrapTraceResult(isolate, info[5]));
 // nodemod.eng.traceModel();
 void sf_eng_pfnTraceModel(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnTraceModel parameter 0 (const float *) is not External, using nullptr\n");
   }
   if (!info[1]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
-  if (!info[3]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
-  if (!info[4]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnTraceModel parameter 1 (const float *) is not External, using nullptr\n");
   }
 
   (*g_engfuncs.pfnTraceModel)((const float*)utils::jsToPointer(isolate, info[0]),
@@ -702,22 +434,13 @@ structures::unwrapTraceResult(isolate, info[4]));
 // nodemod.eng.traceTexture();
 void sf_eng_pfnTraceTexture(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Null(isolate));
-    return;
-  }
   if (!info[1]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Null(isolate));
-    return;
+    printf("Warning: pfnTraceTexture parameter 1 (const float *) is not External, using nullptr\n");
   }
   if (!info[2]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Null(isolate));
-    return;
+    printf("Warning: pfnTraceTexture parameter 2 (const float *) is not External, using nullptr\n");
   }
 
   const char* temp_str = (*g_engfuncs.pfnTraceTexture)(structures::unwrapEntity(isolate, info[0]),
@@ -729,26 +452,13 @@ void sf_eng_pfnTraceTexture(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.traceSphere();
 void sf_eng_pfnTraceSphere(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnTraceSphere parameter 0 (const float *) is not External, using nullptr\n");
   }
   if (!info[1]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
-  if (!info[4]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
-  if (!info[5]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnTraceSphere parameter 1 (const float *) is not External, using nullptr\n");
   }
 
   (*g_engfuncs.pfnTraceSphere)((const float*)utils::jsToPointer(isolate, info[0]),
@@ -762,18 +472,10 @@ structures::unwrapTraceResult(isolate, info[5]));
 // nodemod.eng.getAimVector();
 void sf_eng_pfnGetAimVector(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
   if (!info[2]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnGetAimVector parameter 2 (float *) is not External, using nullptr\n");
   }
 
   (*g_engfuncs.pfnGetAimVector)(structures::unwrapEntity(isolate, info[0]),
@@ -784,10 +486,7 @@ info[1]->NumberValue(context).ToChecked(),
 // nodemod.eng.serverCommand();
 void sf_eng_pfnServerCommand(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   (*g_engfuncs.pfnServerCommand)(utils::js2string(isolate, info[0]));
 }
@@ -795,10 +494,7 @@ void sf_eng_pfnServerCommand(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.serverExecute();
 void sf_eng_pfnServerExecute(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   (*g_engfuncs.pfnServerExecute)();
 }
@@ -806,15 +502,7 @@ void sf_eng_pfnServerExecute(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.clientCommand();
 void sf_eng_pfnClientCommand(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
+  V8_STUFF();
 
   (*g_engfuncs.pfnClientCommand)(structures::unwrapEntity(isolate, info[0]), utils::js2string(isolate, info[1]));;
 }
@@ -822,18 +510,13 @@ void sf_eng_pfnClientCommand(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.particleEffect();
 void sf_eng_pfnParticleEffect(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnParticleEffect parameter 0 (const float *) is not External, using nullptr\n");
   }
   if (!info[1]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnParticleEffect parameter 1 (const float *) is not External, using nullptr\n");
   }
 
   (*g_engfuncs.pfnParticleEffect)((const float*)utils::jsToPointer(isolate, info[0]),
@@ -845,10 +528,7 @@ info[3]->NumberValue(context).ToChecked());
 // nodemod.eng.lightStyle();
 void sf_eng_pfnLightStyle(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   (*g_engfuncs.pfnLightStyle)(info[0]->Int32Value(context).ToChecked(),
 utils::js2string(isolate, info[1]));
@@ -857,10 +537,7 @@ utils::js2string(isolate, info[1]));
 // nodemod.eng.decalIndex();
 void sf_eng_pfnDecalIndex(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnDecalIndex)(utils::js2string(isolate, info[0]))));
 }
@@ -868,14 +545,10 @@ void sf_eng_pfnDecalIndex(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.pointContents();
 void sf_eng_pfnPointContents(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Number::New(isolate, 0));
-    return;
+    printf("Warning: pfnPointContents parameter 0 (const float *) is not External, using nullptr\n");
   }
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnPointContents)((const float*)utils::jsToPointer(isolate, info[0]))));
@@ -884,18 +557,10 @@ void sf_eng_pfnPointContents(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.messageBegin();
 void sf_eng_pfnMessageBegin(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   if (!info[2]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
-  if (!info[3]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnMessageBegin parameter 2 (const float *) is not External, using nullptr\n");
   }
 
   (*g_engfuncs.pfnMessageBegin)(info[0]->Int32Value(context).ToChecked(),
@@ -907,10 +572,7 @@ structures::unwrapEntity(isolate, info[3]));
 // nodemod.eng.messageEnd();
 void sf_eng_pfnMessageEnd(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   (*g_engfuncs.pfnMessageEnd)();
 }
@@ -918,10 +580,7 @@ void sf_eng_pfnMessageEnd(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.writeByte();
 void sf_eng_pfnWriteByte(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   (*g_engfuncs.pfnWriteByte)(info[0]->Int32Value(context).ToChecked());
 }
@@ -929,10 +588,7 @@ void sf_eng_pfnWriteByte(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.writeChar();
 void sf_eng_pfnWriteChar(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   (*g_engfuncs.pfnWriteChar)(info[0]->Int32Value(context).ToChecked());
 }
@@ -940,10 +596,7 @@ void sf_eng_pfnWriteChar(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.writeShort();
 void sf_eng_pfnWriteShort(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   (*g_engfuncs.pfnWriteShort)(info[0]->Int32Value(context).ToChecked());
 }
@@ -951,10 +604,7 @@ void sf_eng_pfnWriteShort(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.writeLong();
 void sf_eng_pfnWriteLong(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   (*g_engfuncs.pfnWriteLong)(info[0]->Int32Value(context).ToChecked());
 }
@@ -962,10 +612,7 @@ void sf_eng_pfnWriteLong(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.writeAngle();
 void sf_eng_pfnWriteAngle(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   (*g_engfuncs.pfnWriteAngle)(info[0]->NumberValue(context).ToChecked());
 }
@@ -973,10 +620,7 @@ void sf_eng_pfnWriteAngle(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.writeCoord();
 void sf_eng_pfnWriteCoord(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   (*g_engfuncs.pfnWriteCoord)(info[0]->NumberValue(context).ToChecked());
 }
@@ -984,10 +628,7 @@ void sf_eng_pfnWriteCoord(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.writeString();
 void sf_eng_pfnWriteString(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   (*g_engfuncs.pfnWriteString)(utils::js2string(isolate, info[0]));
 }
@@ -995,10 +636,7 @@ void sf_eng_pfnWriteString(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.writeEntity();
 void sf_eng_pfnWriteEntity(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   (*g_engfuncs.pfnWriteEntity)(info[0]->Int32Value(context).ToChecked());
 }
@@ -1006,14 +644,10 @@ void sf_eng_pfnWriteEntity(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.cVarRegister();
 void sf_eng_pfnCVarRegister(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnCVarRegister parameter 0 (cvar_t *) is not External, using nullptr\n");
   }
 
   (*g_engfuncs.pfnCVarRegister)((cvar_t*)structures::unwrapCvar(isolate, info[0]));;
@@ -1022,10 +656,7 @@ void sf_eng_pfnCVarRegister(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.cVarGetFloat();
 void sf_eng_pfnCVarGetFloat(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnCVarGetFloat)(utils::js2string(isolate, info[0]))));
 }
@@ -1033,10 +664,7 @@ void sf_eng_pfnCVarGetFloat(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.cVarGetString();
 void sf_eng_pfnCVarGetString(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   const char* temp_str = (*g_engfuncs.pfnCVarGetString)(utils::js2string(isolate, info[0]));
   info.GetReturnValue().Set(v8::String::NewFromUtf8(isolate, temp_str ? temp_str : "").ToLocalChecked());
@@ -1045,10 +673,7 @@ void sf_eng_pfnCVarGetString(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.cVarSetFloat();
 void sf_eng_pfnCVarSetFloat(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   (*g_engfuncs.pfnCVarSetFloat)(utils::js2string(isolate, info[0]),
 info[1]->NumberValue(context).ToChecked());
@@ -1057,10 +682,7 @@ info[1]->NumberValue(context).ToChecked());
 // nodemod.eng.cVarSetString();
 void sf_eng_pfnCVarSetString(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   (*g_engfuncs.pfnCVarSetString)(utils::js2string(isolate, info[0]),
 utils::js2string(isolate, info[1]));
@@ -1069,10 +691,7 @@ utils::js2string(isolate, info[1]));
 // nodemod.eng.alertMessage();
 void sf_eng_pfnAlertMessage(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   (*g_engfuncs.pfnAlertMessage)((ALERT_TYPE)info[0]->Int32Value(context).ToChecked(), "%s", utils::js2string(isolate, info[1]));;
 }
@@ -1080,14 +699,10 @@ void sf_eng_pfnAlertMessage(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.engineFprintf();
 void sf_eng_pfnEngineFprintf(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnEngineFprintf parameter 0 (FILE *) is not External, using nullptr\n");
   }
 
   fprintf((FILE*)utils::jsToPointer(isolate, info[0]), "%s", utils::js2string(isolate, info[1]));;
@@ -1096,15 +711,7 @@ void sf_eng_pfnEngineFprintf(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.pvAllocEntPrivateData();
 void sf_eng_pfnPvAllocEntPrivateData(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Null(isolate));
-    return;
-  }
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::External::New(isolate, (*g_engfuncs.pfnPvAllocEntPrivateData)(structures::unwrapEntity(isolate, info[0]),
 info[1]->Int32Value(context).ToChecked())));
@@ -1113,15 +720,7 @@ info[1]->Int32Value(context).ToChecked())));
 // nodemod.eng.pvEntPrivateData();
 void sf_eng_pfnPvEntPrivateData(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Null(isolate));
-    return;
-  }
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::External::New(isolate, (*g_engfuncs.pfnPvEntPrivateData)(structures::unwrapEntity(isolate, info[0]))));
 }
@@ -1129,15 +728,7 @@ void sf_eng_pfnPvEntPrivateData(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.freeEntPrivateData();
 void sf_eng_pfnFreeEntPrivateData(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
+  V8_STUFF();
 
   (*g_engfuncs.pfnFreeEntPrivateData)(structures::unwrapEntity(isolate, info[0]));
 }
@@ -1145,10 +736,7 @@ void sf_eng_pfnFreeEntPrivateData(const v8::FunctionCallbackInfo<v8::Value>& inf
 // nodemod.eng.szFromIndex();
 void sf_eng_pfnSzFromIndex(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   const char* temp_str = (*g_engfuncs.pfnSzFromIndex)(info[0]->Int32Value(context).ToChecked());
   info.GetReturnValue().Set(v8::String::NewFromUtf8(isolate, temp_str ? temp_str : "").ToLocalChecked());
@@ -1157,10 +745,7 @@ void sf_eng_pfnSzFromIndex(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.allocString();
 void sf_eng_pfnAllocString(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnAllocString)(utils::js2string(isolate, info[0]))));
 }
@@ -1168,15 +753,7 @@ void sf_eng_pfnAllocString(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.getVarsOfEnt();
 void sf_eng_pfnGetVarsOfEnt(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Null(isolate));
-    return;
-  }
+  V8_STUFF();
 
   info.GetReturnValue().Set(structures::wrapEntvars(isolate, (*g_engfuncs.pfnGetVarsOfEnt)(structures::unwrapEntity(isolate, info[0]))));
 }
@@ -1184,10 +761,7 @@ void sf_eng_pfnGetVarsOfEnt(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.pEntityOfEntOffset();
 void sf_eng_pfnPEntityOfEntOffset(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   info.GetReturnValue().Set(structures::wrapEntity(isolate, (*g_engfuncs.pfnPEntityOfEntOffset)(info[0]->Int32Value(context).ToChecked())));
 }
@@ -1195,15 +769,7 @@ void sf_eng_pfnPEntityOfEntOffset(const v8::FunctionCallbackInfo<v8::Value>& inf
 // nodemod.eng.entOffsetOfPEntity();
 void sf_eng_pfnEntOffsetOfPEntity(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Number::New(isolate, 0));
-    return;
-  }
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnEntOffsetOfPEntity)(structures::unwrapEntity(isolate, info[0]))));
 }
@@ -1211,15 +777,7 @@ void sf_eng_pfnEntOffsetOfPEntity(const v8::FunctionCallbackInfo<v8::Value>& inf
 // nodemod.eng.indexOfEdict();
 void sf_eng_pfnIndexOfEdict(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Number::New(isolate, 0));
-    return;
-  }
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnIndexOfEdict)(structures::unwrapEntity(isolate, info[0]))));
 }
@@ -1227,10 +785,7 @@ void sf_eng_pfnIndexOfEdict(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.pEntityOfEntIndex();
 void sf_eng_pfnPEntityOfEntIndex(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   info.GetReturnValue().Set(structures::wrapEntity(isolate, (*g_engfuncs.pfnPEntityOfEntIndex)(info[0]->Int32Value(context).ToChecked())));
 }
@@ -1238,15 +793,7 @@ void sf_eng_pfnPEntityOfEntIndex(const v8::FunctionCallbackInfo<v8::Value>& info
 // nodemod.eng.findEntityByVars();
 void sf_eng_pfnFindEntityByVars(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Null(isolate));
-    return;
-  }
+  V8_STUFF();
 
   info.GetReturnValue().Set(structures::wrapEntity(isolate, (*g_engfuncs.pfnFindEntityByVars)(structures::unwrapEntvars(isolate, info[0]))));
 }
@@ -1254,15 +801,7 @@ void sf_eng_pfnFindEntityByVars(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.getModelPtr();
 void sf_eng_pfnGetModelPtr(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Null(isolate));
-    return;
-  }
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::External::New(isolate, (*g_engfuncs.pfnGetModelPtr)(structures::unwrapEntity(isolate, info[0]))));
 }
@@ -1270,10 +809,7 @@ void sf_eng_pfnGetModelPtr(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.regUserMsg();
 void sf_eng_pfnRegUserMsg(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnRegUserMsg)(utils::js2string(isolate, info[0]),
 info[1]->Int32Value(context).ToChecked())));
@@ -1282,15 +818,7 @@ info[1]->Int32Value(context).ToChecked())));
 // nodemod.eng.animationAutomove();
 void sf_eng_pfnAnimationAutomove(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
+  V8_STUFF();
 
   (*g_engfuncs.pfnAnimationAutomove)(structures::unwrapEntity(isolate, info[0]),
 info[1]->NumberValue(context).ToChecked());
@@ -1299,22 +827,13 @@ info[1]->NumberValue(context).ToChecked());
 // nodemod.eng.getBonePosition();
 void sf_eng_pfnGetBonePosition(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
   if (!info[2]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnGetBonePosition parameter 2 (float *) is not External, using nullptr\n");
   }
   if (!info[3]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnGetBonePosition parameter 3 (float *) is not External, using nullptr\n");
   }
 
   (*g_engfuncs.pfnGetBonePosition)(structures::unwrapEntity(isolate, info[0]),
@@ -1326,10 +845,7 @@ info[1]->Int32Value(context).ToChecked(),
 // nodemod.eng.functionFromName();
 void sf_eng_pfnFunctionFromName(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::External::New(isolate, (*g_engfuncs.pfnFunctionFromName)(utils::js2string(isolate, info[0]))));
 }
@@ -1337,14 +853,10 @@ void sf_eng_pfnFunctionFromName(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.nameForFunction();
 void sf_eng_pfnNameForFunction(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Null(isolate));
-    return;
+    printf("Warning: pfnNameForFunction parameter 0 (void *) is not External, using nullptr\n");
   }
 
   const char* temp_str = (*g_engfuncs.pfnNameForFunction)(utils::jsToPointer(isolate, info[0]));
@@ -1354,15 +866,7 @@ void sf_eng_pfnNameForFunction(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.clientPrintf();
 void sf_eng_pfnClientPrintf(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
+  V8_STUFF();
 
   (*g_engfuncs.pfnClientPrintf)(structures::unwrapEntity(isolate, info[0]),
 *(PRINT_TYPE*)utils::jsToBytes(isolate, info[1]),
@@ -1372,10 +876,7 @@ utils::js2string(isolate, info[2]));
 // nodemod.eng.serverPrint();
 void sf_eng_pfnServerPrint(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   (*g_engfuncs.pfnServerPrint)(utils::js2string(isolate, info[0]));
 }
@@ -1383,10 +884,7 @@ void sf_eng_pfnServerPrint(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.cmdArgs();
 void sf_eng_pfnCmd_Args(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   const char* temp_str = (*g_engfuncs.pfnCmd_Args)();
   info.GetReturnValue().Set(v8::String::NewFromUtf8(isolate, temp_str ? temp_str : "").ToLocalChecked());
@@ -1395,10 +893,7 @@ void sf_eng_pfnCmd_Args(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.cmdArgv();
 void sf_eng_pfnCmd_Argv(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   const char* temp_str = (*g_engfuncs.pfnCmd_Argv)(info[0]->Int32Value(context).ToChecked());
   info.GetReturnValue().Set(v8::String::NewFromUtf8(isolate, temp_str ? temp_str : "").ToLocalChecked());
@@ -1407,10 +902,7 @@ void sf_eng_pfnCmd_Argv(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.cmdArgc();
 void sf_eng_pfnCmd_Argc(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnCmd_Argc)()));
 }
@@ -1418,22 +910,13 @@ void sf_eng_pfnCmd_Argc(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.getAttachment();
 void sf_eng_pfnGetAttachment(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
   if (!info[2]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnGetAttachment parameter 2 (float *) is not External, using nullptr\n");
   }
   if (!info[3]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnGetAttachment parameter 3 (float *) is not External, using nullptr\n");
   }
 
   (*g_engfuncs.pfnGetAttachment)(structures::unwrapEntity(isolate, info[0]),
@@ -1445,10 +928,7 @@ info[1]->Int32Value(context).ToChecked(),
 // nodemod.eng.randomLong();
 void sf_eng_pfnRandomLong(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnRandomLong)(info[0]->Int32Value(context).ToChecked(),
 info[1]->Int32Value(context).ToChecked())));
@@ -1457,10 +937,7 @@ info[1]->Int32Value(context).ToChecked())));
 // nodemod.eng.randomFloat();
 void sf_eng_pfnRandomFloat(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnRandomFloat)(info[0]->NumberValue(context).ToChecked(),
 info[1]->NumberValue(context).ToChecked())));
@@ -1469,19 +946,7 @@ info[1]->NumberValue(context).ToChecked())));
 // nodemod.eng.setView();
 void sf_eng_pfnSetView(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
-  if (!info[1]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
+  V8_STUFF();
 
   (*g_engfuncs.pfnSetView)(structures::unwrapEntity(isolate, info[0]),
 structures::unwrapEntity(isolate, info[1]));
@@ -1490,10 +955,7 @@ structures::unwrapEntity(isolate, info[1]));
 // nodemod.eng.time();
 void sf_eng_pfnTime(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnTime)()));
 }
@@ -1501,15 +963,7 @@ void sf_eng_pfnTime(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.crosshairAngle();
 void sf_eng_pfnCrosshairAngle(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
+  V8_STUFF();
 
   (*g_engfuncs.pfnCrosshairAngle)(structures::unwrapEntity(isolate, info[0]),
 info[1]->NumberValue(context).ToChecked(),
@@ -1519,14 +973,10 @@ info[2]->NumberValue(context).ToChecked());
 // nodemod.eng.loadFileForMe();
 void sf_eng_pfnLoadFileForMe(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   if (!info[1]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Null(isolate));
-    return;
+    printf("Warning: pfnLoadFileForMe parameter 1 (int *) is not External, using nullptr\n");
   }
 
   info.GetReturnValue().Set(utils::byteArrayToJS(isolate, (*g_engfuncs.pfnLoadFileForMe)(utils::js2string(isolate, info[0]),
@@ -1536,14 +986,10 @@ void sf_eng_pfnLoadFileForMe(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.freeFile();
 void sf_eng_pfnFreeFile(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnFreeFile parameter 0 (void *) is not External, using nullptr\n");
   }
 
   (*g_engfuncs.pfnFreeFile)(utils::jsToPointer(isolate, info[0]));
@@ -1552,10 +998,7 @@ void sf_eng_pfnFreeFile(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.endSection();
 void sf_eng_pfnEndSection(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   (*g_engfuncs.pfnEndSection)(utils::js2string(isolate, info[0]));
 }
@@ -1563,14 +1006,10 @@ void sf_eng_pfnEndSection(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.compareFileTime();
 void sf_eng_pfnCompareFileTime(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   if (!info[2]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Number::New(isolate, 0));
-    return;
+    printf("Warning: pfnCompareFileTime parameter 2 (int *) is not External, using nullptr\n");
   }
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnCompareFileTime)(utils::js2string(isolate, info[0]),
@@ -1581,10 +1020,7 @@ utils::js2string(isolate, info[1]),
 // nodemod.eng.getGameDir();
 void sf_eng_pfnGetGameDir(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   (*g_engfuncs.pfnGetGameDir)(utils::js2string(isolate, info[0]));
 }
@@ -1592,14 +1028,10 @@ void sf_eng_pfnGetGameDir(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.cvarRegisterVariable();
 void sf_eng_pfnCvar_RegisterVariable(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnCvar_RegisterVariable parameter 0 (cvar_t *) is not External, using nullptr\n");
   }
 
   (*g_engfuncs.pfnCvar_RegisterVariable)((cvar_t*)structures::unwrapCvar(isolate, info[0]));;
@@ -1608,15 +1040,7 @@ void sf_eng_pfnCvar_RegisterVariable(const v8::FunctionCallbackInfo<v8::Value>& 
 // nodemod.eng.fadeClientVolume();
 void sf_eng_pfnFadeClientVolume(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
+  V8_STUFF();
 
   (*g_engfuncs.pfnFadeClientVolume)(structures::unwrapEntity(isolate, info[0]),
 info[1]->Int32Value(context).ToChecked(),
@@ -1628,15 +1052,7 @@ info[4]->Int32Value(context).ToChecked());
 // nodemod.eng.setClientMaxspeed();
 void sf_eng_pfnSetClientMaxspeed(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
+  V8_STUFF();
 
   (*g_engfuncs.pfnSetClientMaxspeed)(structures::unwrapEntity(isolate, info[0]),
 info[1]->NumberValue(context).ToChecked());
@@ -1645,10 +1061,7 @@ info[1]->NumberValue(context).ToChecked());
 // nodemod.eng.createFakeClient();
 void sf_eng_pfnCreateFakeClient(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   info.GetReturnValue().Set(structures::wrapEntity(isolate, (*g_engfuncs.pfnCreateFakeClient)(utils::js2string(isolate, info[0]))));
 }
@@ -1656,18 +1069,10 @@ void sf_eng_pfnCreateFakeClient(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.runPlayerMove();
 void sf_eng_pfnRunPlayerMove(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
   if (!info[1]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnRunPlayerMove parameter 1 (const float *) is not External, using nullptr\n");
   }
 
   (*g_engfuncs.pfnRunPlayerMove)(structures::unwrapEntity(isolate, info[0]),
@@ -1683,10 +1088,7 @@ info[7]->Int32Value(context).ToChecked());
 // nodemod.eng.numberOfEntities();
 void sf_eng_pfnNumberOfEntities(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnNumberOfEntities)()));
 }
@@ -1694,15 +1096,7 @@ void sf_eng_pfnNumberOfEntities(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.getInfoKeyBuffer();
 void sf_eng_pfnGetInfoKeyBuffer(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Null(isolate));
-    return;
-  }
+  V8_STUFF();
 
   const char* temp_str = (*g_engfuncs.pfnGetInfoKeyBuffer)(structures::unwrapEntity(isolate, info[0]));
   info.GetReturnValue().Set(v8::String::NewFromUtf8(isolate, temp_str ? temp_str : "").ToLocalChecked());
@@ -1711,10 +1105,7 @@ void sf_eng_pfnGetInfoKeyBuffer(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.infoKeyValue();
 void sf_eng_pfnInfoKeyValue(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   const char* temp_str = (*g_engfuncs.pfnInfoKeyValue)(utils::js2string(isolate, info[0]),
 utils::js2string(isolate, info[1]));
@@ -1724,10 +1115,7 @@ utils::js2string(isolate, info[1]));
 // nodemod.eng.setKeyValue();
 void sf_eng_pfnSetKeyValue(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   (*g_engfuncs.pfnSetKeyValue)(utils::js2string(isolate, info[0]),
 utils::js2string(isolate, info[1]),
@@ -1737,10 +1125,7 @@ utils::js2string(isolate, info[2]));
 // nodemod.eng.setClientKeyValue();
 void sf_eng_pfnSetClientKeyValue(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   (*g_engfuncs.pfnSetClientKeyValue)(info[0]->Int32Value(context).ToChecked(),
 utils::js2string(isolate, info[1]),
@@ -1751,10 +1136,7 @@ utils::js2string(isolate, info[3]));
 // nodemod.eng.isMapValid();
 void sf_eng_pfnIsMapValid(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnIsMapValid)(utils::js2string(isolate, info[0]))));
 }
@@ -1762,14 +1144,10 @@ void sf_eng_pfnIsMapValid(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.staticDecal();
 void sf_eng_pfnStaticDecal(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnStaticDecal parameter 0 (const float *) is not External, using nullptr\n");
   }
 
   (*g_engfuncs.pfnStaticDecal)((const float*)utils::jsToPointer(isolate, info[0]),
@@ -1781,10 +1159,7 @@ info[3]->Int32Value(context).ToChecked());
 // nodemod.eng.precacheGeneric();
 void sf_eng_pfnPrecacheGeneric(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnPrecacheGeneric)(utils::js2string(isolate, info[0]))));
 }
@@ -1792,15 +1167,7 @@ void sf_eng_pfnPrecacheGeneric(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.getPlayerUserId();
 void sf_eng_pfnGetPlayerUserId(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Number::New(isolate, 0));
-    return;
-  }
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnGetPlayerUserId)(structures::unwrapEntity(isolate, info[0]))));
 }
@@ -1808,22 +1175,10 @@ void sf_eng_pfnGetPlayerUserId(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.buildSoundMsg();
 void sf_eng_pfnBuildSoundMsg(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
   if (!info[9]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
-  if (!info[10]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnBuildSoundMsg parameter 9 (const float *) is not External, using nullptr\n");
   }
 
   (*g_engfuncs.pfnBuildSoundMsg)(structures::unwrapEntity(isolate, info[0]),
@@ -1842,10 +1197,7 @@ structures::unwrapEntity(isolate, info[10]));
 // nodemod.eng.isDedicatedServer();
 void sf_eng_pfnIsDedicatedServer(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnIsDedicatedServer)()));
 }
@@ -1853,10 +1205,7 @@ void sf_eng_pfnIsDedicatedServer(const v8::FunctionCallbackInfo<v8::Value>& info
 // nodemod.eng.cVarGetPointer();
 void sf_eng_pfnCVarGetPointer(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   info.GetReturnValue().Set(structures::wrapCvar(isolate, (*g_engfuncs.pfnCVarGetPointer)(utils::js2string(isolate, info[0]))));
 }
@@ -1864,15 +1213,7 @@ void sf_eng_pfnCVarGetPointer(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.getPlayerWONId();
 void sf_eng_pfnGetPlayerWONId(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Number::New(isolate, 0));
-    return;
-  }
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnGetPlayerWONId)(structures::unwrapEntity(isolate, info[0]))));
 }
@@ -1880,10 +1221,7 @@ void sf_eng_pfnGetPlayerWONId(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.infoRemoveKey();
 void sf_eng_pfnInfo_RemoveKey(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   (*g_engfuncs.pfnInfo_RemoveKey)(utils::js2string(isolate, info[0]),
 utils::js2string(isolate, info[1]));
@@ -1892,15 +1230,7 @@ utils::js2string(isolate, info[1]));
 // nodemod.eng.getPhysicsKeyValue();
 void sf_eng_pfnGetPhysicsKeyValue(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Null(isolate));
-    return;
-  }
+  V8_STUFF();
 
   const char* temp_str = (*g_engfuncs.pfnGetPhysicsKeyValue)(structures::unwrapEntity(isolate, info[0]),
 utils::js2string(isolate, info[1]));
@@ -1910,15 +1240,7 @@ utils::js2string(isolate, info[1]));
 // nodemod.eng.setPhysicsKeyValue();
 void sf_eng_pfnSetPhysicsKeyValue(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
+  V8_STUFF();
 
   (*g_engfuncs.pfnSetPhysicsKeyValue)(structures::unwrapEntity(isolate, info[0]),
 utils::js2string(isolate, info[1]),
@@ -1928,15 +1250,7 @@ utils::js2string(isolate, info[2]));
 // nodemod.eng.getPhysicsInfoString();
 void sf_eng_pfnGetPhysicsInfoString(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Null(isolate));
-    return;
-  }
+  V8_STUFF();
 
   const char* temp_str = (*g_engfuncs.pfnGetPhysicsInfoString)(structures::unwrapEntity(isolate, info[0]));
   info.GetReturnValue().Set(v8::String::NewFromUtf8(isolate, temp_str ? temp_str : "").ToLocalChecked());
@@ -1945,10 +1259,7 @@ void sf_eng_pfnGetPhysicsInfoString(const v8::FunctionCallbackInfo<v8::Value>& i
 // nodemod.eng.precacheEvent();
 void sf_eng_pfnPrecacheEvent(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnPrecacheEvent)(info[0]->Int32Value(context).ToChecked(),
 utils::js2string(isolate, info[1]))));
@@ -1957,22 +1268,13 @@ utils::js2string(isolate, info[1]))));
 // nodemod.eng.playbackEvent();
 void sf_eng_pfnPlaybackEvent(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
-  if (!info[1]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
   if (!info[4]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnPlaybackEvent parameter 4 (const float *) is not External, using nullptr\n");
   }
   if (!info[5]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnPlaybackEvent parameter 5 (const float *) is not External, using nullptr\n");
   }
 
   (*g_engfuncs.pfnPlaybackEvent)(info[0]->Int32Value(context).ToChecked(),
@@ -1992,14 +1294,10 @@ info[11]->Int32Value(context).ToChecked());
 // nodemod.eng.setFatPVS();
 void sf_eng_pfnSetFatPVS(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Null(isolate));
-    return;
+    printf("Warning: pfnSetFatPVS parameter 0 (const float *) is not External, using nullptr\n");
   }
 
   info.GetReturnValue().Set(utils::byteArrayToJS(isolate, (*g_engfuncs.pfnSetFatPVS)((const float*)utils::jsToPointer(isolate, info[0]))));
@@ -2008,14 +1306,10 @@ void sf_eng_pfnSetFatPVS(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.setFatPAS();
 void sf_eng_pfnSetFatPAS(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Null(isolate));
-    return;
+    printf("Warning: pfnSetFatPAS parameter 0 (const float *) is not External, using nullptr\n");
   }
 
   info.GetReturnValue().Set(utils::byteArrayToJS(isolate, (*g_engfuncs.pfnSetFatPAS)((const float*)utils::jsToPointer(isolate, info[0]))));
@@ -2024,15 +1318,7 @@ void sf_eng_pfnSetFatPAS(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.checkVisibility();
 void sf_eng_pfnCheckVisibility(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Number::New(isolate, 0));
-    return;
-  }
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnCheckVisibility)(structures::unwrapEntity(isolate, info[0]),
 (unsigned char*)utils::jsToPointer(isolate, info[1]))));
@@ -2041,15 +1327,7 @@ void sf_eng_pfnCheckVisibility(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.deltaSetField();
 void sf_eng_pfnDeltaSetField(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
+  V8_STUFF();
 
   (*g_engfuncs.pfnDeltaSetField)(structures::unwrapDelta(isolate, info[0]),
 utils::js2string(isolate, info[1]));
@@ -2058,15 +1336,7 @@ utils::js2string(isolate, info[1]));
 // nodemod.eng.deltaUnsetField();
 void sf_eng_pfnDeltaUnsetField(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
+  V8_STUFF();
 
   (*g_engfuncs.pfnDeltaUnsetField)(structures::unwrapDelta(isolate, info[0]),
 utils::js2string(isolate, info[1]));
@@ -2075,14 +1345,10 @@ utils::js2string(isolate, info[1]));
 // nodemod.eng.deltaAddEncoder();
 void sf_eng_pfnDeltaAddEncoder(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   if (!info[1]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnDeltaAddEncoder parameter 1 (void*) is not External, using nullptr\n");
   }
 
   (*g_engfuncs.pfnDeltaAddEncoder)(utils::js2string(isolate, info[0]),
@@ -2092,10 +1358,7 @@ nullptr /* void* not supported */);
 // nodemod.eng.getCurrentPlayer();
 void sf_eng_pfnGetCurrentPlayer(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnGetCurrentPlayer)()));
 }
@@ -2103,15 +1366,7 @@ void sf_eng_pfnGetCurrentPlayer(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.canSkipPlayer();
 void sf_eng_pfnCanSkipPlayer(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Number::New(isolate, 0));
-    return;
-  }
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnCanSkipPlayer)(structures::unwrapEntity(isolate, info[0]))));
 }
@@ -2119,15 +1374,7 @@ void sf_eng_pfnCanSkipPlayer(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.deltaFindField();
 void sf_eng_pfnDeltaFindField(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Number::New(isolate, 0));
-    return;
-  }
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnDeltaFindField)(structures::unwrapDelta(isolate, info[0]),
 utils::js2string(isolate, info[1]))));
@@ -2136,15 +1383,7 @@ utils::js2string(isolate, info[1]))));
 // nodemod.eng.deltaSetFieldByIndex();
 void sf_eng_pfnDeltaSetFieldByIndex(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
+  V8_STUFF();
 
   (*g_engfuncs.pfnDeltaSetFieldByIndex)(structures::unwrapDelta(isolate, info[0]),
 info[1]->Int32Value(context).ToChecked());
@@ -2153,15 +1392,7 @@ info[1]->Int32Value(context).ToChecked());
 // nodemod.eng.deltaUnsetFieldByIndex();
 void sf_eng_pfnDeltaUnsetFieldByIndex(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
+  V8_STUFF();
 
   (*g_engfuncs.pfnDeltaUnsetFieldByIndex)(structures::unwrapDelta(isolate, info[0]),
 info[1]->Int32Value(context).ToChecked());
@@ -2170,10 +1401,7 @@ info[1]->Int32Value(context).ToChecked());
 // nodemod.eng.setGroupMask();
 void sf_eng_pfnSetGroupMask(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   (*g_engfuncs.pfnSetGroupMask)(info[0]->Int32Value(context).ToChecked(),
 info[1]->Int32Value(context).ToChecked());
@@ -2182,15 +1410,7 @@ info[1]->Int32Value(context).ToChecked());
 // nodemod.eng.createInstancedBaseline();
 void sf_eng_pfnCreateInstancedBaseline(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[1]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Number::New(isolate, 0));
-    return;
-  }
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnCreateInstancedBaseline)(info[0]->Int32Value(context).ToChecked(),
 structures::unwrapEntityState(isolate, info[1]))));
@@ -2199,15 +1419,7 @@ structures::unwrapEntityState(isolate, info[1]))));
 // nodemod.eng.cvarDirectSet();
 void sf_eng_pfnCvar_DirectSet(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
+  V8_STUFF();
 
   (*g_engfuncs.pfnCvar_DirectSet)((cvar_t*)structures::unwrapCvar(isolate, info[0]), utils::js2string(isolate, info[1]));;
 }
@@ -2215,18 +1427,13 @@ void sf_eng_pfnCvar_DirectSet(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.forceUnmodified();
 void sf_eng_pfnForceUnmodified(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   if (!info[1]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnForceUnmodified parameter 1 (const float *) is not External, using nullptr\n");
   }
   if (!info[2]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnForceUnmodified parameter 2 (const float *) is not External, using nullptr\n");
   }
 
   (*g_engfuncs.pfnForceUnmodified)(*(FORCE_TYPE*)utils::jsToBytes(isolate, info[0]),
@@ -2238,22 +1445,13 @@ utils::js2string(isolate, info[3]));
 // nodemod.eng.getPlayerStats();
 void sf_eng_pfnGetPlayerStats(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
   if (!info[1]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnGetPlayerStats parameter 1 (int *) is not External, using nullptr\n");
   }
   if (!info[2]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnGetPlayerStats parameter 2 (int *) is not External, using nullptr\n");
   }
 
   (*g_engfuncs.pfnGetPlayerStats)(structures::unwrapEntity(isolate, info[0]),
@@ -2264,14 +1462,10 @@ void sf_eng_pfnGetPlayerStats(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.addServerCommand();
 void sf_eng_pfnAddServerCommand(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   if (!info[1]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnAddServerCommand parameter 1 (void*) is not External, using nullptr\n");
   }
 
   (*g_engfuncs.pfnAddServerCommand)(utils::js2string(isolate, info[0]),
@@ -2281,10 +1475,7 @@ nullptr /* void* not supported */);
 // nodemod.eng.voiceGetClientListening();
 void sf_eng_pfnVoice_GetClientListening(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Boolean::New(isolate, (*g_engfuncs.pfnVoice_GetClientListening)(info[0]->Int32Value(context).ToChecked(),
 info[1]->Int32Value(context).ToChecked())));
@@ -2293,10 +1484,7 @@ info[1]->Int32Value(context).ToChecked())));
 // nodemod.eng.voiceSetClientListening();
 void sf_eng_pfnVoice_SetClientListening(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Boolean::New(isolate, (*g_engfuncs.pfnVoice_SetClientListening)(info[0]->Int32Value(context).ToChecked(),
 info[1]->Int32Value(context).ToChecked(),
@@ -2306,15 +1494,7 @@ info[2]->BooleanValue(isolate))));
 // nodemod.eng.getPlayerAuthId();
 void sf_eng_pfnGetPlayerAuthId(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Null(isolate));
-    return;
-  }
+  V8_STUFF();
 
   const char* temp_str = (*g_engfuncs.pfnGetPlayerAuthId)(structures::unwrapEntity(isolate, info[0]));
   info.GetReturnValue().Set(v8::String::NewFromUtf8(isolate, temp_str ? temp_str : "").ToLocalChecked());
@@ -2323,10 +1503,7 @@ void sf_eng_pfnGetPlayerAuthId(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.sequenceGet();
 void sf_eng_pfnSequenceGet(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::External::New(isolate, (*g_engfuncs.pfnSequenceGet)(utils::js2string(isolate, info[0]),
 utils::js2string(isolate, info[1]))));
@@ -2335,14 +1512,10 @@ utils::js2string(isolate, info[1]))));
 // nodemod.eng.sequencePickSentence();
 void sf_eng_pfnSequencePickSentence(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   if (!info[2]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Null(isolate));
-    return;
+    printf("Warning: pfnSequencePickSentence parameter 2 (int *) is not External, using nullptr\n");
   }
 
   info.GetReturnValue().Set(v8::External::New(isolate, (*g_engfuncs.pfnSequencePickSentence)(utils::js2string(isolate, info[0]),
@@ -2353,10 +1526,7 @@ info[1]->Int32Value(context).ToChecked(),
 // nodemod.eng.getFileSize();
 void sf_eng_pfnGetFileSize(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnGetFileSize)(utils::js2string(isolate, info[0]))));
 }
@@ -2364,10 +1534,7 @@ void sf_eng_pfnGetFileSize(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.getApproxWavePlayLen();
 void sf_eng_pfnGetApproxWavePlayLen(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnGetApproxWavePlayLen)(utils::js2string(isolate, info[0]))));
 }
@@ -2375,10 +1542,7 @@ void sf_eng_pfnGetApproxWavePlayLen(const v8::FunctionCallbackInfo<v8::Value>& i
 // nodemod.eng.isCareerMatch();
 void sf_eng_pfnIsCareerMatch(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnIsCareerMatch)()));
 }
@@ -2386,10 +1550,7 @@ void sf_eng_pfnIsCareerMatch(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.getLocalizedStringLength();
 void sf_eng_pfnGetLocalizedStringLength(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnGetLocalizedStringLength)(utils::js2string(isolate, info[0]))));
 }
@@ -2397,10 +1558,7 @@ void sf_eng_pfnGetLocalizedStringLength(const v8::FunctionCallbackInfo<v8::Value
 // nodemod.eng.registerTutorMessageShown();
 void sf_eng_pfnRegisterTutorMessageShown(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   (*g_engfuncs.pfnRegisterTutorMessageShown)(info[0]->Int32Value(context).ToChecked());
 }
@@ -2408,10 +1566,7 @@ void sf_eng_pfnRegisterTutorMessageShown(const v8::FunctionCallbackInfo<v8::Valu
 // nodemod.eng.getTimesTutorMessageShown();
 void sf_eng_pfnGetTimesTutorMessageShown(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnGetTimesTutorMessageShown)(info[0]->Int32Value(context).ToChecked())));
 }
@@ -2419,14 +1574,10 @@ void sf_eng_pfnGetTimesTutorMessageShown(const v8::FunctionCallbackInfo<v8::Valu
 // nodemod.eng.processTutorMessageDecayBuffer();
 void sf_eng_pfnProcessTutorMessageDecayBuffer(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnProcessTutorMessageDecayBuffer parameter 0 (int *) is not External, using nullptr\n");
   }
 
   (*g_engfuncs.pfnProcessTutorMessageDecayBuffer)((int*)utils::jsToPointer(isolate, info[0]),
@@ -2436,14 +1587,10 @@ info[1]->Int32Value(context).ToChecked());
 // nodemod.eng.constructTutorMessageDecayBuffer();
 void sf_eng_pfnConstructTutorMessageDecayBuffer(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
+    printf("Warning: pfnConstructTutorMessageDecayBuffer parameter 0 (int *) is not External, using nullptr\n");
   }
 
   (*g_engfuncs.pfnConstructTutorMessageDecayBuffer)((int*)utils::jsToPointer(isolate, info[0]),
@@ -2453,10 +1600,7 @@ info[1]->Int32Value(context).ToChecked());
 // nodemod.eng.resetTutorMessageDecayData();
 void sf_eng_pfnResetTutorMessageDecayData(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   (*g_engfuncs.pfnResetTutorMessageDecayData)();
 }
@@ -2464,15 +1608,7 @@ void sf_eng_pfnResetTutorMessageDecayData(const v8::FunctionCallbackInfo<v8::Val
 // nodemod.eng.queryClientCvarValue();
 void sf_eng_pfnQueryClientCvarValue(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
+  V8_STUFF();
 
   (*g_engfuncs.pfnQueryClientCvarValue)(structures::unwrapEntity(isolate, info[0]),
 utils::js2string(isolate, info[1]));
@@ -2481,15 +1617,7 @@ utils::js2string(isolate, info[1]));
 // nodemod.eng.queryClientCvarValue2();
 void sf_eng_pfnQueryClientCvarValue2(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
-
-  if (!info[0]->IsExternal()) {
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-    return;
-  }
+  V8_STUFF();
 
   (*g_engfuncs.pfnQueryClientCvarValue2)(structures::unwrapEntity(isolate, info[0]),
 utils::js2string(isolate, info[1]),
@@ -2499,10 +1627,7 @@ info[2]->Int32Value(context).ToChecked());
 // nodemod.eng.checkParm();
 void sf_eng_CheckParm(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.CheckParm)(utils::js2string(isolate, info[0]),
 (char**)utils::jsToPointer(isolate, info[1]))));
@@ -2511,10 +1636,7 @@ void sf_eng_CheckParm(const v8::FunctionCallbackInfo<v8::Value>& info)
 // nodemod.eng.pEntityOfEntIndexAllEntities();
 void sf_eng_pfnPEntityOfEntIndexAllEntities(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 
   info.GetReturnValue().Set(structures::wrapEntity(isolate, (*g_engfuncs.pfnPEntityOfEntIndexAllEntities)(info[0]->Int32Value(context).ToChecked())));
 }

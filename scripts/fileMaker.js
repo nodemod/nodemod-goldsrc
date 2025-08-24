@@ -274,6 +274,12 @@ const fileMaker = {
         '#include "v8.h"',
         '#include "extdll.h"',
         '#include "node/utils.hpp"',
+        '',
+        '#define V8_STUFF() v8::Isolate* isolate = info.GetIsolate(); \\',
+        '  v8::Locker locker(isolate); \\',
+        '  v8::HandleScope scope(isolate); \\',
+        '  v8::Local<v8::Context> context = isolate->GetCurrentContext()',
+        '',
         '#include "structures/structures.hpp"'
       ].join('\n'),
       '',

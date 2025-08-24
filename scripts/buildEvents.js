@@ -68,9 +68,10 @@ function getFunction(func, prefix, type) {
 
   func._eventName = `${prefix}_${func.name}`;
   if (func.name === 'pfnStartFrame' && prefix !== 'post') {
-    return `// ${func.name}
+    return `// ${func.name} - Run Node.js UV loop tick
   ${func.type} ${prefix}_${func.name} () {
     SET_META_RESULT(MRES_IGNORED);
+    nodeImpl.Tick();
   }`;
   }
 

@@ -317,12 +317,17 @@ const generator = {
   generateCppFunction(func, source, prefix) {
     const customBody = customs[prefix.split('_')[1]]?.[func.name]?.api?.body;
     
-    // Generate null checks for pointer parameters
+    // Generate warning messages for pointer parameters instead of early returns
+    const structureTypes = ['edict_t', 'edict_s', 'entvars_s', 'clientdata_s', 'entity_state_s', 'usercmd_s', 'netadr_s', 'weapon_data_s', 'playermove_s', 'customization_t', 'KeyValueData', 'SAVERESTOREDATA', 'TYPEDESCRIPTION', 'delta_s', 'cvar_s', 'TraceResult'];
     const nullChecks = (func.args || []).map((arg, i) => {
       if (arg.type.includes('*') && !arg.type.includes('char')) {
+        // Skip validation for structure types that use wrap/unwrap pattern
+        const isStructureType = structureTypes.some(structType => arg.type.includes(structType));
+        if (isStructureType) {
+          return '';
+        }
         return `if (!info[${i}]->IsExternal()) {
-    info.GetReturnValue().Set(${func.type === 'void' ? 'v8::Undefined(isolate)' : (func.type.includes('*') ? 'v8::Null(isolate)' : 'v8::Number::New(isolate, 0)')});
-    return;
+    printf("Warning: ${func.name} parameter ${i} (${arg.type}) is not External, using nullptr\\n");
   }`;
       }
       return '';
@@ -332,10 +337,7 @@ const generator = {
     
     return `void ${prefix}_${func.name}(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-	auto isolate = info.GetIsolate();
-  v8::Locker locker(isolate);
-	v8::HandleScope scope(isolate);
-	auto context = isolate->GetCurrentContext();
+  V8_STUFF();
 ${nullCheckSection}
   ${customBody || this.packReturn(func, `(*${source}.${func.name})(${(func.args || []).map((v, i) => this.js2cpp(v.type, `info[${i}]`)).join(',\n')})`)};
 }`;
