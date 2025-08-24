@@ -42,6 +42,17 @@ export default {
       api: {
         body: `fprintf((FILE*)utils::jsToPointer(isolate, info[0]), "%s", utils::js2string(isolate, info[1]));`
       }
+    },
+    pfnMessageBegin: {
+      api: true,
+      typescript: {
+        parameters: [
+          { name: 'msg_dest', type: 'number', originalType: 'int' },
+          { name: 'msg_type', type: 'number', originalType: 'int' },
+          { name: 'pOrigin', type: 'number[]', originalType: 'const float *' },
+          { name: 'ed', type: 'Entity | undefined', originalType: 'edict_t *' }
+        ]
+      }
     }
   },
   dll: {

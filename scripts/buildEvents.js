@@ -483,6 +483,23 @@ function computeFunctionApi(func, source) {
   const jsName = camelize(func.name.replace(/^pfn/, ''));
   const returnType = cTypeToTsType(func.type);
   
+  // Check for custom TypeScript definitions in customs.js (for API functions)
+  const sourceType = source === 'eng' ? 'eng' : 'dll';
+  const customImpl = customs[sourceType] && customs[sourceType][func.name];
+  
+  if (customImpl && customImpl.typescript && customImpl.typescript.parameters && customImpl.api) {
+    // Only apply custom TypeScript if there's also a custom API implementation
+    const parameters = customImpl.typescript.parameters;
+    const paramTypes = parameters.map(p => `${p.name}: ${p.type}`);
+    
+    return {
+      original: func.original,
+      definition: `{ "${jsName}", sf_${source}_${func.name} }`,
+      body: `// nodemod.eng.${jsName}();\n${generator.generateCppFunction(func, 'g_engfuncs', 'sf_eng')}`,
+      typing: `${jsName}(${paramTypes.join(', ')}): ${returnType}`
+    };
+  }
+  
   // Handle variadic functions
   const hasVariadic = func.args && func.args.some(arg => arg.type === '$rest');
   const regularArgs = func.args ? func.args.filter(arg => arg.type !== '$rest') : [];

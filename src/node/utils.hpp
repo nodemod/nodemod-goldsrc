@@ -85,12 +85,43 @@ inline void js2vect(v8::Isolate *isolate, v8::Local<v8::Array> array, vec3_t &ve
 
 	// Convert JS value to generic pointer (for pointer parameter handling)
 	inline void* jsToPointer(v8::Isolate *isolate, const v8::Local<v8::Value>& val) {
-		if (val.IsEmpty() || !val->IsExternal()) {
+		if (val.IsEmpty() || val->IsNull() || val->IsUndefined()) {
 			return nullptr;
 		}
 
-		v8::Local<v8::External> ext = val.As<v8::External>();
-		return ext->Value();
+		// Handle External objects (existing wrapped pointers)
+		if (val->IsExternal()) {
+			v8::Local<v8::External> ext = val.As<v8::External>();
+			return ext->Value();
+		}
+
+		// Handle Arrays - convert to float array (most common case)
+		if (val->IsArray()) {
+			v8::Local<v8::Array> arr = val.As<v8::Array>();
+			uint32_t length = arr->Length();
+			
+			// Static buffer to persist after function returns
+			static thread_local float floatBuffer[16]; // Support up to 16 elements
+			if (length > 16) length = 16;
+			
+			v8::Local<v8::Context> context = isolate->GetCurrentContext();
+			for (uint32_t i = 0; i < length; i++) {
+				v8::Local<v8::Value> element = arr->Get(context, i).ToLocalChecked();
+				floatBuffer[i] = element->NumberValue(context).ToChecked();
+			}
+			return (void*)floatBuffer;
+		}
+
+		// Handle single numbers - convert to single-element float array
+		if (val->IsNumber()) {
+			static thread_local float singleFloat;
+			v8::Local<v8::Context> context = isolate->GetCurrentContext();
+			singleFloat = val->NumberValue(context).ToChecked();
+			return (void*)&singleFloat;
+		}
+
+		// Fall back to nullptr for other types
+		return nullptr;
 	}
 
 	// Convert float array to JS array
