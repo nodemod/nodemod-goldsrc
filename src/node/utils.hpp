@@ -100,24 +100,36 @@ inline void js2vect(v8::Isolate *isolate, v8::Local<v8::Array> array, vec3_t &ve
 			v8::Local<v8::Array> arr = val.As<v8::Array>();
 			uint32_t length = arr->Length();
 			
-			// Static buffer to persist after function returns
-			static thread_local float floatBuffer[16]; // Support up to 16 elements
+			// Circular buffer system to support multiple arrays in same call
+			static thread_local float floatBuffers[8][16]; // 8 buffers of 16 elements each
+			static thread_local int bufferIndex = 0;
+			
+			// Get next buffer in rotation
+			float* currentBuffer = floatBuffers[bufferIndex];
+			bufferIndex = (bufferIndex + 1) % 8;
+			
 			if (length > 16) length = 16;
 			
 			v8::Local<v8::Context> context = isolate->GetCurrentContext();
 			for (uint32_t i = 0; i < length; i++) {
 				v8::Local<v8::Value> element = arr->Get(context, i).ToLocalChecked();
-				floatBuffer[i] = element->NumberValue(context).ToChecked();
+				currentBuffer[i] = element->NumberValue(context).ToChecked();
 			}
-			return (void*)floatBuffer;
+			return (void*)currentBuffer;
 		}
 
 		// Handle single numbers - convert to single-element float array
 		if (val->IsNumber()) {
-			static thread_local float singleFloat;
+			// Use same circular buffer system for single numbers
+			static thread_local float singleFloats[8];
+			static thread_local int singleIndex = 0;
+			
+			float* currentSingle = &singleFloats[singleIndex];
+			singleIndex = (singleIndex + 1) % 8;
+			
 			v8::Local<v8::Context> context = isolate->GetCurrentContext();
-			singleFloat = val->NumberValue(context).ToChecked();
-			return (void*)&singleFloat;
+			*currentSingle = val->NumberValue(context).ToChecked();
+			return (void*)currentSingle;
 		}
 
 		// Fall back to nullptr for other types

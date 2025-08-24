@@ -355,11 +355,24 @@ void sf_eng_pfnTraceLine(const v8::FunctionCallbackInfo<v8::Value>& info)
     printf("Warning: pfnTraceLine parameter 1 (const float *) is not External, using nullptr\n");
   }
 
+  // Allocate TraceResult on stack
+  TraceResult trace;
+  
+  if (!info[0]->IsExternal()) {
+    printf("Warning: pfnTraceLine parameter 0 (const float *) is not External, using nullptr\n");
+  }
+  if (!info[1]->IsExternal()) {
+    printf("Warning: pfnTraceLine parameter 1 (const float *) is not External, using nullptr\n");
+  }
+
   (*g_engfuncs.pfnTraceLine)((const float*)utils::jsToPointer(isolate, info[0]),
 (const float*)utils::jsToPointer(isolate, info[1]),
 info[2]->Int32Value(context).ToChecked(),
 structures::unwrapEntity(isolate, info[3]),
-structures::unwrapTraceResult(isolate, info[4]));
+&trace);
+
+  // Return the populated TraceResult
+  info.GetReturnValue().Set(structures::wrapTraceResult(isolate, &trace));;
 }
 
 // nodemod.eng.traceToss();
@@ -367,9 +380,15 @@ void sf_eng_pfnTraceToss(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
 
+  // Allocate TraceResult on stack
+  TraceResult trace;
+  
   (*g_engfuncs.pfnTraceToss)(structures::unwrapEntity(isolate, info[0]),
 structures::unwrapEntity(isolate, info[1]),
-structures::unwrapTraceResult(isolate, info[2]));
+&trace);
+
+  // Return the populated TraceResult
+  info.GetReturnValue().Set(structures::wrapTraceResult(isolate, &trace));;
 }
 
 // nodemod.eng.traceMonsterHull();
@@ -384,12 +403,28 @@ void sf_eng_pfnTraceMonsterHull(const v8::FunctionCallbackInfo<v8::Value>& info)
     printf("Warning: pfnTraceMonsterHull parameter 2 (const float *) is not External, using nullptr\n");
   }
 
-  info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnTraceMonsterHull)(structures::unwrapEntity(isolate, info[0]),
+  // Allocate TraceResult on stack
+  TraceResult trace;
+  
+  if (!info[1]->IsExternal()) {
+    printf("Warning: pfnTraceMonsterHull parameter 1 (const float *) is not External, using nullptr\n");
+  }
+  if (!info[2]->IsExternal()) {
+    printf("Warning: pfnTraceMonsterHull parameter 2 (const float *) is not External, using nullptr\n");
+  }
+
+  int result = (*g_engfuncs.pfnTraceMonsterHull)(structures::unwrapEntity(isolate, info[0]),
 (const float*)utils::jsToPointer(isolate, info[1]),
 (const float*)utils::jsToPointer(isolate, info[2]),
 info[3]->Int32Value(context).ToChecked(),
 structures::unwrapEntity(isolate, info[4]),
-structures::unwrapTraceResult(isolate, info[5]))));
+&trace);
+
+  // Return object with both result and trace
+  v8::Local<v8::Object> resultObj = v8::Object::New(isolate);
+  resultObj->Set(context, v8::String::NewFromUtf8(isolate, "result").ToLocalChecked(), v8::Number::New(isolate, result)).Check();
+  resultObj->Set(context, v8::String::NewFromUtf8(isolate, "trace").ToLocalChecked(), structures::wrapTraceResult(isolate, &trace)).Check();
+  info.GetReturnValue().Set(resultObj);;
 }
 
 // nodemod.eng.traceHull();
@@ -404,12 +439,25 @@ void sf_eng_pfnTraceHull(const v8::FunctionCallbackInfo<v8::Value>& info)
     printf("Warning: pfnTraceHull parameter 1 (const float *) is not External, using nullptr\n");
   }
 
+  // Allocate TraceResult on stack
+  TraceResult trace;
+  
+  if (!info[0]->IsExternal()) {
+    printf("Warning: pfnTraceHull parameter 0 (const float *) is not External, using nullptr\n");
+  }
+  if (!info[1]->IsExternal()) {
+    printf("Warning: pfnTraceHull parameter 1 (const float *) is not External, using nullptr\n");
+  }
+
   (*g_engfuncs.pfnTraceHull)((const float*)utils::jsToPointer(isolate, info[0]),
 (const float*)utils::jsToPointer(isolate, info[1]),
 info[2]->Int32Value(context).ToChecked(),
 info[3]->Int32Value(context).ToChecked(),
 structures::unwrapEntity(isolate, info[4]),
-structures::unwrapTraceResult(isolate, info[5]));
+&trace);
+
+  // Return the populated TraceResult
+  info.GetReturnValue().Set(structures::wrapTraceResult(isolate, &trace));;
 }
 
 // nodemod.eng.traceModel();
@@ -424,11 +472,24 @@ void sf_eng_pfnTraceModel(const v8::FunctionCallbackInfo<v8::Value>& info)
     printf("Warning: pfnTraceModel parameter 1 (const float *) is not External, using nullptr\n");
   }
 
+  // Allocate TraceResult on stack
+  TraceResult trace;
+  
+  if (!info[0]->IsExternal()) {
+    printf("Warning: pfnTraceModel parameter 0 (const float *) is not External, using nullptr\n");
+  }
+  if (!info[1]->IsExternal()) {
+    printf("Warning: pfnTraceModel parameter 1 (const float *) is not External, using nullptr\n");
+  }
+
   (*g_engfuncs.pfnTraceModel)((const float*)utils::jsToPointer(isolate, info[0]),
 (const float*)utils::jsToPointer(isolate, info[1]),
 info[2]->Int32Value(context).ToChecked(),
 structures::unwrapEntity(isolate, info[3]),
-structures::unwrapTraceResult(isolate, info[4]));
+&trace);
+
+  // Return the populated TraceResult
+  info.GetReturnValue().Set(structures::wrapTraceResult(isolate, &trace));;
 }
 
 // nodemod.eng.traceTexture();
@@ -461,12 +522,25 @@ void sf_eng_pfnTraceSphere(const v8::FunctionCallbackInfo<v8::Value>& info)
     printf("Warning: pfnTraceSphere parameter 1 (const float *) is not External, using nullptr\n");
   }
 
+  // Allocate TraceResult on stack
+  TraceResult trace;
+  
+  if (!info[0]->IsExternal()) {
+    printf("Warning: pfnTraceSphere parameter 0 (const float *) is not External, using nullptr\n");
+  }
+  if (!info[1]->IsExternal()) {
+    printf("Warning: pfnTraceSphere parameter 1 (const float *) is not External, using nullptr\n");
+  }
+
   (*g_engfuncs.pfnTraceSphere)((const float*)utils::jsToPointer(isolate, info[0]),
 (const float*)utils::jsToPointer(isolate, info[1]),
 info[2]->Int32Value(context).ToChecked(),
 info[3]->NumberValue(context).ToChecked(),
 structures::unwrapEntity(isolate, info[4]),
-structures::unwrapTraceResult(isolate, info[5]));
+&trace);
+
+  // Return the populated TraceResult
+  info.GetReturnValue().Set(structures::wrapTraceResult(isolate, &trace));;
 }
 
 // nodemod.eng.getAimVector();

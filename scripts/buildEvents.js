@@ -491,12 +491,13 @@ function computeFunctionApi(func, source) {
     // Only apply custom TypeScript if there's also a custom API implementation
     const parameters = customImpl.typescript.parameters;
     const paramTypes = parameters.map(p => `${p.name}: ${p.type}`);
+    const customReturnType = customImpl.typescript.returnType || returnType;
     
     return {
       original: func.original,
       definition: `{ "${jsName}", sf_${source}_${func.name} }`,
       body: `// nodemod.eng.${jsName}();\n${generator.generateCppFunction(func, 'g_engfuncs', 'sf_eng')}`,
-      typing: `${jsName}(${paramTypes.join(', ')}): ${returnType}`
+      typing: `${jsName}(${paramTypes.join(', ')}): ${customReturnType}`
     };
   }
   
@@ -752,6 +753,16 @@ async function parseStructureInterfaces() {
       { name: 'gamestate', type: 'number', comment: 'ACCESSOR(_entity, "gamestate", v.gamestate, GETN, SETINT)' },
       { name: 'oldbuttons', type: 'number', comment: 'ACCESSOR(_entity, "oldbuttons", v.oldbuttons, GETN, SETINT)' },
       { name: 'groupinfo', type: 'number', comment: 'ACCESSOR(_entity, "groupinfo", v.groupinfo, GETN, SETINT)' }
+    ]
+  });
+
+  // Add TraceMonsterHullResult interface
+  interfaces.push({
+    name: 'TraceMonsterHullResult',
+    description: 'Result from monster hull trace operations',
+    properties: [
+      { name: 'result', type: 'number', comment: 'Return value from pfnTraceMonsterHull - likely collision/movement validity flag' },
+      { name: 'trace', type: 'TraceResult', comment: 'Standard trace result with hit information' }
     ]
   });
 
