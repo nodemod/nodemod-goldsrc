@@ -126,25 +126,43 @@ void createTraceResultTemplate(v8::Isolate* isolate) {
 
 v8::Local<v8::Value> wrapTraceResult(v8::Isolate* isolate, TraceResult* trace) {
     v8::Locker locker(isolate);
+    v8::Local<v8::Context> context = isolate->GetCurrentContext();
+    
     if (!trace) {
         return v8::Null(isolate);
     }
     
-    // Check if already wrapped
-    if (wrappedTraceResults.find(trace) != wrappedTraceResults.end()) {
-        return v8::Local<v8::Object>::New(isolate, wrappedTraceResults[trace]);
+    // Create plain JavaScript object with copied values (not pointer-based accessors)
+    v8::Local<v8::Object> obj = v8::Object::New(isolate);
+    
+    obj->Set(context, v8::String::NewFromUtf8(isolate, "allSolid").ToLocalChecked(), v8::Boolean::New(isolate, trace->fAllSolid)).Check();
+    obj->Set(context, v8::String::NewFromUtf8(isolate, "startSolid").ToLocalChecked(), v8::Boolean::New(isolate, trace->fStartSolid)).Check();
+    obj->Set(context, v8::String::NewFromUtf8(isolate, "inOpen").ToLocalChecked(), v8::Boolean::New(isolate, trace->fInOpen)).Check();
+    obj->Set(context, v8::String::NewFromUtf8(isolate, "inWater").ToLocalChecked(), v8::Boolean::New(isolate, trace->fInWater)).Check();
+    obj->Set(context, v8::String::NewFromUtf8(isolate, "fraction").ToLocalChecked(), v8::Number::New(isolate, trace->flFraction)).Check();
+    obj->Set(context, v8::String::NewFromUtf8(isolate, "planeDist").ToLocalChecked(), v8::Number::New(isolate, trace->flPlaneDist)).Check();
+    obj->Set(context, v8::String::NewFromUtf8(isolate, "hitGroup").ToLocalChecked(), v8::Integer::New(isolate, trace->iHitgroup)).Check();
+    
+    // Create arrays for vectors
+    v8::Local<v8::Array> endPos = v8::Array::New(isolate, 3);
+    endPos->Set(context, 0, v8::Number::New(isolate, trace->vecEndPos.x)).Check();
+    endPos->Set(context, 1, v8::Number::New(isolate, trace->vecEndPos.y)).Check();
+    endPos->Set(context, 2, v8::Number::New(isolate, trace->vecEndPos.z)).Check();
+    obj->Set(context, v8::String::NewFromUtf8(isolate, "endPos").ToLocalChecked(), endPos).Check();
+    
+    v8::Local<v8::Array> planeNormal = v8::Array::New(isolate, 3);
+    planeNormal->Set(context, 0, v8::Number::New(isolate, trace->vecPlaneNormal.x)).Check();
+    planeNormal->Set(context, 1, v8::Number::New(isolate, trace->vecPlaneNormal.y)).Check();
+    planeNormal->Set(context, 2, v8::Number::New(isolate, trace->vecPlaneNormal.z)).Check();
+    obj->Set(context, v8::String::NewFromUtf8(isolate, "planeNormal").ToLocalChecked(), planeNormal).Check();
+    
+    // Handle hit entity
+    if (trace->pHit) {
+        obj->Set(context, v8::String::NewFromUtf8(isolate, "hit").ToLocalChecked(), wrapEntity(isolate, trace->pHit)).Check();
+    } else {
+        obj->Set(context, v8::String::NewFromUtf8(isolate, "hit").ToLocalChecked(), v8::Null(isolate)).Check();
     }
     
-    // Create template if not initialized
-    if (traceResultTemplate.IsEmpty()) {
-        createTraceResultTemplate(isolate);
-    }
-    
-    // Create new instance
-    v8::Local<v8::Object> obj = traceResultTemplate.Get(isolate)->NewInstance(isolate->GetCurrentContext()).ToLocalChecked();
-    obj->SetAlignedPointerInInternalField(0, trace);
-    
-    wrappedTraceResults[trace].Reset(isolate, obj);
     return obj;
 }
 

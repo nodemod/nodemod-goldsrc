@@ -25,7 +25,47 @@ export default {
     },
     pfnCVarRegister: {
       api: {
-        body: `(*g_engfuncs.pfnCVarRegister)((cvar_t*)structures::unwrapCvar(isolate, info[0]));`
+        body: `// Create a new cvar_t structure from JavaScript object
+  if (!info[0]->IsObject()) {
+    printf("Error: pfnCVarRegister requires an object\\n");
+    return;
+  }
+  
+  v8::Local<v8::Object> jsObj = info[0]->ToObject(context).ToLocalChecked();
+  
+  // Extract required fields
+  v8::Local<v8::String> nameKey = v8::String::NewFromUtf8(isolate, "name").ToLocalChecked();
+  v8::Local<v8::String> stringKey = v8::String::NewFromUtf8(isolate, "string").ToLocalChecked();
+  v8::Local<v8::String> flagsKey = v8::String::NewFromUtf8(isolate, "flags").ToLocalChecked();
+  v8::Local<v8::String> valueKey = v8::String::NewFromUtf8(isolate, "value").ToLocalChecked();
+  
+  if (!jsObj->Has(context, nameKey).ToChecked() || !jsObj->Has(context, stringKey).ToChecked()) {
+    printf("Error: pfnCVarRegister requires 'name' and 'string' fields\\n");
+    return;
+  }
+  
+  // Allocate and initialize cvar_t structure
+  cvar_t* cvar = new cvar_t();
+  memset(cvar, 0, sizeof(cvar_t));
+  
+  // Copy strings (need to keep them alive)
+  v8::String::Utf8Value nameStr(isolate, jsObj->Get(context, nameKey).ToLocalChecked());
+  v8::String::Utf8Value stringStr(isolate, jsObj->Get(context, stringKey).ToLocalChecked());
+  
+  cvar->name = strdup(*nameStr);
+  cvar->string = strdup(*stringStr);
+  cvar->flags = jsObj->Has(context, flagsKey).ToChecked() ? 
+    jsObj->Get(context, flagsKey).ToLocalChecked()->Int32Value(context).ToChecked() : 0;
+  cvar->value = jsObj->Has(context, valueKey).ToChecked() ? 
+    jsObj->Get(context, valueKey).ToLocalChecked()->NumberValue(context).ToChecked() : 0.0f;
+  cvar->next = nullptr;
+  
+  (*g_engfuncs.pfnCVarRegister)(cvar);`
+      },
+      typescript: {
+        parameters: [
+          { name: 'cvar', type: 'Cvar', originalType: 'cvar_t *' }
+        ]
       }
     },
     pfnCvar_RegisterVariable: {

@@ -12,6 +12,7 @@ const fileMaker = {
       const eventTypes = this.makeEventTypes(eventNames, eventInterfaces);
       const structures = this.makeStructures(structureInterfaces);
       const engine = this.makeEngine(computed);
+      const dll = this.makeDLL(computed);
       const core = this.makeCore();
       
       return {
@@ -19,6 +20,7 @@ const fileMaker = {
         'events.d.ts': eventTypes, 
         'structures.d.ts': structures,
         'engine.d.ts': engine,
+        'dll.d.ts': dll,
         'index.d.ts': core
       };
     },
@@ -123,12 +125,27 @@ const fileMaker = {
       );
     },
 
+    makeDLL(computed) {
+      return fileMaker.makeFile(
+        '/// <reference path="./structures.d.ts" />',
+        '/// <reference path="./enums.d.ts" />',
+        '',
+        'declare namespace nodemod {',
+        `  interface DLL {`,
+        computed.dll.map(v => `    /** ${v.api.original} */\n    ${v.api.typing};`).join('\n'),
+        `  }`,
+        `  const dll: DLL;`,
+        '}'
+      );
+    },
+
     makeCore() {
       return fileMaker.makeFile(
         '/// <reference path="./enums.d.ts" />',
         '/// <reference path="./events.d.ts" />',
         '/// <reference path="./structures.d.ts" />',
         '/// <reference path="./engine.d.ts" />',
+        '/// <reference path="./dll.d.ts" />',
         '',
         'declare namespace nodemod {',
         `  // Properties`,
