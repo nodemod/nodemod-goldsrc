@@ -317,10 +317,39 @@ const generator = {
   generateCppFunction(func, source, prefix) {
     const customBody = customs[prefix.split('_')[1]]?.[func.name]?.api?.body;
     
+    // Apply same array + length pattern detection as events and TypeScript generation
+    let regularArgs = func.args ? [...func.args] : [];
+    const processedArgs = [];
+    const skipIndices = new Set();
+    
+    // Detect array + length parameter pairs
+    for (let i = 0; i < regularArgs.length; i++) {
+      if (skipIndices.has(i)) continue;
+      
+      const current = regularArgs[i];
+      const next = regularArgs[i + 1];
+      
+      // Check if next parameter is a length parameter AND current is actually an array type
+      if (next && next.name.toLowerCase().includes('length') && 
+          (current.type.includes('*') && !current.type.includes('char'))) {
+        // Current parameter is an array (pointer type, but not char*), next is its length
+        processedArgs.push({
+          ...current,
+          isArrayWithLength: true,
+          lengthParam: next
+        });
+        skipIndices.add(i + 1); // Skip the length parameter
+      } else {
+        processedArgs.push(current);
+      }
+    }
+    
+    regularArgs = processedArgs;
+    
     // Generate warning messages for pointer parameters instead of early returns
     const structureTypes = ['edict_t', 'edict_s', 'entvars_s', 'clientdata_s', 'entity_state_s', 'usercmd_s', 'netadr_s', 'weapon_data_s', 'playermove_s', 'customization_t', 'KeyValueData', 'SAVERESTOREDATA', 'TYPEDESCRIPTION', 'delta_s', 'cvar_s', 'TraceResult'];
-    const nullChecks = (func.args || []).map((arg, i) => {
-      if (arg.type.includes('*') && !arg.type.includes('char')) {
+    const nullChecks = regularArgs.map((arg, i) => {
+      if (arg.type.includes('*') && !arg.type.includes('char') && !arg.isArrayWithLength) {
         // Skip validation for structure types that use wrap/unwrap pattern
         const isStructureType = structureTypes.some(structType => arg.type.includes(structType));
         if (isStructureType) {
@@ -335,11 +364,92 @@ const generator = {
     
     const nullCheckSection = nullChecks ? `\n  ${nullChecks}\n` : '';
     
+    // Generate parameter conversion code
+    const paramConversions = regularArgs.map((arg, i) => {
+      if (arg.isArrayWithLength) {
+        // Handle array + length parameter conversion
+        const arrayType = arg.type;
+        const lengthParamName = arg.lengthParam.name;
+        
+        if (arrayType.includes('int*')) {
+          return `
+  // Convert JavaScript array to int array for ${arg.name}
+  v8::Local<v8::Array> ${arg.name}_array = v8::Local<v8::Array>::Cast(info[${i}]);
+  int ${lengthParamName} = ${arg.name}_array->Length();
+  int* ${arg.name} = new int[${lengthParamName}];
+  for (int j = 0; j < ${lengthParamName}; j++) {
+    ${arg.name}[j] = ${arg.name}_array->Get(context, j).ToLocalChecked()->Int32Value(context).ToChecked();
+  }`;
+        } else if (arrayType.includes('float*')) {
+          return `
+  // Convert JavaScript array to float array for ${arg.name}
+  v8::Local<v8::Array> ${arg.name}_array = v8::Local<v8::Array>::Cast(info[${i}]);
+  int ${lengthParamName} = ${arg.name}_array->Length();
+  float* ${arg.name} = new float[${lengthParamName}];
+  for (int j = 0; j < ${lengthParamName}; j++) {
+    ${arg.name}[j] = ${arg.name}_array->Get(context, j).ToLocalChecked()->NumberValue(context).ToChecked();
+  }`;
+        } else if (arrayType.includes('unsigned char*') || arrayType.includes('byte*')) {
+          return `
+  // Convert JavaScript array to byte array for ${arg.name}
+  v8::Local<v8::Array> ${arg.name}_array = v8::Local<v8::Array>::Cast(info[${i}]);
+  int ${lengthParamName} = ${arg.name}_array->Length();
+  unsigned char* ${arg.name} = new unsigned char[${lengthParamName}];
+  for (int j = 0; j < ${lengthParamName}; j++) {
+    ${arg.name}[j] = ${arg.name}_array->Get(context, j).ToLocalChecked()->Int32Value(context).ToChecked();
+  }`;
+        } else {
+          // Fallback for unknown array types - use proper array conversion
+          return `
+  // Convert JavaScript array to C array for ${arg.name} (${arrayType})
+  v8::Local<v8::Array> ${arg.name}_array = v8::Local<v8::Array>::Cast(info[${i}]);
+  int ${lengthParamName} = ${arg.name}_array->Length();
+  int* ${arg.name} = new int[${lengthParamName}]; // Default to int array for unknown types
+  for (int j = 0; j < ${lengthParamName}; j++) {
+    ${arg.name}[j] = ${arg.name}_array->Get(context, j).ToLocalChecked()->Int32Value(context).ToChecked();
+  }`;
+        }
+      } else {
+        // Regular parameter - no conversion needed, just js2cpp mapping
+        return '';
+      }
+    }).filter(conv => conv).join('');
+    
+    // Generate cleanup code for allocated arrays
+    const cleanupCode = regularArgs.map((arg) => {
+      if (arg.isArrayWithLength) {
+        return `\n  delete[] ${arg.name}; // Free allocated array`;
+      }
+      return '';
+    }).filter(cleanup => cleanup).join('');
+    
+    // Generate function call parameters - use original func.args for proper mapping to C function
+    const callParams = (func.args || []).map((arg, i) => {
+      // Check if this argument was processed as part of an array+length pair
+      const processedArg = regularArgs.find(pArg => pArg.name === arg.name);
+      if (processedArg && processedArg.isArrayWithLength) {
+        // This is the array parameter - just use the variable name
+        return arg.name;
+      } else if (regularArgs.some(pArg => pArg.lengthParam && pArg.lengthParam.name === arg.name)) {
+        // This is the length parameter - use the length variable
+        return arg.name;
+      } else {
+        // Regular parameter - use js2cpp conversion
+        const argIndex = regularArgs.findIndex(pArg => pArg.name === arg.name);
+        if (argIndex >= 0) {
+          return this.js2cpp(arg.type, `info[${argIndex}]`);
+        } else {
+          // This shouldn't happen, but provide a fallback
+          return `nullptr /* missing parameter: ${arg.name} */`;
+        }
+      }
+    }).join(',\n');
+    
     return `void ${prefix}_${func.name}(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-  V8_STUFF();
+  V8_STUFF();${paramConversions}
 ${nullCheckSection}
-  ${customBody || this.packReturn(func, `(*${source}.${func.name})(${(func.args || []).map((v, i) => this.js2cpp(v.type, `info[${i}]`)).join(',\n')})`)};
+  ${customBody || this.packReturn(func, `(*${source}.${func.name})(${callParams})`)};${cleanupCode}
 }`;
   }
 }

@@ -74,9 +74,10 @@ function getFunction(func, prefix, type) {
     const current = regularArgs[i];
     const next = regularArgs[i + 1];
     
-    // Check if next parameter is a length parameter
-    if (next && next.name.toLowerCase().includes('length')) {
-      // Current parameter is an array, next is its length
+    // Check if next parameter is a length parameter AND current is actually an array type
+    if (next && next.name.toLowerCase().includes('length') && 
+        (current.type.includes('*') && !current.type.includes('char'))) {
+      // Current parameter is an array (pointer type, but not char*), next is its length
       processedArgs.push({
         ...current,
         jsConversion: getArrayConversion(current.type, current.name, next.name),
@@ -151,9 +152,9 @@ function getFunction(func, prefix, type) {
   ${func.type} ${prefix}_${func.name} (${func.args.map(v => `${v.type} ${v.name}`).join(', ')}) {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("${eventName}", [=](v8::Isolate* isolate) {
-      unsigned int v8_argCount = ${func.args.length};
-      v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[${func.args.length}];
-      ${func.args.map((v, i) => `v8_args[${i}] = ${getFixedArgToValue(v)}; // ${v.name} (${v.type})`).join('\n      ')}
+      unsigned int v8_argCount = ${regularArgs.length};
+      v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[${regularArgs.length}];
+      ${regularArgs.map((v, i) => `v8_args[${i}] = ${getFixedArgToValue(v)}; // ${v.name} (${v.type})`).join('\n      ')}
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });${returnStatement}
   }`;
@@ -548,7 +549,30 @@ function computeFunctionApi(func, source) {
   
   // Handle variadic functions
   const hasVariadic = func.args && func.args.some(arg => arg.type === '$rest');
-  const regularArgs = func.args ? func.args.filter(arg => arg.type !== '$rest') : [];
+  let regularArgs = func.args ? func.args.filter(arg => arg.type !== '$rest') : [];
+  
+  // Apply same array + length pattern detection as events (for API functions)
+  const processedArgs = [];
+  const skipIndices = new Set();
+  
+  for (let i = 0; i < regularArgs.length; i++) {
+    if (skipIndices.has(i)) continue;
+    
+    const current = regularArgs[i];
+    const next = regularArgs[i + 1];
+    
+    // Check if next parameter is a length parameter AND current is actually an array type
+    if (next && next.name.toLowerCase().includes('length') && 
+        (current.type.includes('*') && !current.type.includes('char'))) {
+      // Current parameter is an array (pointer type, but not char*), next is its length - combine them
+      processedArgs.push(current); // Keep only the array parameter
+      skipIndices.add(i + 1); // Skip the length parameter
+    } else {
+      processedArgs.push(current);
+    }
+  }
+  
+  regularArgs = processedArgs;
   
   // Fix reserved keywords in parameter names
   const paramTypes = regularArgs.map(arg => {
@@ -608,7 +632,30 @@ function computeEventInterface(func, prefix) {
   
   // Fall back to original function signature parsing
   const hasVariadic = func.args && func.args.some(arg => arg.type === '$rest');
-  const regularArgs = func.args ? func.args.filter(arg => arg.type !== '$rest') : [];
+  let regularArgs = func.args ? func.args.filter(arg => arg.type !== '$rest') : [];
+  
+  // Apply same array + length pattern detection as events
+  const processedArgs = [];
+  const skipIndices = new Set();
+  
+  for (let i = 0; i < regularArgs.length; i++) {
+    if (skipIndices.has(i)) continue;
+    
+    const current = regularArgs[i];
+    const next = regularArgs[i + 1];
+    
+    // Check if next parameter is a length parameter AND current is actually an array type
+    if (next && next.name.toLowerCase().includes('length') && 
+        (current.type.includes('*') && !current.type.includes('char'))) {
+      // Current parameter is an array (pointer type, but not char*), next is its length - combine them
+      processedArgs.push(current); // Keep only the array parameter
+      skipIndices.add(i + 1); // Skip the length parameter
+    } else {
+      processedArgs.push(current);
+    }
+  }
+  
+  regularArgs = processedArgs;
   
   if (regularArgs.length === 0) {
     return {

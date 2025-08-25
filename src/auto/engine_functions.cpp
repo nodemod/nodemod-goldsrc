@@ -1703,26 +1703,34 @@ void sf_eng_pfnGetTimesTutorMessageShown(const v8::FunctionCallbackInfo<v8::Valu
 void sf_eng_pfnProcessTutorMessageDecayBuffer(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
-
-  if (!info[0]->IsExternal()) {
-    printf("Warning: pfnProcessTutorMessageDecayBuffer parameter 0 (int *) is not External, using nullptr\n");
+  // Convert JavaScript array to C array for buffer (int *)
+  v8::Local<v8::Array> buffer_array = v8::Local<v8::Array>::Cast(info[0]);
+  int bufferLength = buffer_array->Length();
+  int* buffer = new int[bufferLength]; // Default to int array for unknown types
+  for (int j = 0; j < bufferLength; j++) {
+    buffer[j] = buffer_array->Get(context, j).ToLocalChecked()->Int32Value(context).ToChecked();
   }
 
-  (*g_engfuncs.pfnProcessTutorMessageDecayBuffer)((int*)utils::jsToPointer(isolate, info[0]),
-info[1]->Int32Value(context).ToChecked());
+  (*g_engfuncs.pfnProcessTutorMessageDecayBuffer)(buffer,
+bufferLength);
+  delete[] buffer; // Free allocated array
 }
 
 // nodemod.eng.constructTutorMessageDecayBuffer();
 void sf_eng_pfnConstructTutorMessageDecayBuffer(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
-
-  if (!info[0]->IsExternal()) {
-    printf("Warning: pfnConstructTutorMessageDecayBuffer parameter 0 (int *) is not External, using nullptr\n");
+  // Convert JavaScript array to C array for buffer (int *)
+  v8::Local<v8::Array> buffer_array = v8::Local<v8::Array>::Cast(info[0]);
+  int bufferLength = buffer_array->Length();
+  int* buffer = new int[bufferLength]; // Default to int array for unknown types
+  for (int j = 0; j < bufferLength; j++) {
+    buffer[j] = buffer_array->Get(context, j).ToLocalChecked()->Int32Value(context).ToChecked();
   }
 
-  (*g_engfuncs.pfnConstructTutorMessageDecayBuffer)((int*)utils::jsToPointer(isolate, info[0]),
-info[1]->Int32Value(context).ToChecked());
+  (*g_engfuncs.pfnConstructTutorMessageDecayBuffer)(buffer,
+bufferLength);
+  delete[] buffer; // Free allocated array
 }
 
 // nodemod.eng.resetTutorMessageDecayData();

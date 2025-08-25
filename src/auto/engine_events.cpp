@@ -1155,7 +1155,7 @@
     });
   }
 
-// nodemod.on('engLoadFileForMe', (filename) => console.log('engLoadFileForMe fired!'));
+// nodemod.on('engLoadFileForMe', (filename, pLength) => console.log('engLoadFileForMe fired!'));
   byte* eng_pfnLoadFileForMe (const char * filename, int * pLength) {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("engLoadFileForMe", [=](v8::Isolate* isolate) {
@@ -1870,10 +1870,9 @@
   void eng_pfnProcessTutorMessageDecayBuffer (int * buffer, int bufferLength) {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("engProcessTutorMessageDecayBuffer", [=](v8::Isolate* isolate) {
-      unsigned int v8_argCount = 2;
-      v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = utils::intArrayToJS(isolate, buffer, 1); // buffer (int *)
-      v8_args[1] = v8::Number::New(isolate, bufferLength); // bufferLength (int)
+      unsigned int v8_argCount = 1;
+      v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
+      v8_args[0] = utils::intArrayToJS(isolate, buffer, bufferLength); // buffer (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -1882,10 +1881,9 @@
   void eng_pfnConstructTutorMessageDecayBuffer (int * buffer, int bufferLength) {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("engConstructTutorMessageDecayBuffer", [=](v8::Isolate* isolate) {
-      unsigned int v8_argCount = 2;
-      v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = utils::intArrayToJS(isolate, buffer, 1); // buffer (int *)
-      v8_args[1] = v8::Number::New(isolate, bufferLength); // bufferLength (int)
+      unsigned int v8_argCount = 1;
+      v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
+      v8_args[0] = utils::intArrayToJS(isolate, buffer, bufferLength); // buffer (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -3257,7 +3255,7 @@
     });
   }
 
-// nodemod.on('postEngLoadFileForMe', (filename) => console.log('postEngLoadFileForMe fired!'));
+// nodemod.on('postEngLoadFileForMe', (filename, pLength) => console.log('postEngLoadFileForMe fired!'));
   byte* postEng_pfnLoadFileForMe (const char * filename, int * pLength) {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("postEngLoadFileForMe", [=](v8::Isolate* isolate) {
@@ -3972,10 +3970,9 @@
   void postEng_pfnProcessTutorMessageDecayBuffer (int * buffer, int bufferLength) {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("postEngProcessTutorMessageDecayBuffer", [=](v8::Isolate* isolate) {
-      unsigned int v8_argCount = 2;
-      v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = utils::intArrayToJS(isolate, buffer, 1); // buffer (int *)
-      v8_args[1] = v8::Number::New(isolate, bufferLength); // bufferLength (int)
+      unsigned int v8_argCount = 1;
+      v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
+      v8_args[0] = utils::intArrayToJS(isolate, buffer, bufferLength); // buffer (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -3984,10 +3981,9 @@
   void postEng_pfnConstructTutorMessageDecayBuffer (int * buffer, int bufferLength) {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("postEngConstructTutorMessageDecayBuffer", [=](v8::Isolate* isolate) {
-      unsigned int v8_argCount = 2;
-      v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = utils::intArrayToJS(isolate, buffer, 1); // buffer (int *)
-      v8_args[1] = v8::Number::New(isolate, bufferLength); // bufferLength (int)
+      unsigned int v8_argCount = 1;
+      v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
+      v8_args[0] = utils::intArrayToJS(isolate, buffer, bufferLength); // buffer (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
