@@ -455,7 +455,7 @@
       v8_args[3] = structures::wrapEntity(isolate, host); // host (edict_t *)
       v8_args[4] = v8::Number::New(isolate, hostflags); // hostflags (int)
       v8_args[5] = v8::Number::New(isolate, player); // player (int)
-      v8_args[6] = utils::byteArrayToJS(isolate, pSet); // pSet (unsigned char *)
+      v8_args[6] = utils::byteArrayToJS(isolate, pSet, 1); // pSet (unsigned char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -530,7 +530,7 @@
       v8_args[0] = structures::wrapNetAdr(isolate, (void*)net_from); // net_from (const struct netadr_s *)
       v8_args[1] = v8::String::NewFromUtf8(isolate, args ? args : "").ToLocalChecked(); // args (const char *)
       v8_args[2] = v8::String::NewFromUtf8(isolate, response_buffer ? response_buffer : "").ToLocalChecked(); // response_buffer (char *)
-      v8_args[3] = utils::intArrayToJS(isolate, response_buffer_size); // response_buffer_size (int *)
+      v8_args[3] = utils::intArrayToJS(isolate, response_buffer_size, 1); // response_buffer_size (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -543,8 +543,8 @@
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = v8::Number::New(isolate, hullnumber); // hullnumber (int)
-      v8_args[1] = utils::floatArrayToJS(isolate, mins); // mins (float *)
-      v8_args[2] = utils::floatArrayToJS(isolate, maxs); // maxs (float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, mins, 3); // mins (float *)
+      v8_args[2] = utils::floatArrayToJS(isolate, maxs, 3); // maxs (float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -1079,7 +1079,7 @@
       v8_args[3] = structures::wrapEntity(isolate, host); // host (edict_t *)
       v8_args[4] = v8::Number::New(isolate, hostflags); // hostflags (int)
       v8_args[5] = v8::Number::New(isolate, player); // player (int)
-      v8_args[6] = utils::byteArrayToJS(isolate, pSet); // pSet (unsigned char *)
+      v8_args[6] = utils::byteArrayToJS(isolate, pSet, 1); // pSet (unsigned char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -1154,7 +1154,7 @@
       v8_args[0] = structures::wrapNetAdr(isolate, (void*)net_from); // net_from (const struct netadr_s *)
       v8_args[1] = v8::String::NewFromUtf8(isolate, args ? args : "").ToLocalChecked(); // args (const char *)
       v8_args[2] = v8::String::NewFromUtf8(isolate, response_buffer ? response_buffer : "").ToLocalChecked(); // response_buffer (char *)
-      v8_args[3] = utils::intArrayToJS(isolate, response_buffer_size); // response_buffer_size (int *)
+      v8_args[3] = utils::intArrayToJS(isolate, response_buffer_size, 1); // response_buffer_size (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -1167,8 +1167,8 @@
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = v8::Number::New(isolate, hullnumber); // hullnumber (int)
-      v8_args[1] = utils::floatArrayToJS(isolate, mins); // mins (float *)
-      v8_args[2] = utils::floatArrayToJS(isolate, maxs); // maxs (float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, mins, 3); // mins (float *)
+      v8_args[2] = utils::floatArrayToJS(isolate, maxs, 3); // maxs (float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;

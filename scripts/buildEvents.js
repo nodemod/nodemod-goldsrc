@@ -11,6 +11,11 @@ function argToValue(arg) {
 }
 
 function getFixedArgToValue(arg) {
+  // Use custom array conversion if available
+  if (arg.jsConversion) {
+    return arg.jsConversion;
+  }
+  
   const value = generator.cpp2js(arg.type, arg.name) || 'v8::Boolean::New(isolate, false)';
   // Fix const void* to void* cast for v8::External::New  
   if (value.includes('v8::External::New(isolate, ') && arg.type.includes('const')) {
@@ -37,6 +42,19 @@ function getEventName(func, prefix) {
   return camelize(`${prefix}${func.name.replace(/^pfn/, '')}`);
 }
 
+function getArrayConversion(arrayType, arrayName, lengthName) {
+  if (arrayType.includes('int*')) {
+    return `utils::intArrayToJS(isolate, ${arrayName}, ${lengthName})`;
+  } else if (arrayType.includes('float*')) {
+    return `utils::floatArrayToJS(isolate, ${arrayName}, ${lengthName})`;
+  } else if (arrayType.includes('byte*') || arrayType.includes('unsigned char*')) {
+    return `utils::byteArrayToJS(isolate, ${arrayName}, ${lengthName})`;
+  } else {
+    // Fallback for other pointer types
+    return `utils::intArrayToJS(isolate, ${arrayName}, ${lengthName})`;
+  }
+}
+
 function getFunction(func, prefix, type) {
   const customBody = customs[type]?.[func.name]?.event?.body;
   customBody && console.log(func.name, 'YES')
@@ -44,7 +62,33 @@ function getFunction(func, prefix, type) {
   
   // Handle variadic functions specially
   const hasVariadic = func.args && func.args.some(arg => arg.type === '$rest');
-  const regularArgs = func.args ? func.args.filter(arg => arg.type !== '$rest') : [];
+  let regularArgs = func.args ? func.args.filter(arg => arg.type !== '$rest') : [];
+  
+  // Process array + length patterns
+  const processedArgs = [];
+  const skipIndices = new Set();
+  
+  for (let i = 0; i < regularArgs.length; i++) {
+    if (skipIndices.has(i)) continue;
+    
+    const current = regularArgs[i];
+    const next = regularArgs[i + 1];
+    
+    // Check if next parameter is a length parameter
+    if (next && next.name.toLowerCase().includes('length')) {
+      // Current parameter is an array, next is its length
+      processedArgs.push({
+        ...current,
+        jsConversion: getArrayConversion(current.type, current.name, next.name),
+        isArrayWithLength: true
+      });
+      skipIndices.add(i + 1); // Skip the length parameter
+    } else {
+      processedArgs.push(current);
+    }
+  }
+  
+  regularArgs = processedArgs;
   
   const description = `// nodemod.on('${eventName}', (${regularArgs.map(v => v.name).join(', ')}) => console.log('${eventName} fired!'));`;
   
@@ -443,8 +487,9 @@ function cTypeToTsType(cType) {
     return 'number[]';
   }
   
-  if (normalizedType.includes('unsigned char *') || normalizedType.includes('byte *')) {
-    return 'Uint8Array';
+  if (normalizedType.includes('unsigned char*') || normalizedType.includes('unsigned char *') || 
+      normalizedType.includes('byte*') || normalizedType.includes('byte *')) {
+    return 'number[]';
   }
   
   if (normalizedType.includes('char **')) {
@@ -461,9 +506,9 @@ function cTypeToTsType(cType) {
     return 'Function';
   }
   
-  // Generic void pointer (for private data, buffers, etc)
+  // Generic void pointer - for binary data/buffers
   if (normalizedType === 'void*' || normalizedType === 'void *') {
-    return 'ArrayBuffer | null';
+    return 'ArrayBuffer | Uint8Array | null'; // Binary data buffers
   }
   
   // Variadic args
@@ -471,9 +516,9 @@ function cTypeToTsType(cType) {
     return '...args: any[]';
   }
   
-  // Pointer types default to ArrayBuffer
+  // Unknown pointer types - be conservative
   if (normalizedType.includes('*')) {
-    return 'ArrayBuffer | null';
+    return 'unknown'; // Unknown pointer type - needs specific mapping
   }
   
   return 'unknown';

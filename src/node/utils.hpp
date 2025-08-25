@@ -3,6 +3,8 @@
 #include <string>
 #include <sstream>
 #include <utility>
+#include <cmath>
+#include <cstring>
 #include "node.h"
 #include "v8.h"
 #include "extdll.h"
@@ -95,7 +97,87 @@ inline void js2vect(v8::Isolate *isolate, v8::Local<v8::Array> array, vec3_t &ve
 			return ext->Value();
 		}
 
-		// Handle Arrays - convert to float array (most common case)
+		// Handle ArrayBuffer objects (for file operations and binary data)
+		if (val->IsArrayBuffer()) {
+			v8::Local<v8::ArrayBuffer> buffer = val.As<v8::ArrayBuffer>();
+			std::shared_ptr<v8::BackingStore> backing = buffer->GetBackingStore();
+			return backing->Data();
+		}
+
+		// Handle SharedArrayBuffer objects
+		if (val->IsSharedArrayBuffer()) {
+			v8::Local<v8::SharedArrayBuffer> buffer = val.As<v8::SharedArrayBuffer>();
+			std::shared_ptr<v8::BackingStore> backing = buffer->GetBackingStore();
+			return backing->Data();
+		}
+
+		// Handle all TypedArray types
+		if (val->IsTypedArray()) {
+			v8::Local<v8::TypedArray> typedArray = val.As<v8::TypedArray>();
+			v8::Local<v8::ArrayBuffer> buffer = typedArray->Buffer();
+			std::shared_ptr<v8::BackingStore> backing = buffer->GetBackingStore();
+			return static_cast<uint8_t*>(backing->Data()) + typedArray->ByteOffset();
+		}
+
+		// Handle DataView objects
+		if (val->IsDataView()) {
+			v8::Local<v8::DataView> dataView = val.As<v8::DataView>();
+			v8::Local<v8::ArrayBuffer> buffer = dataView->Buffer();
+			std::shared_ptr<v8::BackingStore> backing = buffer->GetBackingStore();
+			return static_cast<uint8_t*>(backing->Data()) + dataView->ByteOffset();
+		}
+
+		// Handle Node.js Buffer objects (which are Uint8Array under the hood)
+		// Buffer check is already covered by IsTypedArray above
+
+		// Handle String objects - convert to C string
+		if (val->IsString()) {
+			// Use thread-local storage for string conversion
+			static thread_local char stringBuffers[2][64]; // 2 buffers of 64 chars each
+			static thread_local int stringIndex = 0;
+			
+			char* currentString = stringBuffers[stringIndex];
+			stringIndex = (stringIndex + 1) % 2;
+			
+			v8::String::Utf8Value utf8(isolate, val);
+			const char* str = *utf8 ? *utf8 : "";
+			strncpy(currentString, str, 63);
+			currentString[63] = '\0';
+			return (void*)currentString;
+		}
+
+		// Handle Objects with internal pointers (wrapped structures)
+		if (val->IsObject()) {
+			v8::Local<v8::Object> obj = val.As<v8::Object>();
+			v8::Local<v8::Context> context = isolate->GetCurrentContext();
+			
+			// Check for "ptr" or "pointer" property
+			v8::Local<v8::String> ptrKey = v8::String::NewFromUtf8(isolate, "ptr").ToLocalChecked();
+			v8::Local<v8::String> pointerKey = v8::String::NewFromUtf8(isolate, "pointer").ToLocalChecked();
+			
+			if (obj->Has(context, ptrKey).ToChecked()) {
+				v8::Local<v8::Value> ptrVal = obj->Get(context, ptrKey).ToLocalChecked();
+				if (ptrVal->IsNumber()) {
+					// Treat number as raw pointer address
+					intptr_t address = static_cast<intptr_t>(ptrVal->NumberValue(context).ToChecked());
+					return reinterpret_cast<void*>(address);
+				}
+			} else if (obj->Has(context, pointerKey).ToChecked()) {
+				v8::Local<v8::Value> ptrVal = obj->Get(context, pointerKey).ToLocalChecked();
+				if (ptrVal->IsNumber()) {
+					intptr_t address = static_cast<intptr_t>(ptrVal->NumberValue(context).ToChecked());
+					return reinterpret_cast<void*>(address);
+				}
+			}
+			
+			// Check for internal fields (wrapped C++ objects)
+			if (obj->InternalFieldCount() > 0) {
+				void* ptr = obj->GetAlignedPointerFromInternalField(0);
+				if (ptr) return ptr;
+			}
+		}
+
+		// Handle Arrays - convert to float array (most common case for vectors)
 		if (val->IsArray()) {
 			v8::Local<v8::Array> arr = val.As<v8::Array>();
 			uint32_t length = arr->Length();
@@ -118,17 +200,33 @@ inline void js2vect(v8::Isolate *isolate, v8::Local<v8::Array> array, vec3_t &ve
 			return (void*)currentBuffer;
 		}
 
-		// Handle single numbers - convert to single-element float array
+
+		// Handle BigInt as raw pointer address
+		if (val->IsBigInt()) {
+			v8::Local<v8::BigInt> bigint = val.As<v8::BigInt>();
+			int64_t address = bigint->Int64Value();
+			return reinterpret_cast<void*>(static_cast<intptr_t>(address));
+		}
+
+		// Handle single numbers - could be pointer address or single-element float array
 		if (val->IsNumber()) {
-			// Use same circular buffer system for single numbers
+			v8::Local<v8::Context> context = isolate->GetCurrentContext();
+			double numVal = val->NumberValue(context).ToChecked();
+			
+			// If it looks like a pointer address (large integer), treat as pointer
+			if (numVal > 0x10000 && numVal == floor(numVal)) {
+				intptr_t address = static_cast<intptr_t>(numVal);
+				return reinterpret_cast<void*>(address);
+			}
+			
+			// Otherwise treat as single-element float array
 			static thread_local float singleFloats[8];
 			static thread_local int singleIndex = 0;
 			
 			float* currentSingle = &singleFloats[singleIndex];
 			singleIndex = (singleIndex + 1) % 8;
 			
-			v8::Local<v8::Context> context = isolate->GetCurrentContext();
-			*currentSingle = val->NumberValue(context).ToChecked();
+			*currentSingle = static_cast<float>(numVal);
 			return (void*)currentSingle;
 		}
 
@@ -139,6 +237,11 @@ inline void js2vect(v8::Isolate *isolate, v8::Local<v8::Array> array, vec3_t &ve
 	// Convert float array to JS array
 	inline v8::Local<v8::Array> floatArrayToJS(v8::Isolate *isolate, const float* array, size_t length) {
 		v8::Locker locker(isolate);
+		
+		if (!array) {
+			return v8::Array::New(isolate, 0);
+		}
+		
 		v8::Local<v8::Array> jsArray = v8::Array::New(isolate, length);
 
 		for (size_t i = 0; i < length; i++) {
@@ -146,15 +249,6 @@ inline void js2vect(v8::Isolate *isolate, v8::Local<v8::Array> array, vec3_t &ve
 		}
 
 		return jsArray;
-	}
-
-	// Overload for single float pointer - explicit single element
-	inline v8::Local<v8::Array> floatArrayToJS(v8::Isolate *isolate, const float* array) {
-		if (!array) {
-			return v8::Array::New(isolate, 0);
-		}
-		// For single float pointer, return single element array
-		return floatArrayToJS(isolate, array, 1);
 	}
 
 	// Convert int array to JS array
@@ -167,14 +261,6 @@ inline void js2vect(v8::Isolate *isolate, v8::Local<v8::Array> array, vec3_t &ve
 		}
 
 		return jsArray;
-	}
-
-	// Overload for single int pointer
-	inline v8::Local<v8::Array> intArrayToJS(v8::Isolate *isolate, const int* array) {
-		if (!array) {
-			return v8::Array::New(isolate, 0);
-		}
-		return intArrayToJS(isolate, array, 1);
 	}
 
 	// Convert char** (string array) to JS array
@@ -212,6 +298,11 @@ inline void js2vect(v8::Isolate *isolate, v8::Local<v8::Array> array, vec3_t &ve
 	// Convert unsigned char array to JS array (byte array)
 	inline v8::Local<v8::Array> byteArrayToJS(v8::Isolate *isolate, const unsigned char* bytes, size_t length) {
 		v8::Locker locker(isolate);
+		
+		if (!bytes) {
+			return v8::Array::New(isolate, 0);
+		}
+		
 		v8::Local<v8::Array> jsArray = v8::Array::New(isolate, length);
 
 		for (size_t i = 0; i < length; i++) {
@@ -219,13 +310,5 @@ inline void js2vect(v8::Isolate *isolate, v8::Local<v8::Array> array, vec3_t &ve
 		}
 
 		return jsArray;
-	}
-
-	// Overload for single byte pointer (assumes length 1)
-	inline v8::Local<v8::Array> byteArrayToJS(v8::Isolate *isolate, const unsigned char* bytes) {
-		if (!bytes) {
-			return v8::Array::New(isolate, 0);
-		}
-		return byteArrayToJS(isolate, bytes, 1);
 	}
 }

@@ -74,8 +74,8 @@
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = structures::wrapEntity(isolate, e); // e (edict_t *)
-      v8_args[1] = utils::floatArrayToJS(isolate, rgflMin); // rgflMin (const float *)
-      v8_args[2] = utils::floatArrayToJS(isolate, rgflMax); // rgflMax (const float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, rgflMin, 3); // rgflMin (const float *)
+      v8_args[2] = utils::floatArrayToJS(isolate, rgflMax, 3); // rgflMax (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -120,7 +120,7 @@
     event::findAndCall("engVecToYaw", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = utils::floatArrayToJS(isolate, rgflVector); // rgflVector (const float *)
+      v8_args[0] = utils::floatArrayToJS(isolate, rgflVector, 3); // rgflVector (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0.0f;
@@ -132,8 +132,8 @@
     event::findAndCall("engVecToAngles", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = utils::floatArrayToJS(isolate, rgflVectorIn); // rgflVectorIn (const float *)
-      v8_args[1] = utils::floatArrayToJS(isolate, rgflVectorOut); // rgflVectorOut (float *)
+      v8_args[0] = utils::floatArrayToJS(isolate, rgflVectorIn, 3); // rgflVectorIn (const float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, rgflVectorOut, 3); // rgflVectorOut (float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -145,7 +145,7 @@
       unsigned int v8_argCount = 4;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[4];
       v8_args[0] = structures::wrapEntity(isolate, ent); // ent (edict_t *)
-      v8_args[1] = utils::floatArrayToJS(isolate, pflGoal); // pflGoal (const float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, pflGoal, 3); // pflGoal (const float *)
       v8_args[2] = v8::Number::New(isolate, dist); // dist (float)
       v8_args[3] = v8::Number::New(isolate, iMoveType); // iMoveType (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
@@ -207,7 +207,7 @@
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = structures::wrapEntity(isolate, pEdictStartSearchAfter); // pEdictStartSearchAfter (edict_t *)
-      v8_args[1] = utils::floatArrayToJS(isolate, org); // org (const float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, org, 3); // org (const float *)
       v8_args[2] = v8::Number::New(isolate, rad); // rad (float)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -244,7 +244,7 @@
     event::findAndCall("engMakeVectors", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = utils::floatArrayToJS(isolate, rgflVector); // rgflVector (const float *)
+      v8_args[0] = utils::floatArrayToJS(isolate, rgflVector, 3); // rgflVector (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -255,10 +255,10 @@
     event::findAndCall("engAngleVectors", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 4;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[4];
-      v8_args[0] = utils::floatArrayToJS(isolate, rgflVector); // rgflVector (const float *)
-      v8_args[1] = utils::floatArrayToJS(isolate, forward); // forward (float *)
-      v8_args[2] = utils::floatArrayToJS(isolate, right); // right (float *)
-      v8_args[3] = utils::floatArrayToJS(isolate, up); // up (float *)
+      v8_args[0] = utils::floatArrayToJS(isolate, rgflVector, 3); // rgflVector (const float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, forward, 3); // forward (float *)
+      v8_args[2] = utils::floatArrayToJS(isolate, right, 3); // right (float *)
+      v8_args[3] = utils::floatArrayToJS(isolate, up, 3); // up (float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -350,7 +350,7 @@
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = structures::wrapEntity(isolate, e); // e (edict_t *)
-      v8_args[1] = utils::floatArrayToJS(isolate, rgflOrigin); // rgflOrigin (const float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, rgflOrigin, 3); // rgflOrigin (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -379,7 +379,7 @@
       unsigned int v8_argCount = 7;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[7];
       v8_args[0] = structures::wrapEntity(isolate, entity); // entity (edict_t *)
-      v8_args[1] = utils::floatArrayToJS(isolate, pos); // pos (const float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, pos, 3); // pos (const float *)
       v8_args[2] = v8::String::NewFromUtf8(isolate, samp ? samp : "").ToLocalChecked(); // samp (const char *)
       v8_args[3] = v8::Number::New(isolate, vol); // vol (float)
       v8_args[4] = v8::Number::New(isolate, attenuation); // attenuation (float)
@@ -395,8 +395,8 @@
     event::findAndCall("engTraceLine", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 5;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[5];
-      v8_args[0] = utils::floatArrayToJS(isolate, v1); // v1 (const float *)
-      v8_args[1] = utils::floatArrayToJS(isolate, v2); // v2 (const float *)
+      v8_args[0] = utils::floatArrayToJS(isolate, v1, 3); // v1 (const float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, v2, 3); // v2 (const float *)
       v8_args[2] = v8::Number::New(isolate, fNoMonsters); // fNoMonsters (int)
       v8_args[3] = structures::wrapEntity(isolate, pentToSkip); // pentToSkip (edict_t *)
       v8_args[4] = structures::wrapTraceResult(isolate, ptr); // ptr (TraceResult *)
@@ -424,8 +424,8 @@
       unsigned int v8_argCount = 6;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[6];
       v8_args[0] = structures::wrapEntity(isolate, pEdict); // pEdict (edict_t *)
-      v8_args[1] = utils::floatArrayToJS(isolate, v1); // v1 (const float *)
-      v8_args[2] = utils::floatArrayToJS(isolate, v2); // v2 (const float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, v1, 3); // v1 (const float *)
+      v8_args[2] = utils::floatArrayToJS(isolate, v2, 3); // v2 (const float *)
       v8_args[3] = v8::Number::New(isolate, fNoMonsters); // fNoMonsters (int)
       v8_args[4] = structures::wrapEntity(isolate, pentToSkip); // pentToSkip (edict_t *)
       v8_args[5] = structures::wrapTraceResult(isolate, ptr); // ptr (TraceResult *)
@@ -440,8 +440,8 @@
     event::findAndCall("engTraceHull", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 6;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[6];
-      v8_args[0] = utils::floatArrayToJS(isolate, v1); // v1 (const float *)
-      v8_args[1] = utils::floatArrayToJS(isolate, v2); // v2 (const float *)
+      v8_args[0] = utils::floatArrayToJS(isolate, v1, 3); // v1 (const float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, v2, 3); // v2 (const float *)
       v8_args[2] = v8::Number::New(isolate, fNoMonsters); // fNoMonsters (int)
       v8_args[3] = v8::Number::New(isolate, hullNumber); // hullNumber (int)
       v8_args[4] = structures::wrapEntity(isolate, pentToSkip); // pentToSkip (edict_t *)
@@ -456,8 +456,8 @@
     event::findAndCall("engTraceModel", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 5;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[5];
-      v8_args[0] = utils::floatArrayToJS(isolate, v1); // v1 (const float *)
-      v8_args[1] = utils::floatArrayToJS(isolate, v2); // v2 (const float *)
+      v8_args[0] = utils::floatArrayToJS(isolate, v1, 3); // v1 (const float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, v2, 3); // v2 (const float *)
       v8_args[2] = v8::Number::New(isolate, hullNumber); // hullNumber (int)
       v8_args[3] = structures::wrapEntity(isolate, pent); // pent (edict_t *)
       v8_args[4] = structures::wrapTraceResult(isolate, ptr); // ptr (TraceResult *)
@@ -472,8 +472,8 @@
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = structures::wrapEntity(isolate, pTextureEntity); // pTextureEntity (edict_t *)
-      v8_args[1] = utils::floatArrayToJS(isolate, v1); // v1 (const float *)
-      v8_args[2] = utils::floatArrayToJS(isolate, v2); // v2 (const float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, v1, 3); // v1 (const float *)
+      v8_args[2] = utils::floatArrayToJS(isolate, v2, 3); // v2 (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return nullptr;
@@ -485,8 +485,8 @@
     event::findAndCall("engTraceSphere", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 6;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[6];
-      v8_args[0] = utils::floatArrayToJS(isolate, v1); // v1 (const float *)
-      v8_args[1] = utils::floatArrayToJS(isolate, v2); // v2 (const float *)
+      v8_args[0] = utils::floatArrayToJS(isolate, v1, 3); // v1 (const float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, v2, 3); // v2 (const float *)
       v8_args[2] = v8::Number::New(isolate, fNoMonsters); // fNoMonsters (int)
       v8_args[3] = v8::Number::New(isolate, radius); // radius (float)
       v8_args[4] = structures::wrapEntity(isolate, pentToSkip); // pentToSkip (edict_t *)
@@ -503,7 +503,7 @@
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = structures::wrapEntity(isolate, ent); // ent (edict_t *)
       v8_args[1] = v8::Number::New(isolate, speed); // speed (float)
-      v8_args[2] = utils::floatArrayToJS(isolate, rgflReturn); // rgflReturn (float *)
+      v8_args[2] = utils::floatArrayToJS(isolate, rgflReturn, 3); // rgflReturn (float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -543,8 +543,8 @@
     event::findAndCall("engParticleEffect", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 4;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[4];
-      v8_args[0] = utils::floatArrayToJS(isolate, org); // org (const float *)
-      v8_args[1] = utils::floatArrayToJS(isolate, dir); // dir (const float *)
+      v8_args[0] = utils::floatArrayToJS(isolate, org, 3); // org (const float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, dir, 3); // dir (const float *)
       v8_args[2] = v8::Number::New(isolate, color); // color (float)
       v8_args[3] = v8::Number::New(isolate, count); // count (float)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
@@ -581,7 +581,7 @@
     event::findAndCall("engPointContents", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = utils::floatArrayToJS(isolate, rgflVector); // rgflVector (const float *)
+      v8_args[0] = utils::floatArrayToJS(isolate, rgflVector, 3); // rgflVector (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -595,7 +595,7 @@
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[4];
       v8_args[0] = v8::Number::New(isolate, msg_dest); // msg_dest (int)
       v8_args[1] = v8::Number::New(isolate, msg_type); // msg_type (int)
-      v8_args[2] = utils::floatArrayToJS(isolate, pOrigin); // pOrigin (const float *)
+      v8_args[2] = utils::floatArrayToJS(isolate, pOrigin, 3); // pOrigin (const float *)
       v8_args[3] = structures::wrapEntity(isolate, ed); // ed (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -955,8 +955,8 @@
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[4];
       v8_args[0] = structures::wrapEntity(isolate, pEdict); // pEdict (const edict_t*)
       v8_args[1] = v8::Number::New(isolate, iBone); // iBone (int)
-      v8_args[2] = utils::floatArrayToJS(isolate, rgflOrigin); // rgflOrigin (float *)
-      v8_args[3] = utils::floatArrayToJS(isolate, rgflAngles); // rgflAngles (float *)
+      v8_args[2] = utils::floatArrayToJS(isolate, rgflOrigin, 3); // rgflOrigin (float *)
+      v8_args[3] = utils::floatArrayToJS(isolate, rgflAngles, 3); // rgflAngles (float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -1043,8 +1043,8 @@
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[4];
       v8_args[0] = structures::wrapEntity(isolate, pEdict); // pEdict (const edict_t *)
       v8_args[1] = v8::Number::New(isolate, iAttachment); // iAttachment (int)
-      v8_args[2] = utils::floatArrayToJS(isolate, rgflOrigin); // rgflOrigin (float *)
-      v8_args[3] = utils::floatArrayToJS(isolate, rgflAngles); // rgflAngles (float *)
+      v8_args[2] = utils::floatArrayToJS(isolate, rgflOrigin, 3); // rgflOrigin (float *)
+      v8_args[3] = utils::floatArrayToJS(isolate, rgflAngles, 3); // rgflAngles (float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -1155,14 +1155,14 @@
     });
   }
 
-// nodemod.on('engLoadFileForMe', (filename, pLength) => console.log('engLoadFileForMe fired!'));
+// nodemod.on('engLoadFileForMe', (filename) => console.log('engLoadFileForMe fired!'));
   byte* eng_pfnLoadFileForMe (const char * filename, int * pLength) {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("engLoadFileForMe", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = v8::String::NewFromUtf8(isolate, filename ? filename : "").ToLocalChecked(); // filename (const char *)
-      v8_args[1] = utils::intArrayToJS(isolate, pLength); // pLength (int *)
+      v8_args[1] = utils::intArrayToJS(isolate, pLength, 1); // pLength (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return nullptr;
@@ -1198,7 +1198,7 @@
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = v8::String::NewFromUtf8(isolate, filename1 ? filename1 : "").ToLocalChecked(); // filename1 (char *)
       v8_args[1] = v8::String::NewFromUtf8(isolate, filename2 ? filename2 : "").ToLocalChecked(); // filename2 (char *)
-      v8_args[2] = utils::intArrayToJS(isolate, iCompare); // iCompare (int *)
+      v8_args[2] = utils::intArrayToJS(isolate, iCompare, 1); // iCompare (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -1272,7 +1272,7 @@
       unsigned int v8_argCount = 8;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[8];
       v8_args[0] = structures::wrapEntity(isolate, fakeclient); // fakeclient (edict_t *)
-      v8_args[1] = utils::floatArrayToJS(isolate, viewangles); // viewangles (const float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, viewangles, 3); // viewangles (const float *)
       v8_args[2] = v8::Number::New(isolate, forwardmove); // forwardmove (float)
       v8_args[3] = v8::Number::New(isolate, sidemove); // sidemove (float)
       v8_args[4] = v8::Number::New(isolate, upmove); // upmove (float)
@@ -1360,7 +1360,7 @@
     event::findAndCall("engStaticDecal", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 4;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[4];
-      v8_args[0] = utils::floatArrayToJS(isolate, origin); // origin (const float *)
+      v8_args[0] = utils::floatArrayToJS(isolate, origin, 3); // origin (const float *)
       v8_args[1] = v8::Number::New(isolate, decalIndex); // decalIndex (int)
       v8_args[2] = v8::Number::New(isolate, entityIndex); // entityIndex (int)
       v8_args[3] = v8::Number::New(isolate, modelIndex); // modelIndex (int)
@@ -1407,7 +1407,7 @@
       v8_args[6] = v8::Number::New(isolate, pitch); // pitch (int)
       v8_args[7] = v8::Number::New(isolate, msg_dest); // msg_dest (int)
       v8_args[8] = v8::Number::New(isolate, msg_type); // msg_type (int)
-      v8_args[9] = utils::floatArrayToJS(isolate, pOrigin); // pOrigin (const float *)
+      v8_args[9] = utils::floatArrayToJS(isolate, pOrigin, 3); // pOrigin (const float *)
       v8_args[10] = structures::wrapEntity(isolate, ed); // ed (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -1517,8 +1517,8 @@
       v8_args[1] = structures::wrapEntity(isolate, pInvoker); // pInvoker (const edict_t *)
       v8_args[2] = v8::Number::New(isolate, eventindex); // eventindex (unsigned short)
       v8_args[3] = v8::Number::New(isolate, delay); // delay (float)
-      v8_args[4] = utils::floatArrayToJS(isolate, origin); // origin (const float *)
-      v8_args[5] = utils::floatArrayToJS(isolate, angles); // angles (const float *)
+      v8_args[4] = utils::floatArrayToJS(isolate, origin, 3); // origin (const float *)
+      v8_args[5] = utils::floatArrayToJS(isolate, angles, 3); // angles (const float *)
       v8_args[6] = v8::Number::New(isolate, fparam1); // fparam1 (float)
       v8_args[7] = v8::Number::New(isolate, fparam2); // fparam2 (float)
       v8_args[8] = v8::Number::New(isolate, iparam1); // iparam1 (int)
@@ -1535,7 +1535,7 @@
     event::findAndCall("engSetFatPVS", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = utils::floatArrayToJS(isolate, org); // org (const float *)
+      v8_args[0] = utils::floatArrayToJS(isolate, org, 3); // org (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return nullptr;
@@ -1547,7 +1547,7 @@
     event::findAndCall("engSetFatPAS", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = utils::floatArrayToJS(isolate, org); // org (const float *)
+      v8_args[0] = utils::floatArrayToJS(isolate, org, 3); // org (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return nullptr;
@@ -1560,7 +1560,7 @@
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = structures::wrapEntity(isolate, entity); // entity (const edict_t *)
-      v8_args[1] = utils::byteArrayToJS(isolate, pset); // pset (unsigned char *)
+      v8_args[1] = utils::byteArrayToJS(isolate, pset, 1); // pset (unsigned char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -1702,8 +1702,8 @@
       unsigned int v8_argCount = 4;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[4];
       v8_args[0] = v8::Number::New(isolate, type); // type (FORCE_TYPE)
-      v8_args[1] = utils::floatArrayToJS(isolate, mins); // mins (const float *)
-      v8_args[2] = utils::floatArrayToJS(isolate, maxs); // maxs (const float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, mins, 3); // mins (const float *)
+      v8_args[2] = utils::floatArrayToJS(isolate, maxs, 3); // maxs (const float *)
       v8_args[3] = v8::String::NewFromUtf8(isolate, filename ? filename : "").ToLocalChecked(); // filename (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -1716,8 +1716,8 @@
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = structures::wrapEntity(isolate, pClient); // pClient (const edict_t *)
-      v8_args[1] = utils::intArrayToJS(isolate, ping); // ping (int *)
-      v8_args[2] = utils::intArrayToJS(isolate, packet_loss); // packet_loss (int *)
+      v8_args[1] = utils::intArrayToJS(isolate, ping, 1); // ping (int *)
+      v8_args[2] = utils::intArrayToJS(isolate, packet_loss, 1); // packet_loss (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -1794,7 +1794,7 @@
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = v8::String::NewFromUtf8(isolate, groupName ? groupName : "").ToLocalChecked(); // groupName (const char *)
       v8_args[1] = v8::Number::New(isolate, pickMethod); // pickMethod (int)
-      v8_args[2] = utils::intArrayToJS(isolate, picked); // picked (int *)
+      v8_args[2] = utils::intArrayToJS(isolate, picked, 1); // picked (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return nullptr;
@@ -1866,25 +1866,25 @@
     return 0;
   }
 
-// nodemod.on('engProcessTutorMessageDecayBuffer', (buffer, bufferLength) => console.log('engProcessTutorMessageDecayBuffer fired!'));
+// nodemod.on('engProcessTutorMessageDecayBuffer', (buffer) => console.log('engProcessTutorMessageDecayBuffer fired!'));
   void eng_pfnProcessTutorMessageDecayBuffer (int * buffer, int bufferLength) {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("engProcessTutorMessageDecayBuffer", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = utils::intArrayToJS(isolate, buffer); // buffer (int *)
+      v8_args[0] = utils::intArrayToJS(isolate, buffer, 1); // buffer (int *)
       v8_args[1] = v8::Number::New(isolate, bufferLength); // bufferLength (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
 
-// nodemod.on('engConstructTutorMessageDecayBuffer', (buffer, bufferLength) => console.log('engConstructTutorMessageDecayBuffer fired!'));
+// nodemod.on('engConstructTutorMessageDecayBuffer', (buffer) => console.log('engConstructTutorMessageDecayBuffer fired!'));
   void eng_pfnConstructTutorMessageDecayBuffer (int * buffer, int bufferLength) {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("engConstructTutorMessageDecayBuffer", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = utils::intArrayToJS(isolate, buffer); // buffer (int *)
+      v8_args[0] = utils::intArrayToJS(isolate, buffer, 1); // buffer (int *)
       v8_args[1] = v8::Number::New(isolate, bufferLength); // bufferLength (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -2176,8 +2176,8 @@
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = structures::wrapEntity(isolate, e); // e (edict_t *)
-      v8_args[1] = utils::floatArrayToJS(isolate, rgflMin); // rgflMin (const float *)
-      v8_args[2] = utils::floatArrayToJS(isolate, rgflMax); // rgflMax (const float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, rgflMin, 3); // rgflMin (const float *)
+      v8_args[2] = utils::floatArrayToJS(isolate, rgflMax, 3); // rgflMax (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -2222,7 +2222,7 @@
     event::findAndCall("postEngVecToYaw", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = utils::floatArrayToJS(isolate, rgflVector); // rgflVector (const float *)
+      v8_args[0] = utils::floatArrayToJS(isolate, rgflVector, 3); // rgflVector (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0.0f;
@@ -2234,8 +2234,8 @@
     event::findAndCall("postEngVecToAngles", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = utils::floatArrayToJS(isolate, rgflVectorIn); // rgflVectorIn (const float *)
-      v8_args[1] = utils::floatArrayToJS(isolate, rgflVectorOut); // rgflVectorOut (float *)
+      v8_args[0] = utils::floatArrayToJS(isolate, rgflVectorIn, 3); // rgflVectorIn (const float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, rgflVectorOut, 3); // rgflVectorOut (float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -2247,7 +2247,7 @@
       unsigned int v8_argCount = 4;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[4];
       v8_args[0] = structures::wrapEntity(isolate, ent); // ent (edict_t *)
-      v8_args[1] = utils::floatArrayToJS(isolate, pflGoal); // pflGoal (const float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, pflGoal, 3); // pflGoal (const float *)
       v8_args[2] = v8::Number::New(isolate, dist); // dist (float)
       v8_args[3] = v8::Number::New(isolate, iMoveType); // iMoveType (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
@@ -2309,7 +2309,7 @@
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = structures::wrapEntity(isolate, pEdictStartSearchAfter); // pEdictStartSearchAfter (edict_t *)
-      v8_args[1] = utils::floatArrayToJS(isolate, org); // org (const float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, org, 3); // org (const float *)
       v8_args[2] = v8::Number::New(isolate, rad); // rad (float)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -2346,7 +2346,7 @@
     event::findAndCall("postEngMakeVectors", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = utils::floatArrayToJS(isolate, rgflVector); // rgflVector (const float *)
+      v8_args[0] = utils::floatArrayToJS(isolate, rgflVector, 3); // rgflVector (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -2357,10 +2357,10 @@
     event::findAndCall("postEngAngleVectors", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 4;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[4];
-      v8_args[0] = utils::floatArrayToJS(isolate, rgflVector); // rgflVector (const float *)
-      v8_args[1] = utils::floatArrayToJS(isolate, forward); // forward (float *)
-      v8_args[2] = utils::floatArrayToJS(isolate, right); // right (float *)
-      v8_args[3] = utils::floatArrayToJS(isolate, up); // up (float *)
+      v8_args[0] = utils::floatArrayToJS(isolate, rgflVector, 3); // rgflVector (const float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, forward, 3); // forward (float *)
+      v8_args[2] = utils::floatArrayToJS(isolate, right, 3); // right (float *)
+      v8_args[3] = utils::floatArrayToJS(isolate, up, 3); // up (float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -2452,7 +2452,7 @@
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = structures::wrapEntity(isolate, e); // e (edict_t *)
-      v8_args[1] = utils::floatArrayToJS(isolate, rgflOrigin); // rgflOrigin (const float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, rgflOrigin, 3); // rgflOrigin (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -2481,7 +2481,7 @@
       unsigned int v8_argCount = 7;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[7];
       v8_args[0] = structures::wrapEntity(isolate, entity); // entity (edict_t *)
-      v8_args[1] = utils::floatArrayToJS(isolate, pos); // pos (const float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, pos, 3); // pos (const float *)
       v8_args[2] = v8::String::NewFromUtf8(isolate, samp ? samp : "").ToLocalChecked(); // samp (const char *)
       v8_args[3] = v8::Number::New(isolate, vol); // vol (float)
       v8_args[4] = v8::Number::New(isolate, attenuation); // attenuation (float)
@@ -2497,8 +2497,8 @@
     event::findAndCall("postEngTraceLine", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 5;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[5];
-      v8_args[0] = utils::floatArrayToJS(isolate, v1); // v1 (const float *)
-      v8_args[1] = utils::floatArrayToJS(isolate, v2); // v2 (const float *)
+      v8_args[0] = utils::floatArrayToJS(isolate, v1, 3); // v1 (const float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, v2, 3); // v2 (const float *)
       v8_args[2] = v8::Number::New(isolate, fNoMonsters); // fNoMonsters (int)
       v8_args[3] = structures::wrapEntity(isolate, pentToSkip); // pentToSkip (edict_t *)
       v8_args[4] = structures::wrapTraceResult(isolate, ptr); // ptr (TraceResult *)
@@ -2526,8 +2526,8 @@
       unsigned int v8_argCount = 6;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[6];
       v8_args[0] = structures::wrapEntity(isolate, pEdict); // pEdict (edict_t *)
-      v8_args[1] = utils::floatArrayToJS(isolate, v1); // v1 (const float *)
-      v8_args[2] = utils::floatArrayToJS(isolate, v2); // v2 (const float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, v1, 3); // v1 (const float *)
+      v8_args[2] = utils::floatArrayToJS(isolate, v2, 3); // v2 (const float *)
       v8_args[3] = v8::Number::New(isolate, fNoMonsters); // fNoMonsters (int)
       v8_args[4] = structures::wrapEntity(isolate, pentToSkip); // pentToSkip (edict_t *)
       v8_args[5] = structures::wrapTraceResult(isolate, ptr); // ptr (TraceResult *)
@@ -2542,8 +2542,8 @@
     event::findAndCall("postEngTraceHull", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 6;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[6];
-      v8_args[0] = utils::floatArrayToJS(isolate, v1); // v1 (const float *)
-      v8_args[1] = utils::floatArrayToJS(isolate, v2); // v2 (const float *)
+      v8_args[0] = utils::floatArrayToJS(isolate, v1, 3); // v1 (const float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, v2, 3); // v2 (const float *)
       v8_args[2] = v8::Number::New(isolate, fNoMonsters); // fNoMonsters (int)
       v8_args[3] = v8::Number::New(isolate, hullNumber); // hullNumber (int)
       v8_args[4] = structures::wrapEntity(isolate, pentToSkip); // pentToSkip (edict_t *)
@@ -2558,8 +2558,8 @@
     event::findAndCall("postEngTraceModel", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 5;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[5];
-      v8_args[0] = utils::floatArrayToJS(isolate, v1); // v1 (const float *)
-      v8_args[1] = utils::floatArrayToJS(isolate, v2); // v2 (const float *)
+      v8_args[0] = utils::floatArrayToJS(isolate, v1, 3); // v1 (const float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, v2, 3); // v2 (const float *)
       v8_args[2] = v8::Number::New(isolate, hullNumber); // hullNumber (int)
       v8_args[3] = structures::wrapEntity(isolate, pent); // pent (edict_t *)
       v8_args[4] = structures::wrapTraceResult(isolate, ptr); // ptr (TraceResult *)
@@ -2574,8 +2574,8 @@
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = structures::wrapEntity(isolate, pTextureEntity); // pTextureEntity (edict_t *)
-      v8_args[1] = utils::floatArrayToJS(isolate, v1); // v1 (const float *)
-      v8_args[2] = utils::floatArrayToJS(isolate, v2); // v2 (const float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, v1, 3); // v1 (const float *)
+      v8_args[2] = utils::floatArrayToJS(isolate, v2, 3); // v2 (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return nullptr;
@@ -2587,8 +2587,8 @@
     event::findAndCall("postEngTraceSphere", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 6;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[6];
-      v8_args[0] = utils::floatArrayToJS(isolate, v1); // v1 (const float *)
-      v8_args[1] = utils::floatArrayToJS(isolate, v2); // v2 (const float *)
+      v8_args[0] = utils::floatArrayToJS(isolate, v1, 3); // v1 (const float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, v2, 3); // v2 (const float *)
       v8_args[2] = v8::Number::New(isolate, fNoMonsters); // fNoMonsters (int)
       v8_args[3] = v8::Number::New(isolate, radius); // radius (float)
       v8_args[4] = structures::wrapEntity(isolate, pentToSkip); // pentToSkip (edict_t *)
@@ -2605,7 +2605,7 @@
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = structures::wrapEntity(isolate, ent); // ent (edict_t *)
       v8_args[1] = v8::Number::New(isolate, speed); // speed (float)
-      v8_args[2] = utils::floatArrayToJS(isolate, rgflReturn); // rgflReturn (float *)
+      v8_args[2] = utils::floatArrayToJS(isolate, rgflReturn, 3); // rgflReturn (float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -2645,8 +2645,8 @@
     event::findAndCall("postEngParticleEffect", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 4;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[4];
-      v8_args[0] = utils::floatArrayToJS(isolate, org); // org (const float *)
-      v8_args[1] = utils::floatArrayToJS(isolate, dir); // dir (const float *)
+      v8_args[0] = utils::floatArrayToJS(isolate, org, 3); // org (const float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, dir, 3); // dir (const float *)
       v8_args[2] = v8::Number::New(isolate, color); // color (float)
       v8_args[3] = v8::Number::New(isolate, count); // count (float)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
@@ -2683,7 +2683,7 @@
     event::findAndCall("postEngPointContents", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = utils::floatArrayToJS(isolate, rgflVector); // rgflVector (const float *)
+      v8_args[0] = utils::floatArrayToJS(isolate, rgflVector, 3); // rgflVector (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -2697,7 +2697,7 @@
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[4];
       v8_args[0] = v8::Number::New(isolate, msg_dest); // msg_dest (int)
       v8_args[1] = v8::Number::New(isolate, msg_type); // msg_type (int)
-      v8_args[2] = utils::floatArrayToJS(isolate, pOrigin); // pOrigin (const float *)
+      v8_args[2] = utils::floatArrayToJS(isolate, pOrigin, 3); // pOrigin (const float *)
       v8_args[3] = structures::wrapEntity(isolate, ed); // ed (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -3057,8 +3057,8 @@
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[4];
       v8_args[0] = structures::wrapEntity(isolate, pEdict); // pEdict (const edict_t*)
       v8_args[1] = v8::Number::New(isolate, iBone); // iBone (int)
-      v8_args[2] = utils::floatArrayToJS(isolate, rgflOrigin); // rgflOrigin (float *)
-      v8_args[3] = utils::floatArrayToJS(isolate, rgflAngles); // rgflAngles (float *)
+      v8_args[2] = utils::floatArrayToJS(isolate, rgflOrigin, 3); // rgflOrigin (float *)
+      v8_args[3] = utils::floatArrayToJS(isolate, rgflAngles, 3); // rgflAngles (float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -3145,8 +3145,8 @@
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[4];
       v8_args[0] = structures::wrapEntity(isolate, pEdict); // pEdict (const edict_t *)
       v8_args[1] = v8::Number::New(isolate, iAttachment); // iAttachment (int)
-      v8_args[2] = utils::floatArrayToJS(isolate, rgflOrigin); // rgflOrigin (float *)
-      v8_args[3] = utils::floatArrayToJS(isolate, rgflAngles); // rgflAngles (float *)
+      v8_args[2] = utils::floatArrayToJS(isolate, rgflOrigin, 3); // rgflOrigin (float *)
+      v8_args[3] = utils::floatArrayToJS(isolate, rgflAngles, 3); // rgflAngles (float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -3257,14 +3257,14 @@
     });
   }
 
-// nodemod.on('postEngLoadFileForMe', (filename, pLength) => console.log('postEngLoadFileForMe fired!'));
+// nodemod.on('postEngLoadFileForMe', (filename) => console.log('postEngLoadFileForMe fired!'));
   byte* postEng_pfnLoadFileForMe (const char * filename, int * pLength) {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("postEngLoadFileForMe", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = v8::String::NewFromUtf8(isolate, filename ? filename : "").ToLocalChecked(); // filename (const char *)
-      v8_args[1] = utils::intArrayToJS(isolate, pLength); // pLength (int *)
+      v8_args[1] = utils::intArrayToJS(isolate, pLength, 1); // pLength (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return nullptr;
@@ -3300,7 +3300,7 @@
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = v8::String::NewFromUtf8(isolate, filename1 ? filename1 : "").ToLocalChecked(); // filename1 (char *)
       v8_args[1] = v8::String::NewFromUtf8(isolate, filename2 ? filename2 : "").ToLocalChecked(); // filename2 (char *)
-      v8_args[2] = utils::intArrayToJS(isolate, iCompare); // iCompare (int *)
+      v8_args[2] = utils::intArrayToJS(isolate, iCompare, 1); // iCompare (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -3374,7 +3374,7 @@
       unsigned int v8_argCount = 8;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[8];
       v8_args[0] = structures::wrapEntity(isolate, fakeclient); // fakeclient (edict_t *)
-      v8_args[1] = utils::floatArrayToJS(isolate, viewangles); // viewangles (const float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, viewangles, 3); // viewangles (const float *)
       v8_args[2] = v8::Number::New(isolate, forwardmove); // forwardmove (float)
       v8_args[3] = v8::Number::New(isolate, sidemove); // sidemove (float)
       v8_args[4] = v8::Number::New(isolate, upmove); // upmove (float)
@@ -3462,7 +3462,7 @@
     event::findAndCall("postEngStaticDecal", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 4;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[4];
-      v8_args[0] = utils::floatArrayToJS(isolate, origin); // origin (const float *)
+      v8_args[0] = utils::floatArrayToJS(isolate, origin, 3); // origin (const float *)
       v8_args[1] = v8::Number::New(isolate, decalIndex); // decalIndex (int)
       v8_args[2] = v8::Number::New(isolate, entityIndex); // entityIndex (int)
       v8_args[3] = v8::Number::New(isolate, modelIndex); // modelIndex (int)
@@ -3509,7 +3509,7 @@
       v8_args[6] = v8::Number::New(isolate, pitch); // pitch (int)
       v8_args[7] = v8::Number::New(isolate, msg_dest); // msg_dest (int)
       v8_args[8] = v8::Number::New(isolate, msg_type); // msg_type (int)
-      v8_args[9] = utils::floatArrayToJS(isolate, pOrigin); // pOrigin (const float *)
+      v8_args[9] = utils::floatArrayToJS(isolate, pOrigin, 3); // pOrigin (const float *)
       v8_args[10] = structures::wrapEntity(isolate, ed); // ed (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -3619,8 +3619,8 @@
       v8_args[1] = structures::wrapEntity(isolate, pInvoker); // pInvoker (const edict_t *)
       v8_args[2] = v8::Number::New(isolate, eventindex); // eventindex (unsigned short)
       v8_args[3] = v8::Number::New(isolate, delay); // delay (float)
-      v8_args[4] = utils::floatArrayToJS(isolate, origin); // origin (const float *)
-      v8_args[5] = utils::floatArrayToJS(isolate, angles); // angles (const float *)
+      v8_args[4] = utils::floatArrayToJS(isolate, origin, 3); // origin (const float *)
+      v8_args[5] = utils::floatArrayToJS(isolate, angles, 3); // angles (const float *)
       v8_args[6] = v8::Number::New(isolate, fparam1); // fparam1 (float)
       v8_args[7] = v8::Number::New(isolate, fparam2); // fparam2 (float)
       v8_args[8] = v8::Number::New(isolate, iparam1); // iparam1 (int)
@@ -3637,7 +3637,7 @@
     event::findAndCall("postEngSetFatPVS", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = utils::floatArrayToJS(isolate, org); // org (const float *)
+      v8_args[0] = utils::floatArrayToJS(isolate, org, 3); // org (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return nullptr;
@@ -3649,7 +3649,7 @@
     event::findAndCall("postEngSetFatPAS", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[1];
-      v8_args[0] = utils::floatArrayToJS(isolate, org); // org (const float *)
+      v8_args[0] = utils::floatArrayToJS(isolate, org, 3); // org (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return nullptr;
@@ -3662,7 +3662,7 @@
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
       v8_args[0] = structures::wrapEntity(isolate, entity); // entity (const edict_t *)
-      v8_args[1] = utils::byteArrayToJS(isolate, pset); // pset (unsigned char *)
+      v8_args[1] = utils::byteArrayToJS(isolate, pset, 1); // pset (unsigned char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return 0;
@@ -3804,8 +3804,8 @@
       unsigned int v8_argCount = 4;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[4];
       v8_args[0] = v8::Number::New(isolate, type); // type (FORCE_TYPE)
-      v8_args[1] = utils::floatArrayToJS(isolate, mins); // mins (const float *)
-      v8_args[2] = utils::floatArrayToJS(isolate, maxs); // maxs (const float *)
+      v8_args[1] = utils::floatArrayToJS(isolate, mins, 3); // mins (const float *)
+      v8_args[2] = utils::floatArrayToJS(isolate, maxs, 3); // maxs (const float *)
       v8_args[3] = v8::String::NewFromUtf8(isolate, filename ? filename : "").ToLocalChecked(); // filename (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
@@ -3818,8 +3818,8 @@
       unsigned int v8_argCount = 3;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = structures::wrapEntity(isolate, pClient); // pClient (const edict_t *)
-      v8_args[1] = utils::intArrayToJS(isolate, ping); // ping (int *)
-      v8_args[2] = utils::intArrayToJS(isolate, packet_loss); // packet_loss (int *)
+      v8_args[1] = utils::intArrayToJS(isolate, ping, 1); // ping (int *)
+      v8_args[2] = utils::intArrayToJS(isolate, packet_loss, 1); // packet_loss (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
@@ -3896,7 +3896,7 @@
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[3];
       v8_args[0] = v8::String::NewFromUtf8(isolate, groupName ? groupName : "").ToLocalChecked(); // groupName (const char *)
       v8_args[1] = v8::Number::New(isolate, pickMethod); // pickMethod (int)
-      v8_args[2] = utils::intArrayToJS(isolate, picked); // picked (int *)
+      v8_args[2] = utils::intArrayToJS(isolate, picked, 1); // picked (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
     return nullptr;
@@ -3968,25 +3968,25 @@
     return 0;
   }
 
-// nodemod.on('postEngProcessTutorMessageDecayBuffer', (buffer, bufferLength) => console.log('postEngProcessTutorMessageDecayBuffer fired!'));
+// nodemod.on('postEngProcessTutorMessageDecayBuffer', (buffer) => console.log('postEngProcessTutorMessageDecayBuffer fired!'));
   void postEng_pfnProcessTutorMessageDecayBuffer (int * buffer, int bufferLength) {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("postEngProcessTutorMessageDecayBuffer", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = utils::intArrayToJS(isolate, buffer); // buffer (int *)
+      v8_args[0] = utils::intArrayToJS(isolate, buffer, 1); // buffer (int *)
       v8_args[1] = v8::Number::New(isolate, bufferLength); // bufferLength (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
   }
 
-// nodemod.on('postEngConstructTutorMessageDecayBuffer', (buffer, bufferLength) => console.log('postEngConstructTutorMessageDecayBuffer fired!'));
+// nodemod.on('postEngConstructTutorMessageDecayBuffer', (buffer) => console.log('postEngConstructTutorMessageDecayBuffer fired!'));
   void postEng_pfnConstructTutorMessageDecayBuffer (int * buffer, int bufferLength) {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("postEngConstructTutorMessageDecayBuffer", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 2;
       v8::Local<v8::Value>* v8_args = new v8::Local<v8::Value>[2];
-      v8_args[0] = utils::intArrayToJS(isolate, buffer); // buffer (int *)
+      v8_args[0] = utils::intArrayToJS(isolate, buffer, 1); // buffer (int *)
       v8_args[1] = v8::Number::New(isolate, bufferLength); // bufferLength (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });

@@ -6,19 +6,19 @@ const TYPE_MAPPINGS = {
   basicTypes: {
     'const char *': { 
       js2cpp: (value) => `utils::js2string(isolate, ${value})`,
-      cpp2js: (value) => `v8::String::NewFromUtf8(isolate, ${value} ? ${value} : "").ToLocalChecked()`
+      cpp2js: (value) => `v8::String::NewFromUtf8(isolate, ${value}).ToLocalChecked()`
     },
     'const char*': { 
       js2cpp: (value) => `utils::js2string(isolate, ${value})`,
-      cpp2js: (value) => `v8::String::NewFromUtf8(isolate, ${value} ? ${value} : "").ToLocalChecked()`
+      cpp2js: (value) => `v8::String::NewFromUtf8(isolate, ${value}).ToLocalChecked()`
     },
     'char *': { 
       js2cpp: (value) => `utils::js2string(isolate, ${value})`,
-      cpp2js: (value) => `v8::String::NewFromUtf8(isolate, ${value} ? ${value} : "").ToLocalChecked()`
+      cpp2js: (value) => `v8::String::NewFromUtf8(isolate, ${value}).ToLocalChecked()`
     },
     'char*': { 
       js2cpp: (value) => `utils::js2string(isolate, ${value})`,
-      cpp2js: (value) => `v8::String::NewFromUtf8(isolate, ${value} ? ${value} : "").ToLocalChecked()`
+      cpp2js: (value) => `v8::String::NewFromUtf8(isolate, ${value}).ToLocalChecked()`
     },
     'char': { 
       js2cpp: (value) => `${value}->Int32Value(context).ToChecked()`,
@@ -91,43 +91,6 @@ const TYPE_MAPPINGS = {
     '$rest': { 
       js2cpp: (value) => `/* variadic args */`,
       cpp2js: (value) => `/* variadic args */`
-    },
-    // Direct pointer type matches
-    'int *': { 
-      js2cpp: (value) => `(int*)utils::jsToPointer(isolate, ${value})`,
-      cpp2js: (value) => `utils::intArrayToJS(isolate, ${value}, 1)` // Default to 1, may need custom handling for larger arrays
-    },
-    'float *': { 
-      js2cpp: (value) => `(float*)utils::jsToPointer(isolate, ${value})`,
-      cpp2js: (value) => `utils::floatArrayToJS(isolate, ${value}, 3)` // Most float* in HLSDK are vec3_t
-    },
-    'const float *': { 
-      js2cpp: (value) => `(const float*)utils::jsToPointer(isolate, ${value})`,
-      cpp2js: (value) => `utils::floatArrayToJS(isolate, ${value}, 3)` // Most const float* in HLSDK are vec3_t
-    },
-    'void *': { 
-      js2cpp: (value) => `utils::jsToPointer(isolate, ${value})`,
-      cpp2js: (value) => `v8::External::New(isolate, ${value})`
-    },
-    'unsigned char *': { 
-      js2cpp: (value) => `(unsigned char*)utils::jsToPointer(isolate, ${value})`,
-      cpp2js: (value) => `utils::byteArrayToJS(isolate, ${value}, 1)` // Default to 1, may need custom handling for larger arrays
-    },
-    'unsigned char **': { 
-      js2cpp: (value) => `(unsigned char**)utils::jsToPointer(isolate, ${value})`,
-      cpp2js: (value) => `v8::External::New(isolate, ${value})`
-    },
-    'char **': { 
-      js2cpp: (value) => `(char**)utils::jsToPointer(isolate, ${value})`,
-      cpp2js: (value) => `utils::stringArrayToJS(isolate, ${value})`
-    },
-    'const struct usercmd_s *': { 
-      js2cpp: (value) => `structures::unwrapUserCmd(isolate, ${value})`,
-      cpp2js: (value) => `structures::wrapUserCmd(isolate, (void*)${value})`
-    },
-    'const struct netadr_s *': { 
-      js2cpp: (value) => `structures::unwrapNetAdr(isolate, ${value})`,
-      cpp2js: (value) => `structures::wrapNetAdr(isolate, (void*)${value})`
     }
   },
 
@@ -156,15 +119,15 @@ const TYPE_MAPPINGS = {
   pointerMappings: {
     'float': { 
       js2cpp: (value) => `(float*)utils::jsToPointer(isolate, ${value})`,
-      cpp2js: (value) => `utils::floatArrayToJS(isolate, ${value}, 3)` // Most float* in HLSDK are 3D vectors
+      cpp2js: (value) => `utils::floatArrayToJS(isolate, ${value})`
     },
     'int': { 
       js2cpp: (value) => `(int*)utils::jsToPointer(isolate, ${value})`,
-      cpp2js: (value) => `v8::Number::New(isolate, *${value})` // Most int* in HLSDK are single output values
+      cpp2js: (value) => `utils::intArrayToJS(isolate, ${value})`
     },
     'char *': { 
-      js2cpp: (value) => `utils::js2string(isolate, ${value})`,
-      cpp2js: (value) => `v8::String::NewFromUtf8(isolate, ${value} ? ${value} : "").ToLocalChecked()`
+      js2cpp: (value) => `(char**)utils::jsToPointer(isolate, ${value})`,
+      cpp2js: (value) => `utils::stringArrayToJS(isolate, ${value})`
     },
     'void': { 
       js2cpp: (value) => `utils::jsToPointer(isolate, ${value})`,
@@ -176,11 +139,11 @@ const TYPE_MAPPINGS = {
     },
     'unsigned char': { 
       js2cpp: (value) => `(unsigned char*)utils::jsToPointer(isolate, ${value})`,
-      cpp2js: (value) => `utils::byteArrayToJS(isolate, ${value}, 1)` // Default to single byte, needs custom handling for actual arrays
+      cpp2js: (value) => `utils::byteArrayToJS(isolate, ${value})`
     },
     'byte': { 
       js2cpp: (value) => `(byte*)utils::jsToPointer(isolate, ${value})`,
-      cpp2js: (value) => `utils::byteArrayToJS(isolate, ${value}, 1)` // Default to single byte, needs custom handling for actual arrays  
+      cpp2js: (value) => `utils::byteArrayToJS(isolate, ${value})`
     },
     'FILE': { 
       js2cpp: (value) => `nullptr /* FILE* not supported */`,
@@ -305,40 +268,18 @@ const generator = {
       return `${value} /* TODO: type ${func.type} */`;
     }
 
-    // For string types, use a temporary variable to avoid calling the function twice
-    if ((func.type.includes('char *') || func.type.includes('char*')) && generated.includes('?')) {
-      return `const char* temp_str = ${value};
-  info.GetReturnValue().Set(v8::String::NewFromUtf8(isolate, temp_str ? temp_str : "").ToLocalChecked())`;
-    }
-
     return `info.GetReturnValue().Set(${generated})`;
   },
 
   generateCppFunction(func, source, prefix) {
     const customBody = customs[prefix.split('_')[1]]?.[func.name]?.api?.body;
-    
-    // Generate warning messages for pointer parameters instead of early returns
-    const structureTypes = ['edict_t', 'edict_s', 'entvars_s', 'clientdata_s', 'entity_state_s', 'usercmd_s', 'netadr_s', 'weapon_data_s', 'playermove_s', 'customization_t', 'KeyValueData', 'SAVERESTOREDATA', 'TYPEDESCRIPTION', 'delta_s', 'cvar_s', 'TraceResult'];
-    const nullChecks = (func.args || []).map((arg, i) => {
-      if (arg.type.includes('*') && !arg.type.includes('char')) {
-        // Skip validation for structure types that use wrap/unwrap pattern
-        const isStructureType = structureTypes.some(structType => arg.type.includes(structType));
-        if (isStructureType) {
-          return '';
-        }
-        return `if (!info[${i}]->IsExternal()) {
-    printf("Warning: ${func.name} parameter ${i} (${arg.type}) is not External, using nullptr\\n");
-  }`;
-      }
-      return '';
-    }).filter(check => check).join('\n  ');
-    
-    const nullCheckSection = nullChecks ? `\n  ${nullChecks}\n` : '';
-    
     return `void ${prefix}_${func.name}(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-  V8_STUFF();
-${nullCheckSection}
+	auto isolate = info.GetIsolate();
+  v8::Locker locker(isolate);
+	v8::HandleScope scope(isolate);
+	auto context = isolate->GetCurrentContext();
+
   ${customBody || this.packReturn(func, `(*${source}.${func.name})(${(func.args || []).map((v, i) => this.js2cpp(v.type, `info[${i}]`)).join(',\n')})`)};
 }`;
   }

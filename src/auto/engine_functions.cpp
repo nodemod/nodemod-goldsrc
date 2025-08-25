@@ -1088,8 +1088,15 @@ void sf_eng_pfnLoadFileForMe(const v8::FunctionCallbackInfo<v8::Value>& info)
     printf("Warning: pfnLoadFileForMe parameter 1 (int *) is not External, using nullptr\n");
   }
 
-  info.GetReturnValue().Set(utils::byteArrayToJS(isolate, (*g_engfuncs.pfnLoadFileForMe)(utils::js2string(isolate, info[0]),
-(int*)utils::jsToPointer(isolate, info[1]))));
+  int fileLength = 0;
+  byte* result = (*g_engfuncs.pfnLoadFileForMe)(utils::js2string(isolate, info[0]), &fileLength);
+  if (result && fileLength > 0) {
+    auto jsArray = utils::byteArrayToJS(isolate, result, fileLength);
+    (*g_engfuncs.pfnFreeFile)(result);
+    info.GetReturnValue().Set(jsArray);
+  } else {
+    info.GetReturnValue().Set(v8::Null(isolate));
+  };
 }
 
 // nodemod.eng.freeFile();
@@ -1409,7 +1416,13 @@ void sf_eng_pfnSetFatPVS(const v8::FunctionCallbackInfo<v8::Value>& info)
     printf("Warning: pfnSetFatPVS parameter 0 (const float *) is not External, using nullptr\n");
   }
 
-  info.GetReturnValue().Set(utils::byteArrayToJS(isolate, (*g_engfuncs.pfnSetFatPVS)((const float*)utils::jsToPointer(isolate, info[0]))));
+  byte* result = (*g_engfuncs.pfnSetFatPVS)((const float*)utils::jsToPointer(isolate, info[0]));
+  if (result) {
+    // FatPVS size is implementation-dependent, use a reasonable default
+    info.GetReturnValue().Set(utils::byteArrayToJS(isolate, result, 256));
+  } else {
+    info.GetReturnValue().Set(v8::Null(isolate));
+  };
 }
 
 // nodemod.eng.setFatPAS();
@@ -1421,7 +1434,13 @@ void sf_eng_pfnSetFatPAS(const v8::FunctionCallbackInfo<v8::Value>& info)
     printf("Warning: pfnSetFatPAS parameter 0 (const float *) is not External, using nullptr\n");
   }
 
-  info.GetReturnValue().Set(utils::byteArrayToJS(isolate, (*g_engfuncs.pfnSetFatPAS)((const float*)utils::jsToPointer(isolate, info[0]))));
+  byte* result = (*g_engfuncs.pfnSetFatPAS)((const float*)utils::jsToPointer(isolate, info[0]));
+  if (result) {
+    // FatPAS size is implementation-dependent, use a reasonable default  
+    info.GetReturnValue().Set(utils::byteArrayToJS(isolate, result, 256));
+  } else {
+    info.GetReturnValue().Set(v8::Null(isolate));
+  };
 }
 
 // nodemod.eng.checkVisibility();

@@ -90,7 +90,7 @@ export default {
           { name: 'msg_dest', type: 'number', originalType: 'int' },
           { name: 'msg_type', type: 'number', originalType: 'int' },
           { name: 'pOrigin', type: 'number[]', originalType: 'const float *' },
-          { name: 'ed', type: 'Entity | undefined', originalType: 'edict_t *' }
+          { name: 'ed', type: 'Entity | null', originalType: 'edict_t *' }
         ]
       }
     },
@@ -120,7 +120,7 @@ structures::unwrapEntity(isolate, info[3]),
           { name: 'start', type: 'number[]', originalType: 'const float *' },
           { name: 'end', type: 'number[]', originalType: 'const float *' },
           { name: 'flags', type: 'number', originalType: 'int' },
-          { name: 'skipEntity', type: 'Entity | undefined', originalType: 'edict_t *' }
+          { name: 'skipEntity', type: 'Entity | null', originalType: 'edict_t *' }
         ],
         returnType: 'TraceResult'
       }
@@ -276,6 +276,59 @@ structures::unwrapEntity(isolate, info[4]),
           { name: 'pentToSkip', type: 'Entity', originalType: 'edict_t *' }
         ],
         returnType: 'TraceResult'
+      }
+    },
+    pfnLoadFileForMe: {
+      api: {
+        body: `int fileLength = 0;
+  byte* result = (*g_engfuncs.pfnLoadFileForMe)(utils::js2string(isolate, info[0]), &fileLength);
+  if (result && fileLength > 0) {
+    auto jsArray = utils::byteArrayToJS(isolate, result, fileLength);
+    (*g_engfuncs.pfnFreeFile)(result);
+    info.GetReturnValue().Set(jsArray);
+  } else {
+    info.GetReturnValue().Set(v8::Null(isolate));
+  }`
+      },
+      typescript: {
+        parameters: [
+          { name: 'filename', type: 'string', originalType: 'const char *' }
+        ],
+        returnType: 'number[] | null'
+      }
+    },
+    pfnSetFatPVS: {
+      api: {
+        body: `byte* result = (*g_engfuncs.pfnSetFatPVS)((const float*)utils::jsToPointer(isolate, info[0]));
+  if (result) {
+    // FatPVS size is implementation-dependent, use a reasonable default
+    info.GetReturnValue().Set(utils::byteArrayToJS(isolate, result, 256));
+  } else {
+    info.GetReturnValue().Set(v8::Null(isolate));
+  }`
+      },
+      typescript: {
+        parameters: [
+          { name: 'org', type: 'number[]', originalType: 'const float *' }
+        ],
+        returnType: 'number[] | null'
+      }
+    },
+    pfnSetFatPAS: {
+      api: {
+        body: `byte* result = (*g_engfuncs.pfnSetFatPAS)((const float*)utils::jsToPointer(isolate, info[0]));
+  if (result) {
+    // FatPAS size is implementation-dependent, use a reasonable default  
+    info.GetReturnValue().Set(utils::byteArrayToJS(isolate, result, 256));
+  } else {
+    info.GetReturnValue().Set(v8::Null(isolate));
+  }`
+      },
+      typescript: {
+        parameters: [
+          { name: 'org', type: 'number[]', originalType: 'const float *' }
+        ],
+        returnType: 'number[] | null'
       }
     }
   },
