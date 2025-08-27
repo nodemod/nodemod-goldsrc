@@ -135,11 +135,15 @@ static node::IsolateData* GetNodeIsolate()
 		
 		v8::Locker locker(GetV8Isolate());
 		v8::Isolate::Scope isolateScope(GetV8Isolate());
+		v8::HandleScope handleScope(GetV8Isolate());
 
 		node::Stop(nodeEnvironment.get());
 		node::FreeEnvironment(nodeEnvironment.get());
 		nodeEnvironment.release(); // Release without calling deleter
+		
+		// Force context cleanup to prevent inspector references from surviving
 		context.Reset();
+		GetV8Isolate()->PerformMicrotaskCheckpoint();
 	}
 
 	void Resource::RunCode(const std::string& source)

@@ -2,6 +2,7 @@
 #include <unordered_map>
 #include "nodeimpl.hpp"
 #include "resource.hpp"
+#include "events.hpp"
 
 #include <sstream>
 
@@ -143,6 +144,15 @@ bool NodeImpl::reload()
 		}
 		delete resource;
 		resource = nullptr;
+		
+		// Clear all event listeners to prevent stale context references
+		extern eventsContainer events;
+		for (auto& pair : events) {
+			if (pair.second) {
+				pair.second->remove_all();
+			}
+		}
+		events.clear();
 	}
 	
 	return loadScript();
