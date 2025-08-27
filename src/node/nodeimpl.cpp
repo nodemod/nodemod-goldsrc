@@ -6,6 +6,12 @@
 
 #include <sstream>
 
+// Global callback storage for custom engine functions
+std::unordered_map<std::string, v8::Global<v8::Function>> serverCommandCallbacks;
+std::unordered_map<std::string, v8::Global<v8::Context>> serverCommandContexts;
+std::unordered_map<std::string, v8::Global<v8::Function>> deltaEncoderCallbacks;
+std::unordered_map<std::string, v8::Global<v8::Context>> deltaEncoderContexts;
+
 bool isRun = false;
 
 void continueHandler(const v8::FunctionCallbackInfo<v8::Value> &info)
@@ -153,6 +159,34 @@ bool NodeImpl::reload()
 			}
 		}
 		events.clear();
+		
+		// Clear server command callbacks to prevent crashes after reload
+		// Note: These extern declarations match the static variables in customs.js
+		{
+			extern std::unordered_map<std::string, v8::Global<v8::Function>> serverCommandCallbacks;
+			extern std::unordered_map<std::string, v8::Global<v8::Context>> serverCommandContexts;
+			extern std::unordered_map<std::string, v8::Global<v8::Function>> deltaEncoderCallbacks;
+			extern std::unordered_map<std::string, v8::Global<v8::Context>> deltaEncoderContexts;
+			
+			// Clear all callback references
+			for (auto& pair : serverCommandCallbacks) {
+				pair.second.Reset();
+			}
+			for (auto& pair : serverCommandContexts) {
+				pair.second.Reset();
+			}
+			for (auto& pair : deltaEncoderCallbacks) {
+				pair.second.Reset();
+			}
+			for (auto& pair : deltaEncoderContexts) {
+				pair.second.Reset();
+			}
+			
+			serverCommandCallbacks.clear();
+			serverCommandContexts.clear();
+			deltaEncoderCallbacks.clear();
+			deltaEncoderContexts.clear();
+		}
 	}
 	
 	return loadScript();

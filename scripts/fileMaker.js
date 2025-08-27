@@ -290,6 +290,8 @@ const fileMaker = {
         '#include <string>',
         '#include "v8.h"',
         '#include "extdll.h"',
+        '#include "enginecallback.h"',
+        '#include "node/nodeimpl.hpp"',
         '#include "node/utils.hpp"',
         '',
         '#define V8_STUFF() v8::Isolate* isolate = info.GetIsolate(); \\',

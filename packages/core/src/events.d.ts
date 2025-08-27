@@ -1339,10 +1339,10 @@ declare namespace nodemod {
     "engDeltaUnsetField": (pFields: Delta, fieldname: string) => void;
     /**
      * Event handler for engDeltaAddEncoder
-     * @param name const char * - string
-     * @param value1 void* - ArrayBuffer | Uint8Array | null
+     * @param encoderName const char * - string
+     * @param callback void (*)(struct delta_s *, const unsigned char *, const unsigned char *) - (pFields: any, from: ArrayBuffer | Uint8Array | null, to: ArrayBuffer | Uint8Array | null) => void
      */
-    "engDeltaAddEncoder": (name: string, value1: ArrayBuffer | Uint8Array | null) => void;
+    "engDeltaAddEncoder": (encoderName: string, callback: (pFields: any, from: ArrayBuffer | Uint8Array | null, to: ArrayBuffer | Uint8Array | null) => void) => void;
     /**
      * Event handler for engGetCurrentPlayer
      */
@@ -1405,10 +1405,10 @@ declare namespace nodemod {
     "engGetPlayerStats": (pClient: Entity, ping: number[], packet_loss: number[]) => void;
     /**
      * Event handler for engAddServerCommand
-     * @param cmd_name const char * - string
-     * @param value1 void* - ArrayBuffer | Uint8Array | null
+     * @param commandName const char * - string
+     * @param callback void (*)(void) - () => void
      */
-    "engAddServerCommand": (cmd_name: string, value1: ArrayBuffer | Uint8Array | null) => void;
+    "engAddServerCommand": (commandName: string, callback: () => void) => void;
     /**
      * Event handler for engVoiceGetClientListening
      * @param iReceiver int - number
@@ -2260,10 +2260,10 @@ declare namespace nodemod {
     "postEngDeltaUnsetField": (pFields: Delta, fieldname: string) => void;
     /**
      * Event handler for postEngDeltaAddEncoder
-     * @param name const char * - string
-     * @param value1 void* - ArrayBuffer | Uint8Array | null
+     * @param encoderName const char * - string
+     * @param callback void (*)(struct delta_s *, const unsigned char *, const unsigned char *) - (pFields: any, from: ArrayBuffer | Uint8Array | null, to: ArrayBuffer | Uint8Array | null) => void
      */
-    "postEngDeltaAddEncoder": (name: string, value1: ArrayBuffer | Uint8Array | null) => void;
+    "postEngDeltaAddEncoder": (encoderName: string, callback: (pFields: any, from: ArrayBuffer | Uint8Array | null, to: ArrayBuffer | Uint8Array | null) => void) => void;
     /**
      * Event handler for postEngGetCurrentPlayer
      */
@@ -2326,10 +2326,10 @@ declare namespace nodemod {
     "postEngGetPlayerStats": (pClient: Entity, ping: number[], packet_loss: number[]) => void;
     /**
      * Event handler for postEngAddServerCommand
-     * @param cmd_name const char * - string
-     * @param value1 void* - ArrayBuffer | Uint8Array | null
+     * @param commandName const char * - string
+     * @param callback void (*)(void) - () => void
      */
-    "postEngAddServerCommand": (cmd_name: string, value1: ArrayBuffer | Uint8Array | null) => void;
+    "postEngAddServerCommand": (commandName: string, callback: () => void) => void;
     /**
      * Event handler for postEngVoiceGetClientListening
      * @param iReceiver int - number

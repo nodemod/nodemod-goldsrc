@@ -255,7 +255,7 @@ declare namespace nodemod {
     /** void	(*pfnDeltaUnsetField)( struct delta_s *pFields, const char *fieldname ); */
     deltaUnsetField(pFields: Delta, fieldname: string): void;
     /** void	(*pfnDeltaAddEncoder)( const char *name, void (*conditionalencode)( struct delta_s *pFields, const unsigned char *from, const unsigned char *to ) ); */
-    deltaAddEncoder(name: string, value1: ArrayBuffer | Uint8Array | null): void;
+    deltaAddEncoder(encoderName: string, callback: (pFields: any, from: ArrayBuffer | Uint8Array | null, to: ArrayBuffer | Uint8Array | null) => void): void;
     /** int	(*pfnGetCurrentPlayer)( void ); */
     getCurrentPlayer(): number;
     /** int	(*pfnCanSkipPlayer)( const edict_t *player ); */
@@ -277,7 +277,7 @@ declare namespace nodemod {
     /** void	(*pfnGetPlayerStats)( const edict_t *pClient, int *ping, int *packet_loss ); */
     getPlayerStats(pClient: Entity, ping: number[], packet_loss: number[]): void;
     /** void	(*pfnAddServerCommand)( const char *cmd_name, void (*function) (void) ); */
-    addServerCommand(cmd_name: string, value1: ArrayBuffer | Uint8Array | null): void;
+    addServerCommand(commandName: string, callback: () => void): void;
     /** qboolean	(*pfnVoice_GetClientListening)(int iReceiver, int iSender); */
     voiceGetClientListening(iReceiver: number, iSender: number): boolean;
     /** qboolean	(*pfnVoice_SetClientListening)(int iReceiver, int iSender, qboolean bListen); */
