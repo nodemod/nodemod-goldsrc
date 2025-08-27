@@ -300,10 +300,11 @@
     });
   }
 
-// pfnStartFrame - Run Node.js UV loop tick
+// pfnStartFrame - Run Node.js UV loop tick and fire event
   void dll_pfnStartFrame () {
     SET_META_RESULT(MRES_IGNORED);
     nodeImpl.Tick();
+    event::findAndCall("dllStartFrame", nullptr, 0);
   }
 
 // nodemod.on('dllParmsNewLevel', () => console.log('dllParmsNewLevel fired!'));
@@ -924,10 +925,11 @@
     });
   }
 
-// pfnStartFrame - Run Node.js UV loop tick
+// pfnStartFrame - Run Node.js UV loop tick and fire event
   void postDll_pfnStartFrame () {
     SET_META_RESULT(MRES_IGNORED);
     nodeImpl.Tick();
+    event::findAndCall("postDllStartFrame", nullptr, 0);
   }
 
 // nodemod.on('postDllParmsNewLevel', () => console.log('postDllParmsNewLevel fired!'));

@@ -64,3 +64,12 @@ You can run your TypeScript code using the [ts-node](https://www.npmjs.com/packa
 - [iAmir (Amyr Aahmady)](https://github.com/AmyrAhmady) for his [samp-node project](https://github.com/AmyrAhmady/samp-node).
 - [TheEVolk (Maksim Nikiforov)](https://github.com/theevolk) that's me.
 - [SNMetamorph](https://github.com/SNMetamorph) for moving code to C++17 and build system refactoring
+
+
+LD_LIBRARY_PATH=. valgrind --tool=memcheck --leak-check=full --error-exitcode=0 ./hlds_linux -game ts +map ts_lobby
+LD_LIBRARY_PATH=. gdb --args ./hlds_linux -game ts +map ts_lobby
+(gdb) set environment MALLOC_CHECK_ = 1
+(gdb) handle SIGBUS stop print
+(gdb) handle SIGSEGV stop print
+(gdb) set logging file debug.log
+(gdb) set logging on
