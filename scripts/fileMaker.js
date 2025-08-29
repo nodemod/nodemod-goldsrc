@@ -284,13 +284,20 @@ const fileMaker = {
       };
     }
 
-    console.log(computed.filter(v => v.status === 'failed'))
+    console.log('=== COMPUTED FUNCTIONS DEBUG ===');
+    console.log('Total computed:', computed.length);
+    console.log('Success:', computed.filter(v => v.status === 'success').length);
+    console.log('Failed:', computed.filter(v => v.status === 'failed').length);
+    console.log('Failed functions:', computed.filter(v => v.status === 'failed').map(v => v.original));
+    if (source === 'dll') {
+      console.log('DLL Functions being processed:', computed.map(v => ({ status: v.status, original: v.original })));
+    }
     return fileMaker.makeFile(
       [
         '#include <string>',
         '#include "v8.h"',
         '#include "extdll.h"',
-        '#include "enginecallback.h"',
+        source === 'eng' ? '#include "enginecallback.h"' : '#include "meta_api.h"',
         '#include "node/nodeimpl.hpp"',
         '#include "node/utils.hpp"',
         '',
@@ -302,20 +309,20 @@ const fileMaker = {
         '#include "structures/structures.hpp"'
       ].join('\n'),
       '',
-      'extern enginefuncs_t	 g_engfuncs;',
+      source === 'eng' ? 'extern enginefuncs_t	 g_engfuncs;' : 'extern gamedll_funcs_t *gpGamedllFuncs;',
       '',
       computed.filter(v => v.status === 'success').map(v => v.body).join('\n\n'),
       '',
       fileMaker.makeBlock(
-        'static std::pair<std::string, v8::FunctionCallback> engineSpecificFunctions[] =',
+        `static std::pair<std::string, v8::FunctionCallback> ${source === 'eng' ? 'engine' : 'gamedll'}SpecificFunctions[] =`,
         computed.filter(v => v.status === 'success').map(v => v.definition).join(',\n')
       ),
       fileMaker.makeBlock(
-        'v8::Local<v8::ObjectTemplate> registerEngineFunctions(v8::Isolate* isolate)',
+        `v8::Local<v8::ObjectTemplate> register${source === 'eng' ? 'Engine' : 'Dll'}Functions(v8::Isolate* isolate)`,
         [
           'v8::Local <v8::ObjectTemplate> object = v8::ObjectTemplate::New(isolate);',
           fileMaker.makeBlock(
-            `for (auto &routine : engineSpecificFunctions)`,
+            `for (auto &routine : ${source === 'eng' ? 'engine' : 'gamedll'}SpecificFunctions)`,
             'object-> Set(v8::String::NewFromUtf8(isolate, routine.first.c_str(), v8::NewStringType::kNormal).ToLocalChecked(), v8::FunctionTemplate::New(isolate, routine.second));'
           ),
           '',

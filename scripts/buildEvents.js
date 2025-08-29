@@ -305,6 +305,7 @@ function parseFunction(line) {
   }
   const { engineFunctionsFile, dllFunctionsFile } = fileMaker.makeFunctions(computed);
   await fs.writeFile('./src/auto/engine_functions.cpp', engineFunctionsFile);
+  await fs.writeFile('./src/auto/dll_functions.cpp', dllFunctionsFile);
 
   const file = `// This file builded by: node scripts/buildEvents.js
   #include <extdll.h>
@@ -543,7 +544,7 @@ function computeFunctionApi(func, source) {
     return {
       original: func.original,
       definition: `{ "${jsName}", sf_${source}_${func.name} }`,
-      body: `// nodemod.eng.${jsName}();\n${generator.generateCppFunction(func, 'g_engfuncs', 'sf_eng')}`,
+      body: `// nodemod.${source}.${jsName}();\n${generator.generateCppFunction(func, source === 'eng' ? 'g_engfuncs' : 'gpGamedllFuncs->dllapi_table', `sf_${source}`)}`,
       typing: `${jsName}(${paramTypes.join(', ')}): ${customReturnType}`
     };
   }
@@ -593,7 +594,7 @@ function computeFunctionApi(func, source) {
   return {
     original: func.original,
     definition: `{ "${camelize(func.name.replace(/^pfn/, ''))}", sf_${source}_${func.name} }`,
-    body: `// nodemod.eng.${jsName}();\n${generator.generateCppFunction(func, 'g_engfuncs', 'sf_eng')}`,
+    body: `// nodemod.${source}.${jsName}(${paramTypes.join(', ')});\n${generator.generateCppFunction(func, source === 'eng' ? 'g_engfuncs' : 'gpGamedllFuncs->dllapi_table', `sf_${source}`)}`,
     typing: `${jsName}(${paramTypes.join(', ')}): ${returnType}`
   };
 }

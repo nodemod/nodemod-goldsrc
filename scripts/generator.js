@@ -73,8 +73,8 @@ const TYPE_MAPPINGS = {
       cpp2js: (value) => `v8::Number::New(isolate, ${value})`
     },
     'vec3_t': { 
-      js2cpp: (value) => `utils::js2vect(isolate, ${value})`,
-      cpp2js: (value) => `utils::vect2js(isolate, ${value})`
+      js2cpp: (value, paramName) => `${paramName}_vec`, // Return variable name - will be handled specially
+      cpp2js: (value) => `utils::vect2js(isolate, ${value})`,
     },
     'TraceResult': { 
       js2cpp: (value) => `structures::unwrapTraceResult(isolate, ${value})`,
@@ -237,13 +237,13 @@ function getPointerMapping(type, isJs2Cpp, value) {
 
 // Генератор транслейтов
 const generator = {
-  js2cpp(type, value) {
+  js2cpp(type, value, paramName = 'param') {
     const normalizedType = normalizeType(type);
 
     // Check basic types first
     const basicMapping = TYPE_MAPPINGS.basicTypes[normalizedType];
     if (basicMapping) {
-      return basicMapping.js2cpp(value);
+      return basicMapping.js2cpp(value, paramName);
     }
 
     // Try struct mapping
@@ -366,7 +366,12 @@ const generator = {
     
     // Generate parameter conversion code
     const paramConversions = regularArgs.map((arg, i) => {
-      if (arg.isArrayWithLength) {
+      // Handle vec3_t parameters specially
+      if (arg.type === 'vec3_t') {
+        return `
+  vec3_t ${arg.name}_vec;
+  utils::js2vect(isolate, v8::Local<v8::Array>::Cast(info[${i}]), ${arg.name}_vec);`;
+      } else if (arg.isArrayWithLength) {
         // Handle array + length parameter conversion
         const arrayType = arg.type;
         const lengthParamName = arg.lengthParam.name;
@@ -437,7 +442,7 @@ const generator = {
         // Regular parameter - use js2cpp conversion
         const argIndex = regularArgs.findIndex(pArg => pArg.name === arg.name);
         if (argIndex >= 0) {
-          return this.js2cpp(arg.type, `info[${argIndex}]`);
+          return this.js2cpp(arg.type, `info[${argIndex}]`, arg.name);
         } else {
           // This shouldn't happen, but provide a fallback
           return `nullptr /* missing parameter: ${arg.name} */`;
@@ -449,7 +454,7 @@ const generator = {
 {
   V8_STUFF();${paramConversions}
 ${nullCheckSection}
-  ${customBody || this.packReturn(func, `(*${source}.${func.name})(${callParams})`)};${cleanupCode}
+  ${customBody || this.packReturn(func, `(*${source}${source.includes('->') ? '->' : '.'}${func.name})(${callParams})`)};${cleanupCode}
 }`;
   }
 }

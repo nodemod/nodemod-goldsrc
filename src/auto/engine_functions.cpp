@@ -15,7 +15,7 @@
 
 extern enginefuncs_t	 g_engfuncs;
 
-// nodemod.eng.precacheModel();
+// nodemod.eng.precacheModel(s: string);
 void sf_eng_pfnPrecacheModel(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -23,7 +23,7 @@ void sf_eng_pfnPrecacheModel(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnPrecacheModel)(utils::js2string(isolate, info[0]))));
 }
 
-// nodemod.eng.precacheSound();
+// nodemod.eng.precacheSound(s: string);
 void sf_eng_pfnPrecacheSound(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -31,7 +31,7 @@ void sf_eng_pfnPrecacheSound(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnPrecacheSound)(utils::js2string(isolate, info[0]))));
 }
 
-// nodemod.eng.setModel();
+// nodemod.eng.setModel(e: Entity, m: string);
 void sf_eng_pfnSetModel(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -40,7 +40,7 @@ void sf_eng_pfnSetModel(const v8::FunctionCallbackInfo<v8::Value>& info)
 utils::js2string(isolate, info[1]));
 }
 
-// nodemod.eng.modelIndex();
+// nodemod.eng.modelIndex(m: string);
 void sf_eng_pfnModelIndex(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -48,7 +48,7 @@ void sf_eng_pfnModelIndex(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnModelIndex)(utils::js2string(isolate, info[0]))));
 }
 
-// nodemod.eng.modelFrames();
+// nodemod.eng.modelFrames(modelIndex: number);
 void sf_eng_pfnModelFrames(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -56,7 +56,7 @@ void sf_eng_pfnModelFrames(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnModelFrames)(info[0]->Int32Value(context).ToChecked())));
 }
 
-// nodemod.eng.setSize();
+// nodemod.eng.setSize(e: Entity, rgflMin: number[], rgflMax: number[]);
 void sf_eng_pfnSetSize(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -73,7 +73,7 @@ void sf_eng_pfnSetSize(const v8::FunctionCallbackInfo<v8::Value>& info)
 (const float*)utils::jsToPointer(isolate, info[2]));
 }
 
-// nodemod.eng.changeLevel();
+// nodemod.eng.changeLevel(s1: string, s2: string);
 void sf_eng_pfnChangeLevel(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -82,7 +82,7 @@ void sf_eng_pfnChangeLevel(const v8::FunctionCallbackInfo<v8::Value>& info)
 utils::js2string(isolate, info[1]));
 }
 
-// nodemod.eng.getSpawnParms();
+// nodemod.eng.getSpawnParms(ent: Entity);
 void sf_eng_pfnGetSpawnParms(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -90,7 +90,7 @@ void sf_eng_pfnGetSpawnParms(const v8::FunctionCallbackInfo<v8::Value>& info)
   (*g_engfuncs.pfnGetSpawnParms)(structures::unwrapEntity(isolate, info[0]));
 }
 
-// nodemod.eng.saveSpawnParms();
+// nodemod.eng.saveSpawnParms(ent: Entity);
 void sf_eng_pfnSaveSpawnParms(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -98,7 +98,7 @@ void sf_eng_pfnSaveSpawnParms(const v8::FunctionCallbackInfo<v8::Value>& info)
   (*g_engfuncs.pfnSaveSpawnParms)(structures::unwrapEntity(isolate, info[0]));
 }
 
-// nodemod.eng.vecToYaw();
+// nodemod.eng.vecToYaw(rgflVector: number[]);
 void sf_eng_pfnVecToYaw(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -110,7 +110,7 @@ void sf_eng_pfnVecToYaw(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnVecToYaw)((const float*)utils::jsToPointer(isolate, info[0]))));
 }
 
-// nodemod.eng.vecToAngles();
+// nodemod.eng.vecToAngles(rgflVectorIn: number[], rgflVectorOut: number[]);
 void sf_eng_pfnVecToAngles(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -126,7 +126,7 @@ void sf_eng_pfnVecToAngles(const v8::FunctionCallbackInfo<v8::Value>& info)
 (float*)utils::jsToPointer(isolate, info[1]));
 }
 
-// nodemod.eng.moveToOrigin();
+// nodemod.eng.moveToOrigin(ent: Entity, pflGoal: number[], dist: number, iMoveType: number);
 void sf_eng_pfnMoveToOrigin(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -141,7 +141,7 @@ info[2]->NumberValue(context).ToChecked(),
 info[3]->Int32Value(context).ToChecked());
 }
 
-// nodemod.eng.changeYaw();
+// nodemod.eng.changeYaw(ent: Entity);
 void sf_eng_pfnChangeYaw(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -149,7 +149,7 @@ void sf_eng_pfnChangeYaw(const v8::FunctionCallbackInfo<v8::Value>& info)
   (*g_engfuncs.pfnChangeYaw)(structures::unwrapEntity(isolate, info[0]));
 }
 
-// nodemod.eng.changePitch();
+// nodemod.eng.changePitch(ent: Entity);
 void sf_eng_pfnChangePitch(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -157,7 +157,7 @@ void sf_eng_pfnChangePitch(const v8::FunctionCallbackInfo<v8::Value>& info)
   (*g_engfuncs.pfnChangePitch)(structures::unwrapEntity(isolate, info[0]));
 }
 
-// nodemod.eng.findEntityByString();
+// nodemod.eng.findEntityByString(pEdictStartSearchAfter: Entity, pszField: string, pszValue: string);
 void sf_eng_pfnFindEntityByString(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -167,7 +167,7 @@ utils::js2string(isolate, info[1]),
 utils::js2string(isolate, info[2]))));
 }
 
-// nodemod.eng.getEntityIllum();
+// nodemod.eng.getEntityIllum(pEnt: Entity);
 void sf_eng_pfnGetEntityIllum(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -175,7 +175,7 @@ void sf_eng_pfnGetEntityIllum(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnGetEntityIllum)(structures::unwrapEntity(isolate, info[0]))));
 }
 
-// nodemod.eng.findEntityInSphere();
+// nodemod.eng.findEntityInSphere(pEdictStartSearchAfter: Entity, org: number[], rad: number);
 void sf_eng_pfnFindEntityInSphere(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -189,7 +189,7 @@ void sf_eng_pfnFindEntityInSphere(const v8::FunctionCallbackInfo<v8::Value>& inf
 info[2]->NumberValue(context).ToChecked())));
 }
 
-// nodemod.eng.findClientInPVS();
+// nodemod.eng.findClientInPVS(pEdict: Entity);
 void sf_eng_pfnFindClientInPVS(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -197,7 +197,7 @@ void sf_eng_pfnFindClientInPVS(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(structures::wrapEntity(isolate, (*g_engfuncs.pfnFindClientInPVS)(structures::unwrapEntity(isolate, info[0]))));
 }
 
-// nodemod.eng.entitiesInPVS();
+// nodemod.eng.entitiesInPVS(pplayer: Entity);
 void sf_eng_pfnEntitiesInPVS(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -205,7 +205,7 @@ void sf_eng_pfnEntitiesInPVS(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(structures::wrapEntity(isolate, (*g_engfuncs.pfnEntitiesInPVS)(structures::unwrapEntity(isolate, info[0]))));
 }
 
-// nodemod.eng.makeVectors();
+// nodemod.eng.makeVectors(rgflVector: number[]);
 void sf_eng_pfnMakeVectors(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -217,7 +217,7 @@ void sf_eng_pfnMakeVectors(const v8::FunctionCallbackInfo<v8::Value>& info)
   (*g_engfuncs.pfnMakeVectors)((const float*)utils::jsToPointer(isolate, info[0]));
 }
 
-// nodemod.eng.angleVectors();
+// nodemod.eng.angleVectors(rgflVector: number[], forward: number[], right: number[], up: number[]);
 void sf_eng_pfnAngleVectors(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -249,7 +249,7 @@ void sf_eng_pfnCreateEntity(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(structures::wrapEntity(isolate, (*g_engfuncs.pfnCreateEntity)()));
 }
 
-// nodemod.eng.removeEntity();
+// nodemod.eng.removeEntity(e: Entity);
 void sf_eng_pfnRemoveEntity(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -257,7 +257,7 @@ void sf_eng_pfnRemoveEntity(const v8::FunctionCallbackInfo<v8::Value>& info)
   (*g_engfuncs.pfnRemoveEntity)(structures::unwrapEntity(isolate, info[0]));
 }
 
-// nodemod.eng.createNamedEntity();
+// nodemod.eng.createNamedEntity(className: number);
 void sf_eng_pfnCreateNamedEntity(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -265,7 +265,7 @@ void sf_eng_pfnCreateNamedEntity(const v8::FunctionCallbackInfo<v8::Value>& info
   info.GetReturnValue().Set(structures::wrapEntity(isolate, (*g_engfuncs.pfnCreateNamedEntity)(info[0]->Int32Value(context).ToChecked())));
 }
 
-// nodemod.eng.makeStatic();
+// nodemod.eng.makeStatic(ent: Entity);
 void sf_eng_pfnMakeStatic(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -273,7 +273,7 @@ void sf_eng_pfnMakeStatic(const v8::FunctionCallbackInfo<v8::Value>& info)
   (*g_engfuncs.pfnMakeStatic)(structures::unwrapEntity(isolate, info[0]));
 }
 
-// nodemod.eng.entIsOnFloor();
+// nodemod.eng.entIsOnFloor(e: Entity);
 void sf_eng_pfnEntIsOnFloor(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -281,7 +281,7 @@ void sf_eng_pfnEntIsOnFloor(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnEntIsOnFloor)(structures::unwrapEntity(isolate, info[0]))));
 }
 
-// nodemod.eng.dropToFloor();
+// nodemod.eng.dropToFloor(e: Entity);
 void sf_eng_pfnDropToFloor(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -289,7 +289,7 @@ void sf_eng_pfnDropToFloor(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnDropToFloor)(structures::unwrapEntity(isolate, info[0]))));
 }
 
-// nodemod.eng.walkMove();
+// nodemod.eng.walkMove(ent: Entity, yaw: number, dist: number, iMode: number);
 void sf_eng_pfnWalkMove(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -300,7 +300,7 @@ info[2]->NumberValue(context).ToChecked(),
 info[3]->Int32Value(context).ToChecked())));
 }
 
-// nodemod.eng.setOrigin();
+// nodemod.eng.setOrigin(e: Entity, rgflOrigin: number[]);
 void sf_eng_pfnSetOrigin(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -313,7 +313,7 @@ void sf_eng_pfnSetOrigin(const v8::FunctionCallbackInfo<v8::Value>& info)
 (const float*)utils::jsToPointer(isolate, info[1]));
 }
 
-// nodemod.eng.emitSound();
+// nodemod.eng.emitSound(entity: Entity, channel: number, sample: string, volume: number, attenuation: number, fFlags: number, pitch: number);
 void sf_eng_pfnEmitSound(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -327,7 +327,7 @@ info[5]->Int32Value(context).ToChecked(),
 info[6]->Int32Value(context).ToChecked());
 }
 
-// nodemod.eng.emitAmbientSound();
+// nodemod.eng.emitAmbientSound(entity: Entity, pos: number[], samp: string, vol: number, attenuation: number, fFlags: number, pitch: number);
 void sf_eng_pfnEmitAmbientSound(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -494,7 +494,7 @@ structures::unwrapEntity(isolate, info[3]),
   info.GetReturnValue().Set(structures::wrapTraceResult(isolate, &trace));;
 }
 
-// nodemod.eng.traceTexture();
+// nodemod.eng.traceTexture(pTextureEntity: Entity, v1: number[], v2: number[]);
 void sf_eng_pfnTraceTexture(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -545,7 +545,7 @@ structures::unwrapEntity(isolate, info[4]),
   info.GetReturnValue().Set(structures::wrapTraceResult(isolate, &trace));;
 }
 
-// nodemod.eng.getAimVector();
+// nodemod.eng.getAimVector(ent: Entity, speed: number, rgflReturn: number[]);
 void sf_eng_pfnGetAimVector(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -559,7 +559,7 @@ info[1]->NumberValue(context).ToChecked(),
 (float*)utils::jsToPointer(isolate, info[2]));
 }
 
-// nodemod.eng.serverCommand();
+// nodemod.eng.serverCommand(str: string);
 void sf_eng_pfnServerCommand(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -583,7 +583,7 @@ void sf_eng_pfnClientCommand(const v8::FunctionCallbackInfo<v8::Value>& info)
   (*g_engfuncs.pfnClientCommand)(structures::unwrapEntity(isolate, info[0]), utils::js2string(isolate, info[1]));;
 }
 
-// nodemod.eng.particleEffect();
+// nodemod.eng.particleEffect(org: number[], dir: number[], color: number, count: number);
 void sf_eng_pfnParticleEffect(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -601,7 +601,7 @@ info[2]->NumberValue(context).ToChecked(),
 info[3]->NumberValue(context).ToChecked());
 }
 
-// nodemod.eng.lightStyle();
+// nodemod.eng.lightStyle(style: number, val: string);
 void sf_eng_pfnLightStyle(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -610,7 +610,7 @@ void sf_eng_pfnLightStyle(const v8::FunctionCallbackInfo<v8::Value>& info)
 utils::js2string(isolate, info[1]));
 }
 
-// nodemod.eng.decalIndex();
+// nodemod.eng.decalIndex(name: string);
 void sf_eng_pfnDecalIndex(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -618,7 +618,7 @@ void sf_eng_pfnDecalIndex(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnDecalIndex)(utils::js2string(isolate, info[0]))));
 }
 
-// nodemod.eng.pointContents();
+// nodemod.eng.pointContents(rgflVector: number[]);
 void sf_eng_pfnPointContents(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -653,7 +653,7 @@ void sf_eng_pfnMessageEnd(const v8::FunctionCallbackInfo<v8::Value>& info)
   (*g_engfuncs.pfnMessageEnd)();
 }
 
-// nodemod.eng.writeByte();
+// nodemod.eng.writeByte(iValue: number);
 void sf_eng_pfnWriteByte(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -661,7 +661,7 @@ void sf_eng_pfnWriteByte(const v8::FunctionCallbackInfo<v8::Value>& info)
   (*g_engfuncs.pfnWriteByte)(info[0]->Int32Value(context).ToChecked());
 }
 
-// nodemod.eng.writeChar();
+// nodemod.eng.writeChar(iValue: number);
 void sf_eng_pfnWriteChar(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -669,7 +669,7 @@ void sf_eng_pfnWriteChar(const v8::FunctionCallbackInfo<v8::Value>& info)
   (*g_engfuncs.pfnWriteChar)(info[0]->Int32Value(context).ToChecked());
 }
 
-// nodemod.eng.writeShort();
+// nodemod.eng.writeShort(iValue: number);
 void sf_eng_pfnWriteShort(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -677,7 +677,7 @@ void sf_eng_pfnWriteShort(const v8::FunctionCallbackInfo<v8::Value>& info)
   (*g_engfuncs.pfnWriteShort)(info[0]->Int32Value(context).ToChecked());
 }
 
-// nodemod.eng.writeLong();
+// nodemod.eng.writeLong(iValue: number);
 void sf_eng_pfnWriteLong(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -685,7 +685,7 @@ void sf_eng_pfnWriteLong(const v8::FunctionCallbackInfo<v8::Value>& info)
   (*g_engfuncs.pfnWriteLong)(info[0]->Int32Value(context).ToChecked());
 }
 
-// nodemod.eng.writeAngle();
+// nodemod.eng.writeAngle(flValue: number);
 void sf_eng_pfnWriteAngle(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -693,7 +693,7 @@ void sf_eng_pfnWriteAngle(const v8::FunctionCallbackInfo<v8::Value>& info)
   (*g_engfuncs.pfnWriteAngle)(info[0]->NumberValue(context).ToChecked());
 }
 
-// nodemod.eng.writeCoord();
+// nodemod.eng.writeCoord(flValue: number);
 void sf_eng_pfnWriteCoord(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -701,7 +701,7 @@ void sf_eng_pfnWriteCoord(const v8::FunctionCallbackInfo<v8::Value>& info)
   (*g_engfuncs.pfnWriteCoord)(info[0]->NumberValue(context).ToChecked());
 }
 
-// nodemod.eng.writeString();
+// nodemod.eng.writeString(sz: string);
 void sf_eng_pfnWriteString(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -709,7 +709,7 @@ void sf_eng_pfnWriteString(const v8::FunctionCallbackInfo<v8::Value>& info)
   (*g_engfuncs.pfnWriteString)(utils::js2string(isolate, info[0]));
 }
 
-// nodemod.eng.writeEntity();
+// nodemod.eng.writeEntity(iValue: number);
 void sf_eng_pfnWriteEntity(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -764,7 +764,7 @@ void sf_eng_pfnCVarRegister(const v8::FunctionCallbackInfo<v8::Value>& info)
   (*g_engfuncs.pfnCVarRegister)(cvar);;
 }
 
-// nodemod.eng.cVarGetFloat();
+// nodemod.eng.cVarGetFloat(szVarName: string);
 void sf_eng_pfnCVarGetFloat(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -772,7 +772,7 @@ void sf_eng_pfnCVarGetFloat(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnCVarGetFloat)(utils::js2string(isolate, info[0]))));
 }
 
-// nodemod.eng.cVarGetString();
+// nodemod.eng.cVarGetString(szVarName: string);
 void sf_eng_pfnCVarGetString(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -781,7 +781,7 @@ void sf_eng_pfnCVarGetString(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(v8::String::NewFromUtf8(isolate, temp_str ? temp_str : "").ToLocalChecked());
 }
 
-// nodemod.eng.cVarSetFloat();
+// nodemod.eng.cVarSetFloat(szVarName: string, flValue: number);
 void sf_eng_pfnCVarSetFloat(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -790,7 +790,7 @@ void sf_eng_pfnCVarSetFloat(const v8::FunctionCallbackInfo<v8::Value>& info)
 info[1]->NumberValue(context).ToChecked());
 }
 
-// nodemod.eng.cVarSetString();
+// nodemod.eng.cVarSetString(szVarName: string, szValue: string);
 void sf_eng_pfnCVarSetString(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -799,7 +799,7 @@ void sf_eng_pfnCVarSetString(const v8::FunctionCallbackInfo<v8::Value>& info)
 utils::js2string(isolate, info[1]));
 }
 
-// nodemod.eng.alertMessage();
+// nodemod.eng.alertMessage(atype: number, szFmt: string, ...args: any[]);
 void sf_eng_pfnAlertMessage(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -807,7 +807,7 @@ void sf_eng_pfnAlertMessage(const v8::FunctionCallbackInfo<v8::Value>& info)
   (*g_engfuncs.pfnAlertMessage)((ALERT_TYPE)info[0]->Int32Value(context).ToChecked(), "%s", utils::js2string(isolate, info[1]));;
 }
 
-// nodemod.eng.engineFprintf();
+// nodemod.eng.engineFprintf(pfile: FileHandle, szFmt: string, ...args: any[]);
 void sf_eng_pfnEngineFprintf(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -819,7 +819,7 @@ void sf_eng_pfnEngineFprintf(const v8::FunctionCallbackInfo<v8::Value>& info)
   fprintf((FILE*)utils::jsToPointer(isolate, info[0]), "%s", utils::js2string(isolate, info[1]));;
 }
 
-// nodemod.eng.pvAllocEntPrivateData();
+// nodemod.eng.pvAllocEntPrivateData(pEdict: Entity, cb: number);
 void sf_eng_pfnPvAllocEntPrivateData(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -828,7 +828,7 @@ void sf_eng_pfnPvAllocEntPrivateData(const v8::FunctionCallbackInfo<v8::Value>& 
 info[1]->Int32Value(context).ToChecked())));
 }
 
-// nodemod.eng.pvEntPrivateData();
+// nodemod.eng.pvEntPrivateData(pEdict: Entity);
 void sf_eng_pfnPvEntPrivateData(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -836,7 +836,7 @@ void sf_eng_pfnPvEntPrivateData(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(v8::External::New(isolate, (*g_engfuncs.pfnPvEntPrivateData)(structures::unwrapEntity(isolate, info[0]))));
 }
 
-// nodemod.eng.freeEntPrivateData();
+// nodemod.eng.freeEntPrivateData(pEdict: Entity);
 void sf_eng_pfnFreeEntPrivateData(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -844,7 +844,7 @@ void sf_eng_pfnFreeEntPrivateData(const v8::FunctionCallbackInfo<v8::Value>& inf
   (*g_engfuncs.pfnFreeEntPrivateData)(structures::unwrapEntity(isolate, info[0]));
 }
 
-// nodemod.eng.szFromIndex();
+// nodemod.eng.szFromIndex(iString: number);
 void sf_eng_pfnSzFromIndex(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -853,7 +853,7 @@ void sf_eng_pfnSzFromIndex(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(v8::String::NewFromUtf8(isolate, temp_str ? temp_str : "").ToLocalChecked());
 }
 
-// nodemod.eng.allocString();
+// nodemod.eng.allocString(szValue: string);
 void sf_eng_pfnAllocString(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -861,7 +861,7 @@ void sf_eng_pfnAllocString(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnAllocString)(utils::js2string(isolate, info[0]))));
 }
 
-// nodemod.eng.getVarsOfEnt();
+// nodemod.eng.getVarsOfEnt(pEdict: Entity);
 void sf_eng_pfnGetVarsOfEnt(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -869,7 +869,7 @@ void sf_eng_pfnGetVarsOfEnt(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(structures::wrapEntvars(isolate, (*g_engfuncs.pfnGetVarsOfEnt)(structures::unwrapEntity(isolate, info[0]))));
 }
 
-// nodemod.eng.pEntityOfEntOffset();
+// nodemod.eng.pEntityOfEntOffset(iEntOffset: number);
 void sf_eng_pfnPEntityOfEntOffset(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -877,7 +877,7 @@ void sf_eng_pfnPEntityOfEntOffset(const v8::FunctionCallbackInfo<v8::Value>& inf
   info.GetReturnValue().Set(structures::wrapEntity(isolate, (*g_engfuncs.pfnPEntityOfEntOffset)(info[0]->Int32Value(context).ToChecked())));
 }
 
-// nodemod.eng.entOffsetOfPEntity();
+// nodemod.eng.entOffsetOfPEntity(pEdict: Entity);
 void sf_eng_pfnEntOffsetOfPEntity(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -885,7 +885,7 @@ void sf_eng_pfnEntOffsetOfPEntity(const v8::FunctionCallbackInfo<v8::Value>& inf
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnEntOffsetOfPEntity)(structures::unwrapEntity(isolate, info[0]))));
 }
 
-// nodemod.eng.indexOfEdict();
+// nodemod.eng.indexOfEdict(pEdict: Entity);
 void sf_eng_pfnIndexOfEdict(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -893,7 +893,7 @@ void sf_eng_pfnIndexOfEdict(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnIndexOfEdict)(structures::unwrapEntity(isolate, info[0]))));
 }
 
-// nodemod.eng.pEntityOfEntIndex();
+// nodemod.eng.pEntityOfEntIndex(iEntIndex: number);
 void sf_eng_pfnPEntityOfEntIndex(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -901,7 +901,7 @@ void sf_eng_pfnPEntityOfEntIndex(const v8::FunctionCallbackInfo<v8::Value>& info
   info.GetReturnValue().Set(structures::wrapEntity(isolate, (*g_engfuncs.pfnPEntityOfEntIndex)(info[0]->Int32Value(context).ToChecked())));
 }
 
-// nodemod.eng.findEntityByVars();
+// nodemod.eng.findEntityByVars(pvars: Entvars);
 void sf_eng_pfnFindEntityByVars(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -909,7 +909,7 @@ void sf_eng_pfnFindEntityByVars(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(structures::wrapEntity(isolate, (*g_engfuncs.pfnFindEntityByVars)(structures::unwrapEntvars(isolate, info[0]))));
 }
 
-// nodemod.eng.getModelPtr();
+// nodemod.eng.getModelPtr(pEdict: Entity);
 void sf_eng_pfnGetModelPtr(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -917,7 +917,7 @@ void sf_eng_pfnGetModelPtr(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(v8::External::New(isolate, (*g_engfuncs.pfnGetModelPtr)(structures::unwrapEntity(isolate, info[0]))));
 }
 
-// nodemod.eng.regUserMsg();
+// nodemod.eng.regUserMsg(pszName: string, iSize: number);
 void sf_eng_pfnRegUserMsg(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -926,7 +926,7 @@ void sf_eng_pfnRegUserMsg(const v8::FunctionCallbackInfo<v8::Value>& info)
 info[1]->Int32Value(context).ToChecked())));
 }
 
-// nodemod.eng.animationAutomove();
+// nodemod.eng.animationAutomove(pEdict: Entity, flTime: number);
 void sf_eng_pfnAnimationAutomove(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -935,7 +935,7 @@ void sf_eng_pfnAnimationAutomove(const v8::FunctionCallbackInfo<v8::Value>& info
 info[1]->NumberValue(context).ToChecked());
 }
 
-// nodemod.eng.getBonePosition();
+// nodemod.eng.getBonePosition(pEdict: Entity, iBone: number, rgflOrigin: number[], rgflAngles: number[]);
 void sf_eng_pfnGetBonePosition(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -953,7 +953,7 @@ info[1]->Int32Value(context).ToChecked(),
 (float*)utils::jsToPointer(isolate, info[3]));
 }
 
-// nodemod.eng.functionFromName();
+// nodemod.eng.functionFromName(pName: string);
 void sf_eng_pfnFunctionFromName(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -961,7 +961,7 @@ void sf_eng_pfnFunctionFromName(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(v8::External::New(isolate, (*g_engfuncs.pfnFunctionFromName)(utils::js2string(isolate, info[0]))));
 }
 
-// nodemod.eng.nameForFunction();
+// nodemod.eng.nameForFunction(callback: ArrayBuffer | Uint8Array | null);
 void sf_eng_pfnNameForFunction(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -974,7 +974,7 @@ void sf_eng_pfnNameForFunction(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(v8::String::NewFromUtf8(isolate, temp_str ? temp_str : "").ToLocalChecked());
 }
 
-// nodemod.eng.clientPrintf();
+// nodemod.eng.clientPrintf(pEdict: Entity, ptype: number, szMsg: string);
 void sf_eng_pfnClientPrintf(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -984,7 +984,7 @@ void sf_eng_pfnClientPrintf(const v8::FunctionCallbackInfo<v8::Value>& info)
 utils::js2string(isolate, info[2]));
 }
 
-// nodemod.eng.serverPrint();
+// nodemod.eng.serverPrint(szMsg: string);
 void sf_eng_pfnServerPrint(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1001,7 +1001,7 @@ void sf_eng_pfnCmd_Args(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(v8::String::NewFromUtf8(isolate, temp_str ? temp_str : "").ToLocalChecked());
 }
 
-// nodemod.eng.cmdArgv();
+// nodemod.eng.cmdArgv(argc: number);
 void sf_eng_pfnCmd_Argv(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1018,7 +1018,7 @@ void sf_eng_pfnCmd_Argc(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnCmd_Argc)()));
 }
 
-// nodemod.eng.getAttachment();
+// nodemod.eng.getAttachment(pEdict: Entity, iAttachment: number, rgflOrigin: number[], rgflAngles: number[]);
 void sf_eng_pfnGetAttachment(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1036,7 +1036,7 @@ info[1]->Int32Value(context).ToChecked(),
 (float*)utils::jsToPointer(isolate, info[3]));
 }
 
-// nodemod.eng.randomLong();
+// nodemod.eng.randomLong(lLow: number, lHigh: number);
 void sf_eng_pfnRandomLong(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1045,7 +1045,7 @@ void sf_eng_pfnRandomLong(const v8::FunctionCallbackInfo<v8::Value>& info)
 info[1]->Int32Value(context).ToChecked())));
 }
 
-// nodemod.eng.randomFloat();
+// nodemod.eng.randomFloat(flLow: number, flHigh: number);
 void sf_eng_pfnRandomFloat(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1054,7 +1054,7 @@ void sf_eng_pfnRandomFloat(const v8::FunctionCallbackInfo<v8::Value>& info)
 info[1]->NumberValue(context).ToChecked())));
 }
 
-// nodemod.eng.setView();
+// nodemod.eng.setView(pClient: Entity, pViewent: Entity);
 void sf_eng_pfnSetView(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1071,7 +1071,7 @@ void sf_eng_pfnTime(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnTime)()));
 }
 
-// nodemod.eng.crosshairAngle();
+// nodemod.eng.crosshairAngle(pClient: Entity, pitch: number, yaw: number);
 void sf_eng_pfnCrosshairAngle(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1101,7 +1101,7 @@ void sf_eng_pfnLoadFileForMe(const v8::FunctionCallbackInfo<v8::Value>& info)
   };
 }
 
-// nodemod.eng.freeFile();
+// nodemod.eng.freeFile(buffer: ArrayBuffer | Uint8Array | null);
 void sf_eng_pfnFreeFile(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1113,7 +1113,7 @@ void sf_eng_pfnFreeFile(const v8::FunctionCallbackInfo<v8::Value>& info)
   (*g_engfuncs.pfnFreeFile)(utils::jsToPointer(isolate, info[0]));
 }
 
-// nodemod.eng.endSection();
+// nodemod.eng.endSection(pszSectionName: string);
 void sf_eng_pfnEndSection(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1121,7 +1121,7 @@ void sf_eng_pfnEndSection(const v8::FunctionCallbackInfo<v8::Value>& info)
   (*g_engfuncs.pfnEndSection)(utils::js2string(isolate, info[0]));
 }
 
-// nodemod.eng.compareFileTime();
+// nodemod.eng.compareFileTime(filename1: string, filename2: string, iCompare: number[]);
 void sf_eng_pfnCompareFileTime(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1135,7 +1135,7 @@ utils::js2string(isolate, info[1]),
 (int*)utils::jsToPointer(isolate, info[2]))));
 }
 
-// nodemod.eng.getGameDir();
+// nodemod.eng.getGameDir(szGetGameDir: string);
 void sf_eng_pfnGetGameDir(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1143,7 +1143,7 @@ void sf_eng_pfnGetGameDir(const v8::FunctionCallbackInfo<v8::Value>& info)
   (*g_engfuncs.pfnGetGameDir)(utils::js2string(isolate, info[0]));
 }
 
-// nodemod.eng.cvarRegisterVariable();
+// nodemod.eng.cvarRegisterVariable(variable: Cvar);
 void sf_eng_pfnCvar_RegisterVariable(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1155,7 +1155,7 @@ void sf_eng_pfnCvar_RegisterVariable(const v8::FunctionCallbackInfo<v8::Value>& 
   (*g_engfuncs.pfnCvar_RegisterVariable)((cvar_t*)structures::unwrapCvar(isolate, info[0]));;
 }
 
-// nodemod.eng.fadeClientVolume();
+// nodemod.eng.fadeClientVolume(pEdict: Entity, fadePercent: number, fadeOutSeconds: number, holdTime: number, fadeInSeconds: number);
 void sf_eng_pfnFadeClientVolume(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1167,7 +1167,7 @@ info[3]->Int32Value(context).ToChecked(),
 info[4]->Int32Value(context).ToChecked());
 }
 
-// nodemod.eng.setClientMaxspeed();
+// nodemod.eng.setClientMaxspeed(pEdict: Entity, fNewMaxspeed: number);
 void sf_eng_pfnSetClientMaxspeed(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1176,7 +1176,7 @@ void sf_eng_pfnSetClientMaxspeed(const v8::FunctionCallbackInfo<v8::Value>& info
 info[1]->NumberValue(context).ToChecked());
 }
 
-// nodemod.eng.createFakeClient();
+// nodemod.eng.createFakeClient(netname: string);
 void sf_eng_pfnCreateFakeClient(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1184,7 +1184,7 @@ void sf_eng_pfnCreateFakeClient(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(structures::wrapEntity(isolate, (*g_engfuncs.pfnCreateFakeClient)(utils::js2string(isolate, info[0]))));
 }
 
-// nodemod.eng.runPlayerMove();
+// nodemod.eng.runPlayerMove(fakeclient: Entity, viewangles: number[], forwardmove: number, sidemove: number, upmove: number, buttons: number, impulse: number, msec: number);
 void sf_eng_pfnRunPlayerMove(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1211,7 +1211,7 @@ void sf_eng_pfnNumberOfEntities(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnNumberOfEntities)()));
 }
 
-// nodemod.eng.getInfoKeyBuffer();
+// nodemod.eng.getInfoKeyBuffer(e: Entity);
 void sf_eng_pfnGetInfoKeyBuffer(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1220,7 +1220,7 @@ void sf_eng_pfnGetInfoKeyBuffer(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(v8::String::NewFromUtf8(isolate, temp_str ? temp_str : "").ToLocalChecked());
 }
 
-// nodemod.eng.infoKeyValue();
+// nodemod.eng.infoKeyValue(infobuffer: string, key: string);
 void sf_eng_pfnInfoKeyValue(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1230,7 +1230,7 @@ utils::js2string(isolate, info[1]));
   info.GetReturnValue().Set(v8::String::NewFromUtf8(isolate, temp_str ? temp_str : "").ToLocalChecked());
 }
 
-// nodemod.eng.setKeyValue();
+// nodemod.eng.setKeyValue(infobuffer: string, key: string, value: string);
 void sf_eng_pfnSetKeyValue(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1240,7 +1240,7 @@ utils::js2string(isolate, info[1]),
 utils::js2string(isolate, info[2]));
 }
 
-// nodemod.eng.setClientKeyValue();
+// nodemod.eng.setClientKeyValue(clientIndex: number, infobuffer: string, key: string, value: string);
 void sf_eng_pfnSetClientKeyValue(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1251,7 +1251,7 @@ utils::js2string(isolate, info[2]),
 utils::js2string(isolate, info[3]));
 }
 
-// nodemod.eng.isMapValid();
+// nodemod.eng.isMapValid(filename: string);
 void sf_eng_pfnIsMapValid(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1259,7 +1259,7 @@ void sf_eng_pfnIsMapValid(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnIsMapValid)(utils::js2string(isolate, info[0]))));
 }
 
-// nodemod.eng.staticDecal();
+// nodemod.eng.staticDecal(origin: number[], decalIndex: number, entityIndex: number, modelIndex: number);
 void sf_eng_pfnStaticDecal(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1274,7 +1274,7 @@ info[2]->Int32Value(context).ToChecked(),
 info[3]->Int32Value(context).ToChecked());
 }
 
-// nodemod.eng.precacheGeneric();
+// nodemod.eng.precacheGeneric(s: string);
 void sf_eng_pfnPrecacheGeneric(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1282,7 +1282,7 @@ void sf_eng_pfnPrecacheGeneric(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnPrecacheGeneric)(utils::js2string(isolate, info[0]))));
 }
 
-// nodemod.eng.getPlayerUserId();
+// nodemod.eng.getPlayerUserId(e: Entity);
 void sf_eng_pfnGetPlayerUserId(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1290,7 +1290,7 @@ void sf_eng_pfnGetPlayerUserId(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnGetPlayerUserId)(structures::unwrapEntity(isolate, info[0]))));
 }
 
-// nodemod.eng.buildSoundMsg();
+// nodemod.eng.buildSoundMsg(entity: Entity, channel: number, sample: string, volume: number, attenuation: number, fFlags: number, pitch: number, msg_dest: number, msg_type: number, pOrigin: number[], ed: Entity);
 void sf_eng_pfnBuildSoundMsg(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1320,7 +1320,7 @@ void sf_eng_pfnIsDedicatedServer(const v8::FunctionCallbackInfo<v8::Value>& info
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnIsDedicatedServer)()));
 }
 
-// nodemod.eng.cVarGetPointer();
+// nodemod.eng.cVarGetPointer(szVarName: string);
 void sf_eng_pfnCVarGetPointer(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1328,7 +1328,7 @@ void sf_eng_pfnCVarGetPointer(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(structures::wrapCvar(isolate, (*g_engfuncs.pfnCVarGetPointer)(utils::js2string(isolate, info[0]))));
 }
 
-// nodemod.eng.getPlayerWONId();
+// nodemod.eng.getPlayerWONId(e: Entity);
 void sf_eng_pfnGetPlayerWONId(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1336,7 +1336,7 @@ void sf_eng_pfnGetPlayerWONId(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnGetPlayerWONId)(structures::unwrapEntity(isolate, info[0]))));
 }
 
-// nodemod.eng.infoRemoveKey();
+// nodemod.eng.infoRemoveKey(s: string, key: string);
 void sf_eng_pfnInfo_RemoveKey(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1345,7 +1345,7 @@ void sf_eng_pfnInfo_RemoveKey(const v8::FunctionCallbackInfo<v8::Value>& info)
 utils::js2string(isolate, info[1]));
 }
 
-// nodemod.eng.getPhysicsKeyValue();
+// nodemod.eng.getPhysicsKeyValue(pClient: Entity, key: string);
 void sf_eng_pfnGetPhysicsKeyValue(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1355,7 +1355,7 @@ utils::js2string(isolate, info[1]));
   info.GetReturnValue().Set(v8::String::NewFromUtf8(isolate, temp_str ? temp_str : "").ToLocalChecked());
 }
 
-// nodemod.eng.setPhysicsKeyValue();
+// nodemod.eng.setPhysicsKeyValue(pClient: Entity, key: string, value: string);
 void sf_eng_pfnSetPhysicsKeyValue(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1365,7 +1365,7 @@ utils::js2string(isolate, info[1]),
 utils::js2string(isolate, info[2]));
 }
 
-// nodemod.eng.getPhysicsInfoString();
+// nodemod.eng.getPhysicsInfoString(pClient: Entity);
 void sf_eng_pfnGetPhysicsInfoString(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1374,7 +1374,7 @@ void sf_eng_pfnGetPhysicsInfoString(const v8::FunctionCallbackInfo<v8::Value>& i
   info.GetReturnValue().Set(v8::String::NewFromUtf8(isolate, temp_str ? temp_str : "").ToLocalChecked());
 }
 
-// nodemod.eng.precacheEvent();
+// nodemod.eng.precacheEvent(type: number, psz: string);
 void sf_eng_pfnPrecacheEvent(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1383,7 +1383,7 @@ void sf_eng_pfnPrecacheEvent(const v8::FunctionCallbackInfo<v8::Value>& info)
 utils::js2string(isolate, info[1]))));
 }
 
-// nodemod.eng.playbackEvent();
+// nodemod.eng.playbackEvent(flags: number, pInvoker: Entity, eventindex: number, delay: number, origin: number[], angles: number[], fparam1: number, fparam2: number, iparam1: number, iparam2: number, bparam1: number, bparam2: number);
 void sf_eng_pfnPlaybackEvent(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1445,7 +1445,7 @@ void sf_eng_pfnSetFatPAS(const v8::FunctionCallbackInfo<v8::Value>& info)
   };
 }
 
-// nodemod.eng.checkVisibility();
+// nodemod.eng.checkVisibility(entity: Entity, pset: number[]);
 void sf_eng_pfnCheckVisibility(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1454,7 +1454,7 @@ void sf_eng_pfnCheckVisibility(const v8::FunctionCallbackInfo<v8::Value>& info)
 (unsigned char*)utils::jsToPointer(isolate, info[1]))));
 }
 
-// nodemod.eng.deltaSetField();
+// nodemod.eng.deltaSetField(pFields: Delta, fieldname: string);
 void sf_eng_pfnDeltaSetField(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1463,7 +1463,7 @@ void sf_eng_pfnDeltaSetField(const v8::FunctionCallbackInfo<v8::Value>& info)
 utils::js2string(isolate, info[1]));
 }
 
-// nodemod.eng.deltaUnsetField();
+// nodemod.eng.deltaUnsetField(pFields: Delta, fieldname: string);
 void sf_eng_pfnDeltaUnsetField(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1582,7 +1582,7 @@ void sf_eng_pfnGetCurrentPlayer(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnGetCurrentPlayer)()));
 }
 
-// nodemod.eng.canSkipPlayer();
+// nodemod.eng.canSkipPlayer(player: Entity);
 void sf_eng_pfnCanSkipPlayer(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1590,7 +1590,7 @@ void sf_eng_pfnCanSkipPlayer(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnCanSkipPlayer)(structures::unwrapEntity(isolate, info[0]))));
 }
 
-// nodemod.eng.deltaFindField();
+// nodemod.eng.deltaFindField(pFields: Delta, fieldname: string);
 void sf_eng_pfnDeltaFindField(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1599,7 +1599,7 @@ void sf_eng_pfnDeltaFindField(const v8::FunctionCallbackInfo<v8::Value>& info)
 utils::js2string(isolate, info[1]))));
 }
 
-// nodemod.eng.deltaSetFieldByIndex();
+// nodemod.eng.deltaSetFieldByIndex(pFields: Delta, fieldNumber: number);
 void sf_eng_pfnDeltaSetFieldByIndex(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1608,7 +1608,7 @@ void sf_eng_pfnDeltaSetFieldByIndex(const v8::FunctionCallbackInfo<v8::Value>& i
 info[1]->Int32Value(context).ToChecked());
 }
 
-// nodemod.eng.deltaUnsetFieldByIndex();
+// nodemod.eng.deltaUnsetFieldByIndex(pFields: Delta, fieldNumber: number);
 void sf_eng_pfnDeltaUnsetFieldByIndex(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1617,7 +1617,7 @@ void sf_eng_pfnDeltaUnsetFieldByIndex(const v8::FunctionCallbackInfo<v8::Value>&
 info[1]->Int32Value(context).ToChecked());
 }
 
-// nodemod.eng.setGroupMask();
+// nodemod.eng.setGroupMask(mask: number, op: number);
 void sf_eng_pfnSetGroupMask(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1626,7 +1626,7 @@ void sf_eng_pfnSetGroupMask(const v8::FunctionCallbackInfo<v8::Value>& info)
 info[1]->Int32Value(context).ToChecked());
 }
 
-// nodemod.eng.createInstancedBaseline();
+// nodemod.eng.createInstancedBaseline(classname: number, baseline: EntityState);
 void sf_eng_pfnCreateInstancedBaseline(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1635,7 +1635,7 @@ void sf_eng_pfnCreateInstancedBaseline(const v8::FunctionCallbackInfo<v8::Value>
 structures::unwrapEntityState(isolate, info[1]))));
 }
 
-// nodemod.eng.cvarDirectSet();
+// nodemod.eng.cvarDirectSet(variable: Cvar, value: string);
 void sf_eng_pfnCvar_DirectSet(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1643,7 +1643,7 @@ void sf_eng_pfnCvar_DirectSet(const v8::FunctionCallbackInfo<v8::Value>& info)
   (*g_engfuncs.pfnCvar_DirectSet)((cvar_t*)structures::unwrapCvar(isolate, info[0]), utils::js2string(isolate, info[1]));;
 }
 
-// nodemod.eng.forceUnmodified();
+// nodemod.eng.forceUnmodified(type: number, mins: number[], maxs: number[], filename: string);
 void sf_eng_pfnForceUnmodified(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1661,7 +1661,7 @@ void sf_eng_pfnForceUnmodified(const v8::FunctionCallbackInfo<v8::Value>& info)
 utils::js2string(isolate, info[3]));
 }
 
-// nodemod.eng.getPlayerStats();
+// nodemod.eng.getPlayerStats(pClient: Entity, ping: number[], packet_loss: number[]);
 void sf_eng_pfnGetPlayerStats(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1757,7 +1757,7 @@ void sf_eng_pfnAddServerCommand(const v8::FunctionCallbackInfo<v8::Value>& info)
   printf("[DEBUG] pfnAddServerCommand completed for '%s'\n", cmdName.c_str());;
 }
 
-// nodemod.eng.voiceGetClientListening();
+// nodemod.eng.voiceGetClientListening(iReceiver: number, iSender: number);
 void sf_eng_pfnVoice_GetClientListening(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1766,7 +1766,7 @@ void sf_eng_pfnVoice_GetClientListening(const v8::FunctionCallbackInfo<v8::Value
 info[1]->Int32Value(context).ToChecked())));
 }
 
-// nodemod.eng.voiceSetClientListening();
+// nodemod.eng.voiceSetClientListening(iReceiver: number, iSender: number, bListen: boolean);
 void sf_eng_pfnVoice_SetClientListening(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1776,7 +1776,7 @@ info[1]->Int32Value(context).ToChecked(),
 info[2]->BooleanValue(isolate))));
 }
 
-// nodemod.eng.getPlayerAuthId();
+// nodemod.eng.getPlayerAuthId(e: Entity);
 void sf_eng_pfnGetPlayerAuthId(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1785,7 +1785,7 @@ void sf_eng_pfnGetPlayerAuthId(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(v8::String::NewFromUtf8(isolate, temp_str ? temp_str : "").ToLocalChecked());
 }
 
-// nodemod.eng.sequenceGet();
+// nodemod.eng.sequenceGet(fileName: string, entryName: string);
 void sf_eng_pfnSequenceGet(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1794,7 +1794,7 @@ void sf_eng_pfnSequenceGet(const v8::FunctionCallbackInfo<v8::Value>& info)
 utils::js2string(isolate, info[1]))));
 }
 
-// nodemod.eng.sequencePickSentence();
+// nodemod.eng.sequencePickSentence(groupName: string, pickMethod: number, picked: number[]);
 void sf_eng_pfnSequencePickSentence(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1808,7 +1808,7 @@ info[1]->Int32Value(context).ToChecked(),
 (int*)utils::jsToPointer(isolate, info[2]))));
 }
 
-// nodemod.eng.getFileSize();
+// nodemod.eng.getFileSize(filename: string);
 void sf_eng_pfnGetFileSize(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1816,7 +1816,7 @@ void sf_eng_pfnGetFileSize(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnGetFileSize)(utils::js2string(isolate, info[0]))));
 }
 
-// nodemod.eng.getApproxWavePlayLen();
+// nodemod.eng.getApproxWavePlayLen(filepath: string);
 void sf_eng_pfnGetApproxWavePlayLen(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1832,7 +1832,7 @@ void sf_eng_pfnIsCareerMatch(const v8::FunctionCallbackInfo<v8::Value>& info)
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnIsCareerMatch)()));
 }
 
-// nodemod.eng.getLocalizedStringLength();
+// nodemod.eng.getLocalizedStringLength(label: string);
 void sf_eng_pfnGetLocalizedStringLength(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1840,7 +1840,7 @@ void sf_eng_pfnGetLocalizedStringLength(const v8::FunctionCallbackInfo<v8::Value
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnGetLocalizedStringLength)(utils::js2string(isolate, info[0]))));
 }
 
-// nodemod.eng.registerTutorMessageShown();
+// nodemod.eng.registerTutorMessageShown(mid: number);
 void sf_eng_pfnRegisterTutorMessageShown(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1848,7 +1848,7 @@ void sf_eng_pfnRegisterTutorMessageShown(const v8::FunctionCallbackInfo<v8::Valu
   (*g_engfuncs.pfnRegisterTutorMessageShown)(info[0]->Int32Value(context).ToChecked());
 }
 
-// nodemod.eng.getTimesTutorMessageShown();
+// nodemod.eng.getTimesTutorMessageShown(mid: number);
 void sf_eng_pfnGetTimesTutorMessageShown(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1856,7 +1856,7 @@ void sf_eng_pfnGetTimesTutorMessageShown(const v8::FunctionCallbackInfo<v8::Valu
   info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnGetTimesTutorMessageShown)(info[0]->Int32Value(context).ToChecked())));
 }
 
-// nodemod.eng.processTutorMessageDecayBuffer();
+// nodemod.eng.processTutorMessageDecayBuffer(buffer: number[]);
 void sf_eng_pfnProcessTutorMessageDecayBuffer(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1873,7 +1873,7 @@ bufferLength);
   delete[] buffer; // Free allocated array
 }
 
-// nodemod.eng.constructTutorMessageDecayBuffer();
+// nodemod.eng.constructTutorMessageDecayBuffer(buffer: number[]);
 void sf_eng_pfnConstructTutorMessageDecayBuffer(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1898,7 +1898,7 @@ void sf_eng_pfnResetTutorMessageDecayData(const v8::FunctionCallbackInfo<v8::Val
   (*g_engfuncs.pfnResetTutorMessageDecayData)();
 }
 
-// nodemod.eng.queryClientCvarValue();
+// nodemod.eng.queryClientCvarValue(player: Entity, cvarName: string);
 void sf_eng_pfnQueryClientCvarValue(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1907,7 +1907,7 @@ void sf_eng_pfnQueryClientCvarValue(const v8::FunctionCallbackInfo<v8::Value>& i
 utils::js2string(isolate, info[1]));
 }
 
-// nodemod.eng.queryClientCvarValue2();
+// nodemod.eng.queryClientCvarValue2(player: Entity, cvarName: string, requestID: number);
 void sf_eng_pfnQueryClientCvarValue2(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1917,7 +1917,7 @@ utils::js2string(isolate, info[1]),
 info[2]->Int32Value(context).ToChecked());
 }
 
-// nodemod.eng.checkParm();
+// nodemod.eng.checkParm(parm: string, ppnext: string[]);
 void sf_eng_CheckParm(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
@@ -1926,7 +1926,7 @@ void sf_eng_CheckParm(const v8::FunctionCallbackInfo<v8::Value>& info)
 (char**)utils::jsToPointer(isolate, info[1]))));
 }
 
-// nodemod.eng.pEntityOfEntIndexAllEntities();
+// nodemod.eng.pEntityOfEntIndexAllEntities(iEntIndex: number);
 void sf_eng_pfnPEntityOfEntIndexAllEntities(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
