@@ -100,8 +100,15 @@ else()
 
 	# these will break compatibility with other architectures
 	# but for now it's required for our purposes
-	target_compile_options(${PROJECT_NAME} PRIVATE -m32)
+	# Force older C++ ABI for compatibility with ReHLDS
+	target_compile_options(${PROJECT_NAME} PRIVATE -m32 -D_GLIBCXX_USE_CXX11_ABI=0)
 	target_link_options(${PROJECT_NAME} PRIVATE -m32)
+	
+	# Use static C++ runtime to avoid conflicts with old libs in HLDS directories
+	target_link_options(${PROJECT_NAME} PRIVATE -static-libstdc++ -static-libgcc)
+	
+	# Use version script to control symbol visibility and avoid ReHLDS conflicts
+	target_link_options(${PROJECT_NAME} PRIVATE -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/nodemod.lds)
 endif()
 
 # link dependency libraries
@@ -171,8 +178,8 @@ else()
 	)
 endif()
 
-# enable static runtime linking
-set_compiler_runtime(${PROJECT_NAME} STATIC)
+# Use dynamic C++ runtime linking to match ReHLDS (Node.js remains statically linked)
+# Removed: set_compiler_runtime(${PROJECT_NAME} STATIC)
 
 # set build output directory
 set(DIR_COMMON_OUTPUT 

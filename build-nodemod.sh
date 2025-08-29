@@ -23,7 +23,6 @@ docker run --name "${CONTAINER_NAME}" \
         
         echo 'Building Node.js v24 from source...'
         cd /app
-        ./scripts/build-node-from-source.sh
         
         echo 'Bootstrapping vcpkg...'
         cd /app/deps/vcpkg && ./bootstrap-vcpkg.sh
@@ -40,14 +39,16 @@ docker run --name "${CONTAINER_NAME}" \
         cmake --build . --config Debug
     "
 
-echo "Container run completed. Built files are available in ./output/"
-echo "The compiled libnodemod.so should be in ./output/Debug/bin/"
+echo "Container run completed. Built files are available in ./build/"
+echo "The compiled libnodemod.so should be in ./build/Debug/bin/"
 
 # Copy the built .so file to the HLDS installation
 if [ -f "./build/Debug/bin/libnodemod.so" ]; then
     echo "Copying libnodemod.so to HLDS installation..."
     mkdir -p "/home/stevenlafl/Containers/hlds/hlds/ts/addons/nodemod/dlls/"
     cp "./build/Debug/bin/libnodemod.so" "/home/stevenlafl/Containers/hlds/hlds/ts/addons/nodemod/dlls/"
+    cp "./build/Debug/bin/libnodemod.so" "/home/stevenlafl/Containers/hlds/hlds-new/ts/addons/nodemod/dlls/"
+    cp "./build/Debug/bin/libnodemod.so" "/home/stevenlafl/Containers/hlds/hlds-notloggedin/ts/addons/nodemod/dlls/"
     echo "✓ libnodemod.so copied successfully to /home/stevenlafl/Containers/hlds/hlds/ts/addons/nodemod/dlls/"
 else
     echo "✗ libnodemod.so not found in ./build/Debug/bin/"

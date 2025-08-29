@@ -1495,7 +1495,7 @@ void sf_eng_pfnDeltaAddEncoder(const v8::FunctionCallbackInfo<v8::Value>& info)
   std::string encoderName = utils::js_to_string(isolate, info[0]);
   v8::Local<v8::Function> jsCallback = info[1].As<v8::Function>();
   
-  printf("[DEBUG] Registering delta encoder: '%s'\n", encoderName.c_str());
+  //printf("[DEBUG] Registering delta encoder: '%s'\n", encoderName.c_str());
   
   // Store the JavaScript callback globally
   extern std::unordered_map<std::string, v8::Global<v8::Function>> deltaEncoderCallbacks;
@@ -1504,21 +1504,21 @@ void sf_eng_pfnDeltaAddEncoder(const v8::FunctionCallbackInfo<v8::Value>& info)
   deltaEncoderCallbacks[encoderName].Reset(isolate, jsCallback);
   deltaEncoderContexts[encoderName].Reset(isolate, context);
   
-  printf("[DEBUG] Stored delta encoder callback for '%s', total encoders: %zu\n", encoderName.c_str(), deltaEncoderCallbacks.size());
+  //printf("[DEBUG] Stored delta encoder callback for '%s', total encoders: %zu\n", encoderName.c_str(), deltaEncoderCallbacks.size());
   
   // Create C++ wrapper function specific to this encoder
   // We need to capture the encoderName in the lambda closure
   auto namedWrapperFunction = [encoderName](struct delta_s *pFields, const unsigned char *from, const unsigned char *to) {
-    printf("[DEBUG] Delta encoder callback triggered for: '%s'\n", encoderName.c_str());
+    //printf("[DEBUG] Delta encoder callback triggered for: '%s'\n", encoderName.c_str());
     
     auto callbackIter = deltaEncoderCallbacks.find(encoderName);
     auto contextIter = deltaEncoderContexts.find(encoderName);
     
-    printf("[DEBUG] Looking for delta encoder callback for: '%s'\n", encoderName.c_str());
-    printf("[DEBUG] Found callback: %s\n", (callbackIter != deltaEncoderCallbacks.end()) ? "YES" : "NO");
+    //printf("[DEBUG] Looking for delta encoder callback for: '%s'\n", encoderName.c_str());
+    //printf("[DEBUG] Found callback: %s\n", (callbackIter != deltaEncoderCallbacks.end()) ? "YES" : "NO");
     
     if (callbackIter != deltaEncoderCallbacks.end() && contextIter != deltaEncoderContexts.end()) {
-      printf("[DEBUG] Calling JavaScript delta encoder callback for '%s'\n", encoderName.c_str());
+      //printf("[DEBUG] Calling JavaScript delta encoder callback for '%s'\n", encoderName.c_str());
       auto isolate = nodeImpl.GetIsolate();
       v8::Locker locker(isolate);
       v8::Isolate::Scope isolateScope(isolate);
@@ -1548,7 +1548,7 @@ void sf_eng_pfnDeltaAddEncoder(const v8::FunctionCallbackInfo<v8::Value>& info)
         printf("Error in delta encoder callback: %s\n", *error);
       }
     } else {
-      printf("[DEBUG] No callback found for delta encoder: '%s'\n", encoderName.c_str());
+      //printf("[DEBUG] No callback found for delta encoder: '%s'\n", encoderName.c_str());
     }
   };
   
@@ -1561,17 +1561,17 @@ void sf_eng_pfnDeltaAddEncoder(const v8::FunctionCallbackInfo<v8::Value>& info)
   auto cWrapperFunction = [](struct delta_s *pFields, const unsigned char *from, const unsigned char *to) {
     // This is tricky - we need to figure out which encoder this is for
     // For a simplified approach, we'll call all registered encoders
-    printf("[DEBUG] Generic delta encoder wrapper called\n");
+    //printf("[DEBUG] Generic delta encoder wrapper called\n");
     
     for (auto& pair : deltaEncoderWrappers) {
-      printf("[DEBUG] Trying delta encoder: '%s'\n", pair.first.c_str());
+      //printf("[DEBUG] Trying delta encoder: '%s'\n", pair.first.c_str());
       pair.second(pFields, from, to);
     }
   };
   
-  printf("[DEBUG] Calling pfnDeltaAddEncoder for '%s'\n", encoderName.c_str());
+  //printf("[DEBUG] Calling pfnDeltaAddEncoder for '%s'\n", encoderName.c_str());
   (*g_engfuncs.pfnDeltaAddEncoder)(encoderName.c_str(), cWrapperFunction);
-  printf("[DEBUG] pfnDeltaAddEncoder completed for '%s'\n", encoderName.c_str());;
+  //printf("[DEBUG] pfnDeltaAddEncoder completed for '%s'\n", encoderName.c_str());;
 }
 
 // nodemod.eng.getCurrentPlayer();
@@ -1701,7 +1701,7 @@ void sf_eng_pfnAddServerCommand(const v8::FunctionCallbackInfo<v8::Value>& info)
   std::string cmdName = utils::js_to_string(isolate, info[0]);
   v8::Local<v8::Function> jsCallback = info[1].As<v8::Function>();
   
-  printf("[DEBUG] Registering server command: '%s'\n", cmdName.c_str());
+  //printf("[DEBUG] Registering server command: '%s'\n", cmdName.c_str());
   
   // Store the JavaScript callback globally
   extern std::unordered_map<std::string, v8::Global<v8::Function>> serverCommandCallbacks;
@@ -1710,25 +1710,25 @@ void sf_eng_pfnAddServerCommand(const v8::FunctionCallbackInfo<v8::Value>& info)
   serverCommandCallbacks[cmdName].Reset(isolate, jsCallback);
   serverCommandContexts[cmdName].Reset(isolate, context);
   
-  printf("[DEBUG] Stored callback for '%s', total commands: %zu\n", cmdName.c_str(), serverCommandCallbacks.size());
+  //printf("[DEBUG] Stored callback for '%s', total commands: %zu\n", cmdName.c_str(), serverCommandCallbacks.size());
   
   // Create C++ wrapper function
   static auto wrapperFunction = []() {
-    printf("[DEBUG] Server command wrapper called\n");
+    //printf("[DEBUG] Server command wrapper called\n");
     // Get command name from engine - use CMD_ARGV(0) not CMD_ARGS()
     const char* cmdNamePtr = CMD_ARGV(0);
     std::string cmdName(cmdNamePtr ? cmdNamePtr : "");
-    printf("[DEBUG] CMD_ARGV(0) returned: '%s'\n", cmdNamePtr ? cmdNamePtr : "(null)");
-    printf("[DEBUG] Extracted command name: '%s'\n", cmdName.c_str());
+    //printf("[DEBUG] CMD_ARGV(0) returned: '%s'\n", cmdNamePtr ? cmdNamePtr : "(null)");
+    //printf("[DEBUG] Extracted command name: '%s'\n", cmdName.c_str());
     
     auto callbackIter = serverCommandCallbacks.find(cmdName);
     auto contextIter = serverCommandContexts.find(cmdName);
     
-    printf("[DEBUG] Looking for callback for command: '%s'\n", cmdName.c_str());
-    printf("[DEBUG] Found callback: %s\n", (callbackIter != serverCommandCallbacks.end()) ? "YES" : "NO");
+    //printf("[DEBUG] Looking for callback for command: '%s'\n", cmdName.c_str());
+    //printf("[DEBUG] Found callback: %s\n", (callbackIter != serverCommandCallbacks.end()) ? "YES" : "NO");
     
     if (callbackIter != serverCommandCallbacks.end() && contextIter != serverCommandContexts.end()) {
-      printf("[DEBUG] Calling JavaScript callback for '%s'\n", cmdName.c_str());
+      //printf("[DEBUG] Calling JavaScript callback for '%s'\n", cmdName.c_str());
       auto isolate = nodeImpl.GetIsolate();
       v8::Locker locker(isolate);
       v8::Isolate::Scope isolateScope(isolate);
@@ -1752,9 +1752,9 @@ void sf_eng_pfnAddServerCommand(const v8::FunctionCallbackInfo<v8::Value>& info)
     }
   };
   
-  printf("[DEBUG] Calling pfnAddServerCommand for '%s'\n", cmdName.c_str());
+  //printf("[DEBUG] Calling pfnAddServerCommand for '%s'\n", cmdName.c_str());
   (*g_engfuncs.pfnAddServerCommand)(cmdName.c_str(), wrapperFunction);
-  printf("[DEBUG] pfnAddServerCommand completed for '%s'\n", cmdName.c_str());;
+  //printf("[DEBUG] pfnAddServerCommand completed for '%s'\n", cmdName.c_str());;
 }
 
 // nodemod.eng.voiceGetClientListening(iReceiver: number, iSender: number);

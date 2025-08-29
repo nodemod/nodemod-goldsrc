@@ -66,8 +66,8 @@ find "$SEARCH_DIR" -type f -name "*.a" | while read -r THIN_ARCHIVE; do
             cp --parents "$OBJ_FILE" "$TEMP_DIR"
         done
 
-        # Generate the output filename for the fat archive
-        FAT_ARCHIVE="${THIN_ARCHIVE%.a}_fat.a"
+        # Generate the output filename for the fat archive (convert to absolute path)
+        FAT_ARCHIVE="$(realpath "${THIN_ARCHIVE%.a}_fat.a")"
 
         # Repack the object files into a new fat archive
         echo " -> Repacking files into a fat archive: $FAT_ARCHIVE"

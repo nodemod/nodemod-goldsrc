@@ -27,12 +27,19 @@ sed -i 's/REPLACEME/repl/g' doc/api/*.md 2>/dev/null || true
 echo "Skipping clean to preserve git state..."
 # make clean 2>/dev/null || true
 
+echo "Cleaning any previous ICU build artifacts..."
+rm -rf deps/icu-tmp 2>/dev/null || true
+
+echo "Patching Node.js build system to use older C++ ABI for ReHLDS compatibility..."
+# Patch common.gypi to set _GLIBCXX_USE_CXX11_ABI=0 instead of =1 (this is the main source)
+sed -i "s/'_GLIBCXX_USE_CXX11_ABI=1'/'_GLIBCXX_USE_CXX11_ABI=0'/g" common.gypi
+
 echo "Configuring Node.js for 32-bit static build..."
 # Disable git checks and other build checks
 export SKIP_GIT_CHECK=1
 export GIT_DIR=""
-export NODE_GYP_FORCE_PYTHON="python3"
-./configure --fully-static --dest-cpu=ia32 --python=python3
+# Let Node.js auto-detect Python instead of forcing a path
+./configure --fully-static --dest-cpu=ia32
 
 echo "Fixing documentation placeholder issues post-configure..."
 sed -i 's/REPLACEME/repl/g' doc/api/*.md 2>/dev/null || true
@@ -48,16 +55,6 @@ export CXX="g++ -m32"
 export AR="ar"
 export LINK="g++ -m32"
 make -j$(nproc) binary DESTCPU="x86" ARCH="x86" VARIATION="" CFLAGS="-m32 -msse2 -fPIC" CXXFLAGS="-m32 -fPIC" LDFLAGS="-m32" ARFLAGS="rcs"
-
-echo "Converting thin archives to fat archives..."
-# Use our fat_archive.sh script from the scripts directory
-if [ -f "../scripts/fat_archive.sh" ]; then
-    echo "Using fat_archive.sh script from scripts directory..."
-    ../scripts/fat_archive.sh out/Release/obj.target
-else
-    echo "Error: fat_archive.sh not found in scripts directory"
-    exit 1
-fi
 
 echo "Creating lib directory structure..."
 mkdir -p lib/Release/linux
