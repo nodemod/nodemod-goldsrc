@@ -1011,13 +1011,20 @@
 
 // nodemod.on('engCmdArgs', () => console.log('engCmdArgs fired!'));
   const char * eng_pfnCmd_Args () {
+    printf("[DEBUG] eng_pfnCmd_Args called\n");
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("engCmdArgs", nullptr, 0);
+    printf("[DEBUG] eng_pfnCmd_Args result: mres=%d, override_ret=%p\n", gpMetaGlobals->mres, gpMetaGlobals->override_ret);
+
+    if (gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
 // nodemod.on('engCmdArgv', (argc) => console.log('engCmdArgv fired!'));
   const char * eng_pfnCmd_Argv (int argc) {
+    printf("[DEBUG] eng_pfnCmd_Argv called with argc=%d\n", argc);
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("engCmdArgv", [=](v8::Isolate* isolate) {
       unsigned int v8_argCount = 1;
@@ -1025,13 +1032,24 @@
       v8_args[0] = v8::Number::New(isolate, argc); // argc (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    printf("[DEBUG] eng_pfnCmd_Argv result: mres=%d, override_ret=%p\n", gpMetaGlobals->mres, gpMetaGlobals->override_ret);
+
+    if (gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
 // nodemod.on('engCmdArgc', () => console.log('engCmdArgc fired!'));
   int eng_pfnCmd_Argc () {
+    printf("[DEBUG] eng_pfnCmd_Argc called\n");
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("engCmdArgc", nullptr, 0);
+    printf("[DEBUG] eng_pfnCmd_Argc result: mres=%d, override_ret=%p\n", gpMetaGlobals->mres, gpMetaGlobals->override_ret);
+    
+    if (gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 

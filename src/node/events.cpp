@@ -5,6 +5,17 @@
 #include "events.hpp"
 #include "common/logger.hpp"
 #include "utils.hpp"
+#include <extdll.h>
+#include <meta_api.h>
+
+// Save metamod's LOG_ERROR macro, then undefine it to avoid conflict with logger
+#ifdef LOG_ERROR
+#define METAMOD_LOG_ERROR LOG_ERROR
+#undef LOG_ERROR
+#endif
+
+// Include metamod globals for override_ret access
+extern meta_globals_t *gpMetaGlobals;
 
 	eventsContainer events = eventsContainer();
 
@@ -272,7 +283,26 @@
 			v8::TryCatch eh(isolate);
 
 			v8::Local<v8::Function> function = listener.function.Get(isolate);
-			function->Call(ctx, ctx->Global(), argCount, args);
+			v8::MaybeLocal<v8::Value> maybeResult = function->Call(ctx, ctx->Global(), argCount, args);
+			v8::Local<v8::Value> result;
+			if (maybeResult.ToLocal(&result)) {
+				if (result->IsNumber()) {
+					double num = result->NumberValue(ctx).ToChecked();
+					printf("JS returned number: %f\n", num);
+				} else if (result->IsBoolean()) {
+					bool val = result->BooleanValue(isolate);
+					printf("JS returned boolean: %s\n", val ? "true" : "false");
+				} else if (result->IsString()) {
+					v8::String::Utf8Value str(isolate, result);
+					printf("JS returned string: %s\n", *str);
+				}
+
+				// Capture return value for metamod override_ret if gpMetaGlobals is available
+				if (gpMetaGlobals && !result.IsEmpty()) {
+					gpMetaGlobals->override_ret = utils::jsToPointer(isolate, result);
+					if (gpMetaGlobals->override_ret) printf("override_ret = %p, override_ret (char*) = %s\n", (void*)gpMetaGlobals->override_ret, (char *) gpMetaGlobals->override_ret);
+				}
+			}
 
 
 			if (eh.HasCaught())
@@ -316,7 +346,25 @@ void event::call(argument_collector_t collectArguments)
 			//	L_DEBUG << "Collected: " << argCount << "\n";
 
 			v8::Local<v8::Function> function = listener.function.Get(isolate);
-			function->Call(ctx, ctx->Global(), argCount, args);
+			v8::MaybeLocal<v8::Value> maybeResult = function->Call(ctx, ctx->Global(), argCount, args);
+			v8::Local<v8::Value> result;
+			if (maybeResult.ToLocal(&result)) {
+				// Capture return value for metamod override_ret if gpMetaGlobals is available
+				if (gpMetaGlobals && !result.IsEmpty()) {
+					if (result->IsNumber()) {
+						double num = result->NumberValue(ctx).ToChecked();
+						printf("JS returned number: %f\n", num);
+					} else if (result->IsBoolean()) {
+						bool val = result->BooleanValue(isolate);
+						printf("JS returned boolean: %s\n", val ? "true" : "false");
+					} else if (result->IsString()) {
+						v8::String::Utf8Value str(isolate, result);
+						printf("JS returned string: %s\n", *str);
+					}
+					gpMetaGlobals->override_ret = utils::jsToPointer(isolate, result);
+					if (gpMetaGlobals->override_ret) printf("override_ret = %p, override_ret (char*) = %s\n", (void*)gpMetaGlobals->override_ret, (char *) gpMetaGlobals->override_ret);
+				}
+			}
 
 
 			if (eh.HasCaught())
