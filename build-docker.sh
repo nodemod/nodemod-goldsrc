@@ -7,9 +7,18 @@ set -e
 IMAGE_NAME="xash3d-nodemod"
 IMAGE_TAG="latest"
 
-echo "Building Docker image: ${IMAGE_NAME}:${IMAGE_TAG}"
+# Get current user information
+USER_ID=$(id -u)
+GROUP_ID=$(id -g)
 
-docker build -t "${IMAGE_NAME}:${IMAGE_TAG}" .
+echo "Building Docker image: ${IMAGE_NAME}:${IMAGE_TAG}"
+echo "Using USER_ID=${USER_ID}, GROUP_ID=${GROUP_ID}"
+
+docker build \
+    --build-arg USER_ID=${USER_ID} \
+    --build-arg GROUP_ID=${GROUP_ID} \
+    --build-arg USERNAME=${USERNAME} \
+    -t "${IMAGE_NAME}:${IMAGE_TAG}" .
 
 echo "Docker image built successfully: ${IMAGE_NAME}:${IMAGE_TAG}"
 echo "Built shared library should be available in the container at: /app/build/"
