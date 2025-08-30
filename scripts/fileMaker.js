@@ -89,6 +89,7 @@ const fileMaker = {
     makeStructures(structureInterfaces) {
       const interfaceDefinitions = structureInterfaces.map(iface => {
         const comment = iface.description ? `  /** ${iface.description} */\n` : '';
+        const extendsClause = iface.extends ? ` extends ${iface.extends}` : '';
         const propertyLines = iface.properties.map(prop => {
           if (typeof prop === 'string') {
             return `    ${prop};`;
@@ -97,7 +98,7 @@ const fileMaker = {
             return `${propComment}    ${prop.name}: ${prop.type};`;
           }
         }).join('\n\n');
-        return `${comment}  interface ${iface.name} {\n${propertyLines}\n  }`;
+        return `${comment}  interface ${iface.name}${extendsClause} {\n${propertyLines}\n  }`;
       }).join('\n');
 
       return fileMaker.makeFile(
@@ -175,6 +176,7 @@ const fileMaker = {
     makeSingleIndex(computed, structureInterfaces = [], eventNames = [], eventInterfaces = []) {
       const interfaceDefinitions = structureInterfaces.map(iface => {
         const comment = iface.description ? `  /** ${iface.description} */\n` : '';
+        const extendsClause = iface.extends ? ` extends ${iface.extends}` : '';
         const propertyLines = iface.properties.map(prop => {
           if (typeof prop === 'string') {
             // Simple string property
@@ -185,7 +187,7 @@ const fileMaker = {
             return `${propComment}    ${prop.name}: ${prop.type};`;
           }
         }).join('\n\n');
-        return `${comment}  interface ${iface.name} {\n${propertyLines}\n  }`;
+        return `${comment}  interface ${iface.name}${extendsClause} {\n${propertyLines}\n  }`;
       }).join('\n');
       
       return fileMaker.makeFile(

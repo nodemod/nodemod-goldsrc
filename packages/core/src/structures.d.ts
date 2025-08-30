@@ -12,30 +12,6 @@ declare namespace nodemod {
     /** ACCESSOR_T(..., "globalname", globalname, GETSTR, SETSTR) */
     globalname: string;
 
-    /** ACCESSOR_T(..., "target", target, GETSTR, SETSTR) */
-    target: string;
-
-    /** ACCESSOR_T(..., "targetname", targetname, GETSTR, SETSTR) */
-    targetname: string;
-
-    /** ACCESSOR_T(..., "netname", netname, GETSTR, SETSTR) */
-    netname: string;
-
-    /** ACCESSOR_T(..., "message", message, GETSTR, SETSTR) */
-    message: string;
-
-    /** ACCESSOR_T(..., "noise", noise, GETSTR, SETSTR) */
-    noise: string;
-
-    /** ACCESSOR_T(..., "noise1", noise1, GETSTR, SETSTR) */
-    noise1: string;
-
-    /** ACCESSOR_T(..., "noise2", noise2, GETSTR, SETSTR) */
-    noise2: string;
-
-    /** ACCESSOR_T(..., "noise3", noise3, GETSTR, SETSTR) */
-    noise3: string;
-
     /** ACCESSOR_T(..., "origin", origin, GETVEC3, SETVEC3) */
     origin: number[];
 
@@ -72,6 +48,36 @@ declare namespace nodemod {
     /** ACCESSOR_T(..., "startpos", startpos, GETVEC3, SETVEC3) */
     startpos: number[];
 
+    /** ACCESSOR_T(..., "impacttime", impacttime, GETN, SETFLOAT) */
+    impacttime: number;
+
+    /** ACCESSOR_T(..., "starttime", starttime, GETN, SETFLOAT) */
+    starttime: number;
+
+    /** ACCESSOR_T(..., "fixangle", fixangle, GETN, SETINT) */
+    fixangle: number;
+
+    /** ACCESSOR_T(..., "idealpitch", idealpitch, GETN, SETFLOAT) */
+    idealpitch: number;
+
+    /** ACCESSOR_T(..., "pitch_speed", pitch_speed, GETN, SETFLOAT) */
+    pitch_speed: number;
+
+    /** ACCESSOR_T(..., "ideal_yaw", ideal_yaw, GETN, SETFLOAT) */
+    ideal_yaw: number;
+
+    /** ACCESSOR_T(..., "yaw_speed", yaw_speed, GETN, SETFLOAT) */
+    yaw_speed: number;
+
+    /** ACCESSOR_T(..., "modelindex", modelindex, GETN, SETINT) */
+    modelindex: number;
+
+    /** ACCESSOR_T(..., "viewmodel", viewmodel, GETN, SETINT) */
+    viewmodel: number;
+
+    /** ACCESSOR_T(..., "weaponmodel", weaponmodel, GETN, SETINT) */
+    weaponmodel: number;
+
     /** ACCESSOR_T(..., "absmin", absmin, GETVEC3, SETVEC3) */
     absmin: number[];
 
@@ -87,146 +93,11 @@ declare namespace nodemod {
     /** ACCESSOR_T(..., "size", size, GETVEC3, SETVEC3) */
     size: number[];
 
-    /** ACCESSOR_T(..., "rendercolor", rendercolor, GETVEC3, SETVEC3) */
-    rendercolor: number[];
-
-    /** ACCESSOR_T(..., "view_ofs", view_ofs, GETVEC3, SETVEC3) */
-    view_ofs: number[];
-
-    /** ACCESSOR_T(..., "vuser1", vuser1, GETVEC3, SETVEC3) */
-    vuser1: number[];
-
-    /** ACCESSOR_T(..., "vuser2", vuser2, GETVEC3, SETVEC3) */
-    vuser2: number[];
-
-    /** ACCESSOR_T(..., "vuser3", vuser3, GETVEC3, SETVEC3) */
-    vuser3: number[];
-
-    /** ACCESSOR_T(..., "vuser4", vuser4, GETVEC3, SETVEC3) */
-    vuser4: number[];
-
-    /** ACCESSOR_T(..., "impacttime", impacttime, GETN, SETFLOAT) */
-    impacttime: number;
-
-    /** ACCESSOR_T(..., "starttime", starttime, GETN, SETFLOAT) */
-    starttime: number;
-
-    /** ACCESSOR_T(..., "idealpitch", idealpitch, GETN, SETFLOAT) */
-    idealpitch: number;
-
-    /** ACCESSOR_T(..., "pitch_speed", pitch_speed, GETN, SETFLOAT) */
-    pitch_speed: number;
-
-    /** ACCESSOR_T(..., "ideal_yaw", ideal_yaw, GETN, SETFLOAT) */
-    ideal_yaw: number;
-
-    /** ACCESSOR_T(..., "yaw_speed", yaw_speed, GETN, SETFLOAT) */
-    yaw_speed: number;
-
     /** ACCESSOR_T(..., "ltime", ltime, GETN, SETFLOAT) */
     ltime: number;
 
     /** ACCESSOR_T(..., "nextthink", nextthink, GETN, SETFLOAT) */
     nextthink: number;
-
-    /** ACCESSOR_T(..., "gravity", gravity, GETN, SETFLOAT) */
-    gravity: number;
-
-    /** ACCESSOR_T(..., "friction", friction, GETN, SETFLOAT) */
-    friction: number;
-
-    /** ACCESSOR_T(..., "frame", frame, GETN, SETFLOAT) */
-    frame: number;
-
-    /** ACCESSOR_T(..., "animtime", animtime, GETN, SETFLOAT) */
-    animtime: number;
-
-    /** ACCESSOR_T(..., "framerate", framerate, GETN, SETFLOAT) */
-    framerate: number;
-
-    /** ACCESSOR_T(..., "scale", scale, GETN, SETFLOAT) */
-    scale: number;
-
-    /** ACCESSOR_T(..., "renderamt", renderamt, GETN, SETFLOAT) */
-    renderamt: number;
-
-    /** ACCESSOR_T(..., "health", health, GETN, SETFLOAT) */
-    health: number;
-
-    /** ACCESSOR_T(..., "frags", frags, GETN, SETFLOAT) */
-    frags: number;
-
-    /** ACCESSOR_T(..., "takedamage", takedamage, GETN, SETFLOAT) */
-    takedamage: number;
-
-    /** ACCESSOR_T(..., "max_health", max_health, GETN, SETFLOAT) */
-    max_health: number;
-
-    /** ACCESSOR_T(..., "teleport_time", teleport_time, GETN, SETFLOAT) */
-    teleport_time: number;
-
-    /** ACCESSOR_T(..., "armortype", armortype, GETN, SETFLOAT) */
-    armortype: number;
-
-    /** ACCESSOR_T(..., "armorvalue", armorvalue, GETN, SETFLOAT) */
-    armorvalue: number;
-
-    /** ACCESSOR_T(..., "dmg_take", dmg_take, GETN, SETFLOAT) */
-    dmg_take: number;
-
-    /** ACCESSOR_T(..., "dmg_save", dmg_save, GETN, SETFLOAT) */
-    dmg_save: number;
-
-    /** ACCESSOR_T(..., "dmg", dmg, GETN, SETFLOAT) */
-    dmg: number;
-
-    /** ACCESSOR_T(..., "dmgtime", dmgtime, GETN, SETFLOAT) */
-    dmgtime: number;
-
-    /** ACCESSOR_T(..., "speed", speed, GETN, SETFLOAT) */
-    speed: number;
-
-    /** ACCESSOR_T(..., "air_finished", air_finished, GETN, SETFLOAT) */
-    air_finished: number;
-
-    /** ACCESSOR_T(..., "pain_finished", pain_finished, GETN, SETFLOAT) */
-    pain_finished: number;
-
-    /** ACCESSOR_T(..., "radsuit_finished", radsuit_finished, GETN, SETFLOAT) */
-    radsuit_finished: number;
-
-    /** ACCESSOR_T(..., "maxspeed", maxspeed, GETN, SETFLOAT) */
-    maxspeed: number;
-
-    /** ACCESSOR_T(..., "fov", fov, GETN, SETFLOAT) */
-    fov: number;
-
-    /** ACCESSOR_T(..., "flFallVelocity", flFallVelocity, GETN, SETFLOAT) */
-    flFallVelocity: number;
-
-    /** ACCESSOR_T(..., "fuser1", fuser1, GETN, SETFLOAT) */
-    fuser1: number;
-
-    /** ACCESSOR_T(..., "fuser2", fuser2, GETN, SETFLOAT) */
-    fuser2: number;
-
-    /** ACCESSOR_T(..., "fuser3", fuser3, GETN, SETFLOAT) */
-    fuser3: number;
-
-    /** ACCESSOR_T(..., "fuser4", fuser4, GETN, SETFLOAT) */
-    fuser4: number;
-
-    /** ACCESSOR_T(..., "fixangle", fixangle, GETN, SETINT) */
-    fixangle: number;
-
-    /** ACCESSOR_T(..., "modelindex", modelindex, GETN, SETINT) */
-    modelindex: number;
-
-    /** ACCESSOR_T(..., "viewmodel", viewmodel, GETN, SETINT) */
-    viewmodel: number;
-
-    /** ACCESSOR_T(..., "weaponmodel", weaponmodel, GETN, SETINT) */
-    weaponmodel: number;
 
     /** ACCESSOR_T(..., "movetype", movetype, GETN, SETINT) */
     movetype: number;
@@ -243,6 +114,12 @@ declare namespace nodemod {
     /** ACCESSOR_T(..., "effects", effects, GETN, SETINT) */
     effects: number;
 
+    /** ACCESSOR_T(..., "gravity", gravity, GETN, SETFLOAT) */
+    gravity: number;
+
+    /** ACCESSOR_T(..., "friction", friction, GETN, SETFLOAT) */
+    friction: number;
+
     /** ACCESSOR_T(..., "light_level", light_level, GETN, SETINT) */
     light_level: number;
 
@@ -252,17 +129,47 @@ declare namespace nodemod {
     /** ACCESSOR_T(..., "gaitsequence", gaitsequence, GETN, SETINT) */
     gaitsequence: number;
 
+    /** ACCESSOR_T(..., "frame", frame, GETN, SETFLOAT) */
+    frame: number;
+
+    /** ACCESSOR_T(..., "animtime", animtime, GETN, SETFLOAT) */
+    animtime: number;
+
+    /** ACCESSOR_T(..., "framerate", framerate, GETN, SETFLOAT) */
+    framerate: number;
+
+    /** ACCESSOR_T(..., "scale", scale, GETN, SETFLOAT) */
+    scale: number;
+
     /** ACCESSOR_T(..., "rendermode", rendermode, GETN, SETINT) */
     rendermode: number;
+
+    /** ACCESSOR_T(..., "renderamt", renderamt, GETN, SETFLOAT) */
+    renderamt: number;
+
+    /** ACCESSOR_T(..., "rendercolor", rendercolor, GETVEC3, SETVEC3) */
+    rendercolor: number[];
 
     /** ACCESSOR_T(..., "renderfx", renderfx, GETN, SETINT) */
     renderfx: number;
 
+    /** ACCESSOR_T(..., "health", health, GETN, SETFLOAT) */
+    health: number;
+
+    /** ACCESSOR_T(..., "frags", frags, GETN, SETFLOAT) */
+    frags: number;
+
     /** ACCESSOR_T(..., "weapons", weapons, GETN, SETINT) */
     weapons: number;
 
+    /** ACCESSOR_T(..., "takedamage", takedamage, GETN, SETFLOAT) */
+    takedamage: number;
+
     /** ACCESSOR_T(..., "deadflag", deadflag, GETN, SETINT) */
     deadflag: number;
+
+    /** ACCESSOR_T(..., "view_ofs", view_ofs, GETVEC3, SETVEC3) */
+    view_ofs: number[];
 
     /** ACCESSOR_T(..., "button", button, GETN, SETINT) */
     button: number;
@@ -282,14 +189,80 @@ declare namespace nodemod {
     /** ACCESSOR_T(..., "team", team, GETN, SETINT) */
     team: number;
 
+    /** ACCESSOR_T(..., "max_health", max_health, GETN, SETFLOAT) */
+    max_health: number;
+
+    /** ACCESSOR_T(..., "teleport_time", teleport_time, GETN, SETFLOAT) */
+    teleport_time: number;
+
+    /** ACCESSOR_T(..., "armortype", armortype, GETN, SETFLOAT) */
+    armortype: number;
+
+    /** ACCESSOR_T(..., "armorvalue", armorvalue, GETN, SETFLOAT) */
+    armorvalue: number;
+
     /** ACCESSOR_T(..., "waterlevel", waterlevel, GETN, SETINT) */
     waterlevel: number;
 
     /** ACCESSOR_T(..., "watertype", watertype, GETN, SETINT) */
     watertype: number;
 
+    /** ACCESSOR_T(..., "target", target, GETSTR, SETSTR) */
+    target: string;
+
+    /** ACCESSOR_T(..., "targetname", targetname, GETSTR, SETSTR) */
+    targetname: string;
+
+    /** ACCESSOR_T(..., "netname", netname, GETSTR, SETSTR) */
+    netname: string;
+
+    /** ACCESSOR_T(..., "message", message, GETSTR, SETSTR) */
+    message: string;
+
+    /** ACCESSOR_T(..., "dmg_take", dmg_take, GETN, SETFLOAT) */
+    dmg_take: number;
+
+    /** ACCESSOR_T(..., "dmg_save", dmg_save, GETN, SETFLOAT) */
+    dmg_save: number;
+
+    /** ACCESSOR_T(..., "dmg", dmg, GETN, SETFLOAT) */
+    dmg: number;
+
+    /** ACCESSOR_T(..., "dmgtime", dmgtime, GETN, SETFLOAT) */
+    dmgtime: number;
+
+    /** ACCESSOR_T(..., "noise", noise, GETSTR, SETSTR) */
+    noise: string;
+
+    /** ACCESSOR_T(..., "noise1", noise1, GETSTR, SETSTR) */
+    noise1: string;
+
+    /** ACCESSOR_T(..., "noise2", noise2, GETSTR, SETSTR) */
+    noise2: string;
+
+    /** ACCESSOR_T(..., "noise3", noise3, GETSTR, SETSTR) */
+    noise3: string;
+
+    /** ACCESSOR_T(..., "speed", speed, GETN, SETFLOAT) */
+    speed: number;
+
+    /** ACCESSOR_T(..., "air_finished", air_finished, GETN, SETFLOAT) */
+    air_finished: number;
+
+    /** ACCESSOR_T(..., "pain_finished", pain_finished, GETN, SETFLOAT) */
+    pain_finished: number;
+
+    /** ACCESSOR_T(..., "radsuit_finished", radsuit_finished, GETN, SETFLOAT) */
+    radsuit_finished: number;
+
     /** ACCESSOR_T(..., "playerclass", playerclass, GETN, SETINT) */
     playerclass: number;
+
+    /** ACCESSOR_T(..., "maxspeed", maxspeed, GETN, SETFLOAT) */
+    maxspeed: number;
+
+    /** ACCESSOR_T(..., "fov", fov, GETN, SETFLOAT) */
+    fov: number;
 
     /** ACCESSOR_T(..., "weaponanim", weaponanim, GETN, SETINT) */
     weaponanim: number;
@@ -312,6 +285,9 @@ declare namespace nodemod {
     /** ACCESSOR_T(..., "iStepLeft", iStepLeft, GETN, SETINT) */
     iStepLeft: number;
 
+    /** ACCESSOR_T(..., "flFallVelocity", flFallVelocity, GETN, SETFLOAT) */
+    flFallVelocity: number;
+
     /** ACCESSOR_T(..., "gamestate", gamestate, GETN, SETINT) */
     gamestate: number;
 
@@ -333,8 +309,38 @@ declare namespace nodemod {
     /** ACCESSOR_T(..., "iuser4", iuser4, GETN, SETINT) */
     iuser4: number;
 
+    /** ACCESSOR_T(..., "fuser1", fuser1, GETN, SETFLOAT) */
+    fuser1: number;
+
+    /** ACCESSOR_T(..., "fuser2", fuser2, GETN, SETFLOAT) */
+    fuser2: number;
+
+    /** ACCESSOR_T(..., "fuser3", fuser3, GETN, SETFLOAT) */
+    fuser3: number;
+
+    /** ACCESSOR_T(..., "fuser4", fuser4, GETN, SETFLOAT) */
+    fuser4: number;
+
+    /** ACCESSOR_T(..., "vuser1", vuser1, GETVEC3, SETVEC3) */
+    vuser1: number[];
+
+    /** ACCESSOR_T(..., "vuser2", vuser2, GETVEC3, SETVEC3) */
+    vuser2: number[];
+
+    /** ACCESSOR_T(..., "vuser3", vuser3, GETVEC3, SETVEC3) */
+    vuser3: number[];
+
+    /** ACCESSOR_T(..., "vuser4", vuser4, GETVEC3, SETVEC3) */
+    vuser4: number[];
+
     /** templ->SetNativeDataProperty("model", ...) */
     model: string;
+
+    /** templ->SetNativeDataProperty("controller", ...) */
+    controller: number;
+
+    /** templ->SetNativeDataProperty("blending", ...) */
+    blending: number;
 
     /** templ->SetNativeDataProperty("chain", ...) */
     chain: Entity | null;
@@ -496,14 +502,26 @@ declare namespace nodemod {
     /** ACCESSOR_T(..., "number", number, GETN, SETINT) */
     number: number;
 
+    /** ACCESSOR_T(..., "msg_time", msg_time, GETN, SETFLOAT) */
+    msg_time: number;
+
     /** ACCESSOR_T(..., "messagenum", messagenum, GETN, SETINT) */
     messagenum: number;
+
+    /** ACCESSOR_T(..., "origin", origin, GETVEC3, SETVEC3) */
+    origin: number[];
+
+    /** ACCESSOR_T(..., "angles", angles, GETVEC3, SETVEC3) */
+    angles: number[];
 
     /** ACCESSOR_T(..., "modelindex", modelindex, GETN, SETINT) */
     modelindex: number;
 
     /** ACCESSOR_T(..., "sequence", sequence, GETN, SETINT) */
     sequence: number;
+
+    /** ACCESSOR_T(..., "frame", frame, GETN, SETFLOAT) */
+    frame: number;
 
     /** ACCESSOR_T(..., "colormap", colormap, GETN, SETINT) */
     colormap: number;
@@ -517,8 +535,11 @@ declare namespace nodemod {
     /** ACCESSOR_T(..., "effects", effects, GETN, SETINT) */
     effects: number;
 
-    /** ACCESSOR_T(..., "eflags", eflags, GETN, SETINT) */
-    eflags: number;
+    /** ACCESSOR_T(..., "scale", scale, GETN, SETFLOAT) */
+    scale: number;
+
+    /** ACCESSOR_T(..., "eflags", eflags, GETBYTE, SETBYTE) */
+    eflags: unknown;
 
     /** ACCESSOR_T(..., "rendermode", rendermode, GETN, SETINT) */
     rendermode: number;
@@ -532,14 +553,35 @@ declare namespace nodemod {
     /** ACCESSOR_T(..., "movetype", movetype, GETN, SETINT) */
     movetype: number;
 
+    /** ACCESSOR_T(..., "animtime", animtime, GETN, SETFLOAT) */
+    animtime: number;
+
+    /** ACCESSOR_T(..., "framerate", framerate, GETN, SETFLOAT) */
+    framerate: number;
+
     /** ACCESSOR_T(..., "body", body, GETN, SETINT) */
     body: number;
+
+    /** ACCESSOR_T(..., "velocity", velocity, GETVEC3, SETVEC3) */
+    velocity: number[];
+
+    /** ACCESSOR_T(..., "mins", mins, GETVEC3, SETVEC3) */
+    mins: number[];
+
+    /** ACCESSOR_T(..., "maxs", maxs, GETVEC3, SETVEC3) */
+    maxs: number[];
 
     /** ACCESSOR_T(..., "aiment", aiment, GETN, SETINT) */
     aiment: number;
 
     /** ACCESSOR_T(..., "owner", owner, GETN, SETINT) */
     owner: number;
+
+    /** ACCESSOR_T(..., "friction", friction, GETN, SETFLOAT) */
+    friction: number;
+
+    /** ACCESSOR_T(..., "gravity", gravity, GETN, SETFLOAT) */
+    gravity: number;
 
     /** ACCESSOR_T(..., "team", team, GETN, SETINT) */
     team: number;
@@ -550,14 +592,17 @@ declare namespace nodemod {
     /** ACCESSOR_T(..., "health", health, GETN, SETINT) */
     health: number;
 
-    /** ACCESSOR_T(..., "spectator", spectator, GETN, SETINT) */
-    spectator: number;
+    /** ACCESSOR_T(..., "spectator", spectator, GETQBOOL, SETQBOOL) */
+    spectator: unknown;
 
     /** ACCESSOR_T(..., "weaponmodel", weaponmodel, GETN, SETINT) */
     weaponmodel: number;
 
     /** ACCESSOR_T(..., "gaitsequence", gaitsequence, GETN, SETINT) */
     gaitsequence: number;
+
+    /** ACCESSOR_T(..., "basevelocity", basevelocity, GETVEC3, SETVEC3) */
+    basevelocity: number[];
 
     /** ACCESSOR_T(..., "usehull", usehull, GETN, SETINT) */
     usehull: number;
@@ -571,59 +616,26 @@ declare namespace nodemod {
     /** ACCESSOR_T(..., "iStepLeft", iStepLeft, GETN, SETINT) */
     iStepLeft: number;
 
-    /** ACCESSOR_T(..., "weaponanim", weaponanim, GETN, SETINT) */
-    weaponanim: number;
-
-    /** ACCESSOR_T(..., "msg_time", msg_time, GETN, SETFLOAT) */
-    msg_time: number;
-
-    /** ACCESSOR_T(..., "frame", frame, GETN, SETFLOAT) */
-    frame: number;
-
-    /** ACCESSOR_T(..., "scale", scale, GETN, SETFLOAT) */
-    scale: number;
-
-    /** ACCESSOR_T(..., "animtime", animtime, GETN, SETFLOAT) */
-    animtime: number;
-
-    /** ACCESSOR_T(..., "framerate", framerate, GETN, SETFLOAT) */
-    framerate: number;
-
-    /** ACCESSOR_T(..., "friction", friction, GETN, SETFLOAT) */
-    friction: number;
-
-    /** ACCESSOR_T(..., "gravity", gravity, GETN, SETFLOAT) */
-    gravity: number;
-
     /** ACCESSOR_T(..., "flFallVelocity", flFallVelocity, GETN, SETFLOAT) */
     flFallVelocity: number;
 
     /** ACCESSOR_T(..., "fov", fov, GETN, SETFLOAT) */
     fov: number;
 
-    /** ACCESSOR_T(..., "origin", origin, GETVEC3, SETVEC3) */
-    origin: number[];
-
-    /** ACCESSOR_T(..., "angles", angles, GETVEC3, SETVEC3) */
-    angles: number[];
-
-    /** ACCESSOR_T(..., "velocity", velocity, GETVEC3, SETVEC3) */
-    velocity: number[];
-
-    /** ACCESSOR_T(..., "mins", mins, GETVEC3, SETVEC3) */
-    mins: number[];
-
-    /** ACCESSOR_T(..., "maxs", maxs, GETVEC3, SETVEC3) */
-    maxs: number[];
-
-    /** ACCESSOR_T(..., "basevelocity", basevelocity, GETVEC3, SETVEC3) */
-    basevelocity: number[];
+    /** ACCESSOR_T(..., "weaponanim", weaponanim, GETN, SETINT) */
+    weaponanim: number;
 
     /** ACCESSOR_T(..., "startpos", startpos, GETVEC3, SETVEC3) */
     startpos: number[];
 
     /** ACCESSOR_T(..., "endpos", endpos, GETVEC3, SETVEC3) */
     endpos: number[];
+
+    /** ACCESSOR_T(..., "impacttime", impacttime, GETN, SETFLOAT) */
+    impacttime: number;
+
+    /** ACCESSOR_T(..., "starttime", starttime, GETN, SETFLOAT) */
+    starttime: number;
 
     /** ACCESSOR_T(..., "iuser1", iuser1, GETN, SETINT) */
     iuser1: number;
@@ -1113,303 +1125,9 @@ declare namespace nodemod {
     hit: null;
   }
   /** Game entity reference with properties and methods */
-  interface Entity {
-    /** obj->Set(..., v8::Number::New(isolate, entityId)) */
+  interface Entity extends Entvars {
+    /** Entity ID from edict index */
     id: number;
-
-    /** ACCESSOR(_entity, "classname", v.classname, GETSTR, SETSTR) */
-    classname: string;
-
-    /** ACCESSOR(_entity, "globalname", v.globalname, GETSTR, SETSTR) */
-    globalname: string;
-
-    /** ACCESSORL(_entity, "origin", v.origin, GETVEC3, SETVEC3) */
-    origin: number[];
-
-    /** ACCESSORL(_entity, "oldorigin", v.oldorigin, GETVEC3, SETVEC3) */
-    oldorigin: number[];
-
-    /** ACCESSORL(_entity, "velocity", v.velocity, GETVEC3, SETVEC3) */
-    velocity: number[];
-
-    /** ACCESSORL(_entity, "basevelocity", v.basevelocity, GETVEC3, SETVEC3) */
-    basevelocity: number[];
-
-    /** ACCESSORL(_entity, "clbasevelocity", v.clbasevelocity, GETVEC3, SETVEC3) */
-    clbasevelocity: number[];
-
-    /** ACCESSORL(_entity, "movedir", v.movedir, GETVEC3, SETVEC3) */
-    movedir: number[];
-
-    /** ACCESSORL(_entity, "angles", v.angles, GETVEC3, SETVEC3) */
-    angles: number[];
-
-    /** ACCESSORL(_entity, "avelocity", v.avelocity, GETVEC3, SETVEC3) */
-    avelocity: number[];
-
-    /** ACCESSORL(_entity, "punchangle", v.punchangle, GETVEC3, SETVEC3) */
-    punchangle: number[];
-
-    /** ACCESSORL(_entity, "angle", v.v_angle, GETVEC3, SETVEC3) */
-    angle: number[];
-
-    /** ACCESSORL(_entity, "endpos", v.endpos, GETVEC3, SETVEC3) */
-    endpos: number[];
-
-    /** ACCESSORL(_entity, "startpos", v.startpos, GETVEC3, SETVEC3) */
-    startpos: number[];
-
-    /** ACCESSOR(_entity, "impacttime", v.impacttime, GETN, SETFLOAT) */
-    impacttime: number;
-
-    /** ACCESSOR(_entity, "starttime", v.starttime, GETN, SETFLOAT) */
-    starttime: number;
-
-    /** ACCESSOR(_entity, "fixangle", v.fixangle, GETN, SETINT) */
-    fixangle: number;
-
-    /** ACCESSOR(_entity, "idealpitch", v.idealpitch, GETN, SETFLOAT) */
-    idealpitch: number;
-
-    /** ACCESSOR(_entity, "pitchSpeed", v.pitch_speed, GETN, SETFLOAT) */
-    pitchSpeed: number;
-
-    /** ACCESSOR(_entity, "idealYaw", v.ideal_yaw, GETN, SETFLOAT) */
-    idealYaw: number;
-
-    /** ACCESSOR(_entity, "yawSpeed", v.yaw_speed, GETN, SETFLOAT) */
-    yawSpeed: number;
-
-    /** ACCESSOR(_entity, "modelindex", v.modelindex, GETN, SETINT) */
-    modelindex: number;
-
-    /** _entity->SetNativeDataProperty(..., GETTER(v.model, GETSTR), ...) */
-    model: string;
-
-    /** ACCESSOR(_entity, "viewmodel", v.viewmodel, GETN, SETINT) */
-    viewmodel: number;
-
-    /** ACCESSOR(_entity, "weaponmodel", v.weaponmodel, GETN, SETINT) */
-    weaponmodel: number;
-
-    /** ACCESSORL(_entity, "absmin", v.absmin, GETVEC3, SETVEC3) */
-    absmin: number[];
-
-    /** ACCESSORL(_entity, "absmax", v.absmax, GETVEC3, SETVEC3) */
-    absmax: number[];
-
-    /** ACCESSORL(_entity, "mins", v.mins, GETVEC3, SETVEC3) */
-    mins: number[];
-
-    /** ACCESSORL(_entity, "maxs", v.maxs, GETVEC3, SETVEC3) */
-    maxs: number[];
-
-    /** ACCESSORL(_entity, "size", v.maxs, GETVEC3, SETVEC3) */
-    size: number[];
-
-    /** ACCESSOR(_entity, "ltime", v.ltime, GETN, SETFLOAT) */
-    ltime: number;
-
-    /** ACCESSOR(_entity, "nextthink", v.nextthink, GETN, SETFLOAT) */
-    nextthink: number;
-
-    /** ACCESSOR(_entity, "movetype", v.movetype, GETN, SETINT) */
-    movetype: number;
-
-    /** ACCESSOR(_entity, "solid", v.solid, GETN, SETINT) */
-    solid: number;
-
-    /** ACCESSOR(_entity, "skin", v.skin, GETN, SETINT) */
-    skin: number;
-
-    /** ACCESSOR(_entity, "body", v.body, GETN, SETINT) */
-    body: number;
-
-    /** ACCESSOR(_entity, "effects", v.effects, GETN, SETINT) */
-    effects: number;
-
-    /** ACCESSOR(_entity, "gravity", v.gravity, GETN, SETFLOAT) */
-    gravity: number;
-
-    /** ACCESSOR(_entity, "friction", v.friction, GETN, SETFLOAT) */
-    friction: number;
-
-    /** ACCESSOR(_entity, "lightLevel", v.light_level, GETN, SETINT) */
-    lightLevel: number;
-
-    /** ACCESSOR(_entity, "sequence", v.sequence, GETN, SETINT) */
-    sequence: number;
-
-    /** ACCESSOR(_entity, "gaitsequence", v.gaitsequence, GETN, SETINT) */
-    gaitsequence: number;
-
-    /** ACCESSOR(_entity, "frame", v.frame, GETN, SETFLOAT) */
-    frame: number;
-
-    /** ACCESSOR(_entity, "animtime", v.animtime, GETN, SETFLOAT) */
-    animtime: number;
-
-    /** ACCESSOR(_entity, "framerate", v.framerate, GETN, SETFLOAT) */
-    framerate: number;
-
-    /** ACCESSOR(_entity, "scale", v.scale, GETN, SETFLOAT) */
-    scale: number;
-
-    /** ACCESSOR(_entity, "rendermode", v.rendermode, GETN, SETINT) */
-    rendermode: number;
-
-    /** ACCESSOR(_entity, "renderamt", v.renderamt, GETN, SETFLOAT) */
-    renderamt: number;
-
-    /** ACCESSORL(_entity, "rendercolor", v.rendercolor, GETVEC3, SETVEC3) */
-    rendercolor: number[];
-
-    /** ACCESSOR(_entity, "renderfx", v.renderfx, GETN, SETINT) */
-    renderfx: number;
-
-    /** ACCESSOR(_entity, "health", v.health, GETN, SETFLOAT) */
-    health: number;
-
-    /** ACCESSOR(_entity, "frags", v.frags, GETN, SETFLOAT) */
-    frags: number;
-
-    /** ACCESSOR(_entity, "weapons", v.weapons, GETN, SETINT) */
-    weapons: number;
-
-    /** ACCESSOR(_entity, "takedamage", v.takedamage, GETN, SETFLOAT) */
-    takedamage: number;
-
-    /** ACCESSOR(_entity, "deadflag", v.deadflag, GETN, SETINT) */
-    deadflag: number;
-
-    /** ACCESSORL(_entity, "viewOfs", v.view_ofs, GETVEC3, SETVEC3) */
-    viewOfs: number[];
-
-    /** ACCESSOR(_entity, "button", v.button, GETN, SETINT) */
-    button: number;
-
-    /** ACCESSOR(_entity, "impulse", v.impulse, GETN, SETINT) */
-    impulse: number;
-
-    /** ACCESSOR(_entity, "spawnflags", v.spawnflags, GETN, SETINT) */
-    spawnflags: number;
-
-    /** ACCESSOR(_entity, "flags", v.flags, GETN, SETINT) */
-    flags: number;
-
-    /** ACCESSOR(_entity, "colormap", v.colormap, GETN, SETINT) */
-    colormap: number;
-
-    /** ACCESSOR(_entity, "team", v.team, GETN, SETINT) */
-    team: number;
-
-    /** ACCESSOR(_entity, "maxHealth", v.max_health, GETN, SETFLOAT) */
-    maxHealth: number;
-
-    /** ACCESSOR(_entity, "teleportTime", v.teleport_time, GETN, SETFLOAT) */
-    teleportTime: number;
-
-    /** ACCESSOR(_entity, "armortype", v.armortype, GETN, SETFLOAT) */
-    armortype: number;
-
-    /** ACCESSOR(_entity, "armorvalue", v.armorvalue, GETN, SETFLOAT) */
-    armorvalue: number;
-
-    /** ACCESSOR(_entity, "waterlevel", v.waterlevel, GETN, SETINT) */
-    waterlevel: number;
-
-    /** ACCESSOR(_entity, "watertype", v.watertype, GETN, SETINT) */
-    watertype: number;
-
-    /** ACCESSOR(_entity, "target", v.target, GETSTR, SETSTR) */
-    target: string;
-
-    /** ACCESSOR(_entity, "targetname", v.targetname, GETSTR, SETSTR) */
-    targetname: string;
-
-    /** ACCESSOR(_entity, "netname", v.netname, GETSTR, SETSTR) */
-    netname: string;
-
-    /** ACCESSOR(_entity, "message", v.message, GETSTR, SETSTR) */
-    message: string;
-
-    /** ACCESSOR(_entity, "dmgTake", v.dmg_take, GETN, SETFLOAT) */
-    dmgTake: number;
-
-    /** ACCESSOR(_entity, "dmgSave", v.dmg_save, GETN, SETFLOAT) */
-    dmgSave: number;
-
-    /** ACCESSOR(_entity, "dmg", v.dmg, GETN, SETFLOAT) */
-    dmg: number;
-
-    /** ACCESSOR(_entity, "dmgtime", v.dmgtime, GETN, SETFLOAT) */
-    dmgtime: number;
-
-    /** ACCESSOR(_entity, "noise", v.noise, GETSTR, SETSTR) */
-    noise: string;
-
-    /** ACCESSOR(_entity, "noise1", v.noise1, GETSTR, SETSTR) */
-    noise1: string;
-
-    /** ACCESSOR(_entity, "noise2", v.noise2, GETSTR, SETSTR) */
-    noise2: string;
-
-    /** ACCESSOR(_entity, "noise3", v.noise3, GETSTR, SETSTR) */
-    noise3: string;
-
-    /** ACCESSOR(_entity, "speed", v.speed, GETN, SETFLOAT) */
-    speed: number;
-
-    /** ACCESSOR(_entity, "airFinished", v.air_finished, GETN, SETFLOAT) */
-    airFinished: number;
-
-    /** ACCESSOR(_entity, "painFinished", v.pain_finished, GETN, SETFLOAT) */
-    painFinished: number;
-
-    /** ACCESSOR(_entity, "radsuitFinished", v.radsuit_finished, GETN, SETFLOAT) */
-    radsuitFinished: number;
-
-    /** ACCESSOR(_entity, "playerclass", v.playerclass, GETN, SETINT) */
-    playerclass: number;
-
-    /** ACCESSOR(_entity, "maxspeed", v.maxspeed, GETN, SETFLOAT) */
-    maxspeed: number;
-
-    /** ACCESSOR(_entity, "fov", v.fov, GETN, SETFLOAT) */
-    fov: number;
-
-    /** ACCESSOR(_entity, "weaponanim", v.weaponanim, GETN, SETINT) */
-    weaponanim: number;
-
-    /** ACCESSOR(_entity, "pushmsec", v.pushmsec, GETN, SETINT) */
-    pushmsec: number;
-
-    /** ACCESSOR(_entity, "bInDuck", v.bInDuck, GETN, SETINT) */
-    bInDuck: number;
-
-    /** ACCESSOR(_entity, "flTimeStepSound", v.flTimeStepSound, GETN, SETINT) */
-    flTimeStepSound: number;
-
-    /** ACCESSOR(_entity, "flSwimTime", v.flSwimTime, GETN, SETINT) */
-    flSwimTime: number;
-
-    /** ACCESSOR(_entity, "flDuckTime", v.flDuckTime, GETN, SETINT) */
-    flDuckTime: number;
-
-    /** ACCESSOR(_entity, "iStepLeft", v.iStepLeft, GETN, SETINT) */
-    iStepLeft: number;
-
-    /** ACCESSOR(_entity, "fallVelocity", v.flFallVelocity, GETN, SETFLOAT) */
-    fallVelocity: number;
-
-    /** ACCESSOR(_entity, "gamestate", v.gamestate, GETN, SETINT) */
-    gamestate: number;
-
-    /** ACCESSOR(_entity, "oldbuttons", v.oldbuttons, GETN, SETINT) */
-    oldbuttons: number;
-
-    /** ACCESSOR(_entity, "groupinfo", v.groupinfo, GETN, SETINT) */
-    groupinfo: number;
   }
   /** Result from monster hull trace operations */
   interface TraceMonsterHullResult {

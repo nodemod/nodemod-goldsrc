@@ -112,29 +112,6 @@ namespace structures
         });
 
     // Common entvars field accessors that delegate to the entvars object
-    #define DELEGATE_ACCESSOR(FIELD_NAME) \
-        _entity->SetNativeDataProperty(v8::String::NewFromUtf8(isolate, FIELD_NAME).ToLocalChecked(), \
-            [](v8::Local<v8::Name> property, const v8::PropertyCallbackInfo<v8::Value> &info) { \
-                edict_t *edict = structures::unwrapEntity(info.GetIsolate(), info.Holder()); \
-                if (edict == nullptr) return; \
-                v8::Local<v8::Value> entvars = structures::wrapEntvars(info.GetIsolate(), &edict->v); \
-                if (!entvars.IsEmpty() && entvars->IsObject()) { \
-                    v8::Local<v8::Object> entvarsObj = entvars.As<v8::Object>(); \
-                    auto context = info.GetIsolate()->GetCurrentContext(); \
-                    v8::Local<v8::Value> value = entvarsObj->Get(context, property).ToLocalChecked(); \
-                    info.GetReturnValue().Set(value); \
-                } \
-            }, \
-            [](v8::Local<v8::Name> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void> &info) { \
-                edict_t *edict = structures::unwrapEntity(info.GetIsolate(), info.Holder()); \
-                if (edict == nullptr) return; \
-                v8::Local<v8::Value> entvars = structures::wrapEntvars(info.GetIsolate(), &edict->v); \
-                if (!entvars.IsEmpty() && entvars->IsObject()) { \
-                    v8::Local<v8::Object> entvarsObj = entvars.As<v8::Object>(); \
-                    auto context = info.GetIsolate()->GetCurrentContext(); \
-                    entvarsObj->Set(context, property, value).Check(); \
-                } \
-            })
 
     DELEGATE_ACCESSOR("classname");
 	  DELEGATE_ACCESSOR("globalname");
@@ -144,7 +121,6 @@ namespace structures
 	  DELEGATE_ACCESSOR("velocity");
 	  DELEGATE_ACCESSOR("basevelocity");
 	  DELEGATE_ACCESSOR("clbasevelocity");
-
 	  DELEGATE_ACCESSOR("movedir");
 
 	  DELEGATE_ACCESSOR("angles");
@@ -294,8 +270,6 @@ namespace structures
 	  DELEGATE_ACCESSOR("euser2");
 	  DELEGATE_ACCESSOR("euser3");
 	  DELEGATE_ACCESSOR("euser4");
-
-    #undef DELEGATE_ACCESSOR
     
     structures::entity.Set(isolate, _entity);
     global->Set(convert::str2js(isolate, "Entity"), entityConstructor);

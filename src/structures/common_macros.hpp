@@ -65,6 +65,31 @@ extern enginefuncs_t g_engfuncs;
     TEMPLATE->SetNativeDataProperty(v8::String::NewFromUtf8(isolate, NAME).ToLocalChecked(), \
         GETTER_T(STRUCT_TYPE, UNWRAP_FN, FIELD, GET))
 
+// Delegation accessor - forwards property access to another wrapped object
+#define DELEGATE_ACCESSOR(FIELD_NAME) \
+    _entity->SetNativeDataProperty(v8::String::NewFromUtf8(isolate, FIELD_NAME).ToLocalChecked(), \
+        [](v8::Local<v8::Name> property, const v8::PropertyCallbackInfo<v8::Value> &info) { \
+            edict_t *edict = structures::unwrapEntity(info.GetIsolate(), info.Holder()); \
+            if (edict == nullptr) return; \
+            v8::Local<v8::Value> entvars = structures::wrapEntvars(info.GetIsolate(), &edict->v); \
+            if (!entvars.IsEmpty() && entvars->IsObject()) { \
+                v8::Local<v8::Object> entvarsObj = entvars.As<v8::Object>(); \
+                auto context = info.GetIsolate()->GetCurrentContext(); \
+                v8::Local<v8::Value> value = entvarsObj->Get(context, property).ToLocalChecked(); \
+                info.GetReturnValue().Set(value); \
+            } \
+        }, \
+        [](v8::Local<v8::Name> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void> &info) { \
+            edict_t *edict = structures::unwrapEntity(info.GetIsolate(), info.Holder()); \
+            if (edict == nullptr) return; \
+            v8::Local<v8::Value> entvars = structures::wrapEntvars(info.GetIsolate(), &edict->v); \
+            if (!entvars.IsEmpty() && entvars->IsObject()) { \
+                v8::Local<v8::Object> entvarsObj = entvars.As<v8::Object>(); \
+                auto context = info.GetIsolate()->GetCurrentContext(); \
+                entvarsObj->Set(context, property, value).Check(); \
+            } \
+        })
+
 // Legacy macros for entity.cpp compatibility (these will be replaced)
 #define GETTER(FIELD, TYPE) GETTER_T(edict_t, structures::unwrapEntity, FIELD, TYPE)
 #define SETTER(FIELD, TYPE) SETTER_T(edict_t, structures::unwrapEntity, FIELD, TYPE)
