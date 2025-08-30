@@ -10,6 +10,8 @@ extern enginefuncs_t g_engfuncs;
 #define GETVEC3(v) utils::vect2js(info.GetIsolate(), v)
 #define GETSTR(v) convert::str2js(info.GetIsolate(), (*g_engfuncs.pfnSzFromIndex)(v))
 #define GETBOOL(v) v8::Boolean::New(info.GetIsolate(), v)
+#define GETQBOOL(v) v8::Boolean::New(info.GetIsolate(), v != 0)
+#define GETBYTE(v) v8::Number::New(info.GetIsolate(), static_cast<int>(v))
 
 // Type conversion macros for setters
 #define SETFLOAT(v) v->NumberValue(info.GetIsolate()->GetCurrentContext()).ToChecked()
@@ -17,6 +19,11 @@ extern enginefuncs_t g_engfuncs;
 #define SETSTR(v) (*g_engfuncs.pfnAllocString)(utils::js2string(info.GetIsolate(), v))
 #define SETVEC3(v, f) utils::js2vect(info.GetIsolate(), v8::Local<v8::Array>::Cast(v), f)
 #define SETBOOL(v) v->BooleanValue(info.GetIsolate())
+#define SETQBOOL(v) (v->BooleanValue(info.GetIsolate()) ? 1 : 0)
+#define SETBYTE(v) static_cast<byte>([](v8::Local<v8::Value> val, v8::Isolate* isolate) { \
+    int intVal = val->Int32Value(isolate->GetCurrentContext()).ToChecked(); \
+    return intVal < 0 ? 0 : (intVal > 255 ? 255 : intVal); \
+}(v, info.GetIsolate()))
 
 // Generic getter macro for any structure type
 #define GETTER_T(STRUCT_TYPE, UNWRAP_FN, FIELD, TYPE) \

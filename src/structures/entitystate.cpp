@@ -30,54 +30,31 @@ void createEntityStateTemplate(v8::Isolate* isolate) {
     v8::Local<v8::ObjectTemplate> templ = v8::ObjectTemplate::New(isolate);
     templ->SetInternalFieldCount(1);
     
-    // Integer fields
+    // Fields in exact order as they appear in entity_state.h
+    
+    // Fields which are filled in by routines outside of delta compression
     ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "entityType", entityType, GETN, SETINT);
     ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "number", number, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "msg_time", msg_time, GETN, SETFLOAT);
     ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "messagenum", messagenum, GETN, SETINT);
+
+    // Fields which can be transmitted and reconstructed over the network stream
+    ACCESSORL_T(entity_state_s, unwrapEntityState_internal, templ, "origin", origin, GETVEC3, SETVEC3);
+    ACCESSORL_T(entity_state_s, unwrapEntityState_internal, templ, "angles", angles, GETVEC3, SETVEC3);
+
     ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "modelindex", modelindex, GETN, SETINT);
     ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "sequence", sequence, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "frame", frame, GETN, SETFLOAT);
     ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "colormap", colormap, GETN, SETINT);
     ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "skin", skin, GETN, SETINT);
     ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "solid", solid, GETN, SETINT);
     ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "effects", effects, GETN, SETINT);
-    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "eflags", eflags, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "scale", scale, GETN, SETFLOAT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "eflags", eflags, GETBYTE, SETBYTE);
+
+    // Render information
     ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "rendermode", rendermode, GETN, SETINT);
     ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "renderamt", renderamt, GETN, SETINT);
-    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "renderfx", renderfx, GETN, SETINT);
-    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "movetype", movetype, GETN, SETINT);
-    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "body", body, GETN, SETINT);
-    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "aiment", aiment, GETN, SETINT);
-    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "owner", owner, GETN, SETINT);
-    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "team", team, GETN, SETINT);
-    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "playerclass", playerclass, GETN, SETINT);
-    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "health", health, GETN, SETINT);
-    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "spectator", spectator, GETN, SETINT);
-    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "weaponmodel", weaponmodel, GETN, SETINT);
-    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "gaitsequence", gaitsequence, GETN, SETINT);
-    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "usehull", usehull, GETN, SETINT);
-    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "oldbuttons", oldbuttons, GETN, SETINT);
-    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "onground", onground, GETN, SETINT);
-    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "iStepLeft", iStepLeft, GETN, SETINT);
-    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "weaponanim", weaponanim, GETN, SETINT);
-    
-    // Float fields
-    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "msg_time", msg_time, GETN, SETFLOAT);
-    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "frame", frame, GETN, SETFLOAT);
-    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "scale", scale, GETN, SETFLOAT);
-    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "animtime", animtime, GETN, SETFLOAT);
-    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "framerate", framerate, GETN, SETFLOAT);
-    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "friction", friction, GETN, SETFLOAT);
-    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "gravity", gravity, GETN, SETFLOAT);
-    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "flFallVelocity", flFallVelocity, GETN, SETFLOAT);
-    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "fov", fov, GETN, SETFLOAT);
-    
-    // Vector fields
-    ACCESSORL_T(entity_state_s, unwrapEntityState_internal, templ, "origin", origin, GETVEC3, SETVEC3);
-    ACCESSORL_T(entity_state_s, unwrapEntityState_internal, templ, "angles", angles, GETVEC3, SETVEC3);
-    ACCESSORL_T(entity_state_s, unwrapEntityState_internal, templ, "velocity", velocity, GETVEC3, SETVEC3);
-    ACCESSORL_T(entity_state_s, unwrapEntityState_internal, templ, "mins", mins, GETVEC3, SETVEC3);
-    ACCESSORL_T(entity_state_s, unwrapEntityState_internal, templ, "maxs", maxs, GETVEC3, SETVEC3);
-    ACCESSORL_T(entity_state_s, unwrapEntityState_internal, templ, "basevelocity", basevelocity, GETVEC3, SETVEC3);
     // rendercolor is a color24 struct, not a vector
     templ->SetNativeDataProperty(v8::String::NewFromUtf8(isolate, "rendercolor").ToLocalChecked(),
         [](v8::Local<v8::Name> property, const v8::PropertyCallbackInfo<v8::Value> &info) {
@@ -110,10 +87,14 @@ void createEntityStateTemplate(v8::Isolate* isolate) {
                 if (b->IsNumber()) state->rendercolor.b = b->Int32Value(context).FromJust();
             }
         });
-    ACCESSORL_T(entity_state_s, unwrapEntityState_internal, templ, "startpos", startpos, GETVEC3, SETVEC3);
-    ACCESSORL_T(entity_state_s, unwrapEntityState_internal, templ, "endpos", endpos, GETVEC3, SETVEC3);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "renderfx", renderfx, GETN, SETINT);
+
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "movetype", movetype, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "animtime", animtime, GETN, SETFLOAT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "framerate", framerate, GETN, SETFLOAT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "body", body, GETN, SETINT);
     
-    // Array fields (controller and blending) - read-only for now
+    // Array fields (controller and blending) in exact order from header
     templ->SetNativeDataProperty(v8::String::NewFromUtf8(isolate, "controller").ToLocalChecked(),
         [](v8::Local<v8::Name> property, const v8::PropertyCallbackInfo<v8::Value> &info) {
             entity_state_s *state = unwrapEntityState_internal(info.GetIsolate(), info.Holder());
@@ -128,6 +109,21 @@ void createEntityStateTemplate(v8::Isolate* isolate) {
                 arr->Set(context, i, v8::Number::New(info.GetIsolate(), state->controller[i])).Check();
             }
             info.GetReturnValue().Set(arr);
+        },
+        [](v8::Local<v8::Name> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void> &info) {
+            entity_state_s *state = unwrapEntityState_internal(info.GetIsolate(), info.Holder());
+            if (state == nullptr || !value->IsArray()) return;
+            
+            v8::Local<v8::Array> arr = v8::Local<v8::Array>::Cast(value);
+            auto context = info.GetIsolate()->GetCurrentContext();
+            uint32_t length = arr->Length();
+            
+            for (uint32_t i = 0; i < 4 && i < length; i++) {
+                v8::Local<v8::Value> val = arr->Get(context, i).ToLocalChecked();
+                if (val->IsNumber()) {
+                    state->controller[i] = SETBYTE(val);
+                }
+            }
         });
     
     templ->SetNativeDataProperty(v8::String::NewFromUtf8(isolate, "blending").ToLocalChecked(),
@@ -144,9 +140,59 @@ void createEntityStateTemplate(v8::Isolate* isolate) {
                 arr->Set(context, i, v8::Number::New(info.GetIsolate(), state->blending[i])).Check();
             }
             info.GetReturnValue().Set(arr);
+        },
+        [](v8::Local<v8::Name> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void> &info) {
+            entity_state_s *state = unwrapEntityState_internal(info.GetIsolate(), info.Holder());
+            if (state == nullptr || !value->IsArray()) return;
+            
+            v8::Local<v8::Array> arr = v8::Local<v8::Array>::Cast(value);
+            auto context = info.GetIsolate()->GetCurrentContext();
+            uint32_t length = arr->Length();
+            
+            for (uint32_t i = 0; i < 4 && i < length; i++) {
+                v8::Local<v8::Value> val = arr->Get(context, i).ToLocalChecked();
+                if (val->IsNumber()) {
+                    state->blending[i] = SETBYTE(val);
+                }
+            }
         });
     
-    // User data fields from end of structure
+    ACCESSORL_T(entity_state_s, unwrapEntityState_internal, templ, "velocity", velocity, GETVEC3, SETVEC3);
+
+    // Send bbox down to client for use during prediction
+    ACCESSORL_T(entity_state_s, unwrapEntityState_internal, templ, "mins", mins, GETVEC3, SETVEC3);
+    ACCESSORL_T(entity_state_s, unwrapEntityState_internal, templ, "maxs", maxs, GETVEC3, SETVEC3);
+
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "aiment", aiment, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "owner", owner, GETN, SETINT);
+
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "friction", friction, GETN, SETFLOAT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "gravity", gravity, GETN, SETFLOAT);
+
+    // PLAYER SPECIFIC
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "team", team, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "playerclass", playerclass, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "health", health, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "spectator", spectator, GETQBOOL, SETQBOOL);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "weaponmodel", weaponmodel, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "gaitsequence", gaitsequence, GETN, SETINT);
+    ACCESSORL_T(entity_state_s, unwrapEntityState_internal, templ, "basevelocity", basevelocity, GETVEC3, SETVEC3);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "usehull", usehull, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "oldbuttons", oldbuttons, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "onground", onground, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "iStepLeft", iStepLeft, GETN, SETINT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "flFallVelocity", flFallVelocity, GETN, SETFLOAT);
+
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "fov", fov, GETN, SETFLOAT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "weaponanim", weaponanim, GETN, SETINT);
+
+    // Parametric movement overrides
+    ACCESSORL_T(entity_state_s, unwrapEntityState_internal, templ, "startpos", startpos, GETVEC3, SETVEC3);
+    ACCESSORL_T(entity_state_s, unwrapEntityState_internal, templ, "endpos", endpos, GETVEC3, SETVEC3);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "impacttime", impacttime, GETN, SETFLOAT);
+    ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "starttime", starttime, GETN, SETFLOAT);
+
+    // For mods - user data fields
     ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "iuser1", iuser1, GETN, SETINT);
     ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "iuser2", iuser2, GETN, SETINT);
     ACCESSOR_T(entity_state_s, unwrapEntityState_internal, templ, "iuser3", iuser3, GETN, SETINT);
