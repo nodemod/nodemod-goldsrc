@@ -749,7 +749,9 @@ async function parseStructureInterfaces() {
     description: 'Game entity reference with properties and methods',
     extends: 'Entvars', // Entity extends Entvars
     properties: [
-      { name: 'id', type: 'number', comment: 'Entity ID from edict index' }
+      { name: 'id', type: 'number', comment: 'Entity ID from edict index' },
+      'getPrivateDataBuffer(offset: number, size: number): Buffer | null',
+      'writePrivateDataBuffer(offset: number, buffer: Buffer | ArrayBuffer | Uint8Array): boolean'
     ]
   });
 

@@ -3,6 +3,7 @@
 #include "common_macros.hpp"
 #include "util/convert.hpp"
 #include "node/utils.hpp"
+#include <node_buffer.h>
 #include <unordered_map>
 
 namespace structures
@@ -109,6 +110,122 @@ namespace structures
             if (newEntvars != nullptr) {
                 edict->v = *newEntvars;  // Copy the entire entvars structure
             }
+        });
+
+    // getPrivateDataBuffer method using SetNativeDataProperty for proper context
+    _entity->SetNativeDataProperty(v8::String::NewFromUtf8(isolate, "getPrivateDataBuffer").ToLocalChecked(),
+        [](v8::Local<v8::Name> property, const v8::PropertyCallbackInfo<v8::Value> &info) {
+            // Return a function that will handle the actual call
+            v8::Local<v8::Function> func = v8::Function::New(
+                info.GetIsolate()->GetCurrentContext(),
+                [](const v8::FunctionCallbackInfo<v8::Value>& args) {
+                    if (args.Length() < 2) {
+                        args.GetIsolate()->ThrowException(v8::Exception::Error(
+                            v8::String::NewFromUtf8(args.GetIsolate(), "getPrivateDataBuffer requires offset and size parameters").ToLocalChecked()));
+                        return;
+                    }
+                    
+                    edict_t *edict = (edict_t *)structures::unwrapEntity(args.GetIsolate(), args.This());
+                    if (edict == nullptr || edict->pvPrivateData == nullptr) {
+                        args.GetReturnValue().Set(v8::Null(args.GetIsolate()));
+                        return;
+                    }
+                    
+                    // Get offset and size from arguments
+                    uint32_t offset = args[0]->Uint32Value(args.GetIsolate()->GetCurrentContext()).FromMaybe(0);
+                    uint32_t size = args[1]->Uint32Value(args.GetIsolate()->GetCurrentContext()).FromMaybe(0);
+                    
+                    if (size == 0) {
+                        args.GetReturnValue().Set(v8::Null(args.GetIsolate()));
+                        return;
+                    }
+                    
+                    // Calculate pointer with offset
+                    void* dataPtr = static_cast<char*>(edict->pvPrivateData) + offset;
+                    
+                    // Create backing store for the specific memory range
+                    std::unique_ptr<v8::BackingStore> backingStore = 
+                        v8::ArrayBuffer::NewBackingStore(dataPtr, size, 
+                        [](void* data, size_t length, void* deleter_data) {
+                            // Do nothing - we don't own this memory
+                        }, nullptr);
+                    
+                    v8::Local<v8::ArrayBuffer> arrayBuffer = 
+                        v8::ArrayBuffer::New(args.GetIsolate(), std::move(backingStore));
+                    
+                    // Convert to Buffer using Node.js context
+                    v8::Local<v8::Value> buffer;
+                    if (node::Buffer::New(args.GetIsolate(), arrayBuffer, 0, size).ToLocal(&buffer)) {
+                        args.GetReturnValue().Set(buffer);
+                    } else {
+                        args.GetReturnValue().Set(v8::Null(args.GetIsolate()));
+                    }
+                }).ToLocalChecked();
+                
+            info.GetReturnValue().Set(func);
+        });
+
+    // writePrivateDataBuffer method for writing to entity private data
+    _entity->SetNativeDataProperty(v8::String::NewFromUtf8(isolate, "writePrivateDataBuffer").ToLocalChecked(),
+        [](v8::Local<v8::Name> property, const v8::PropertyCallbackInfo<v8::Value> &info) {
+            // Return a function that will handle the actual call
+            v8::Local<v8::Function> func = v8::Function::New(
+                info.GetIsolate()->GetCurrentContext(),
+                [](const v8::FunctionCallbackInfo<v8::Value>& args) {
+                    if (args.Length() < 2) {
+                        args.GetIsolate()->ThrowException(v8::Exception::Error(
+                            v8::String::NewFromUtf8(args.GetIsolate(), "writePrivateDataBuffer requires offset and buffer parameters").ToLocalChecked()));
+                        return;
+                    }
+                    
+                    edict_t *edict = (edict_t *)structures::unwrapEntity(args.GetIsolate(), args.This());
+                    if (edict == nullptr || edict->pvPrivateData == nullptr) {
+                        args.GetReturnValue().Set(v8::Boolean::New(args.GetIsolate(), false));
+                        return;
+                    }
+                    
+                    // Get offset from first argument
+                    uint32_t offset = args[0]->Uint32Value(args.GetIsolate()->GetCurrentContext()).FromMaybe(0);
+                    
+                    // Check if second argument is a Buffer or ArrayBuffer
+                    v8::Local<v8::Value> bufferArg = args[1];
+                    const char* sourceData = nullptr;
+                    size_t sourceSize = 0;
+                    
+                    if (node::Buffer::HasInstance(bufferArg)) {
+                        sourceData = node::Buffer::Data(bufferArg);
+                        sourceSize = node::Buffer::Length(bufferArg);
+                    } else if (bufferArg->IsArrayBuffer()) {
+                        v8::Local<v8::ArrayBuffer> arrayBuffer = bufferArg.As<v8::ArrayBuffer>();
+                        sourceData = static_cast<const char*>(arrayBuffer->Data());
+                        sourceSize = arrayBuffer->ByteLength();
+                    } else if (bufferArg->IsTypedArray()) {
+                        v8::Local<v8::TypedArray> typedArray = bufferArg.As<v8::TypedArray>();
+                        v8::Local<v8::ArrayBuffer> arrayBuffer = typedArray->Buffer();
+                        sourceData = static_cast<const char*>(arrayBuffer->Data()) + typedArray->ByteOffset();
+                        sourceSize = typedArray->ByteLength();
+                    } else {
+                        args.GetIsolate()->ThrowException(v8::Exception::TypeError(
+                            v8::String::NewFromUtf8(args.GetIsolate(), "Second argument must be a Buffer, ArrayBuffer, or TypedArray").ToLocalChecked()));
+                        return;
+                    }
+                    
+                    if (sourceData == nullptr || sourceSize == 0) {
+                        args.GetReturnValue().Set(v8::Boolean::New(args.GetIsolate(), false));
+                        return;
+                    }
+                    
+                    // Calculate destination pointer with offset
+                    void* destPtr = static_cast<char*>(edict->pvPrivateData) + offset;
+                    
+                    // Copy data from source buffer to private data
+                    memcpy(destPtr, sourceData, sourceSize);
+                    
+                    // Return success
+                    args.GetReturnValue().Set(v8::Boolean::New(args.GetIsolate(), true));
+                }).ToLocalChecked();
+                
+            info.GetReturnValue().Set(func);
         });
 
     // Common entvars field accessors that delegate to the entvars object

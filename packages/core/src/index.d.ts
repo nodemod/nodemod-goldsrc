@@ -5,6 +5,15 @@
 /// <reference path="./engine.d.ts" />
 /// <reference path="./dll.d.ts" />
 
+// Global Entity constructor
+declare class Entity {
+  /**
+   * Creates a new named entity with proper initialization
+   * @param classname - Entity classname (e.g. "weapon_ak47", "info_player_start")
+   */
+  constructor(classname: string);
+}
+
 declare namespace nodemod {
   // Properties
   const cwd: string;

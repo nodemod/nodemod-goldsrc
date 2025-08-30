@@ -1128,6 +1128,10 @@ declare namespace nodemod {
   interface Entity extends Entvars {
     /** Entity ID from edict index */
     id: number;
+
+    getPrivateDataBuffer(offset: number, size: number): Buffer | null;
+
+    writePrivateDataBuffer(offset: number, buffer: Buffer | ArrayBuffer | Uint8Array): boolean;
   }
   /** Result from monster hull trace operations */
   interface TraceMonsterHullResult {

@@ -2,11 +2,65 @@
 #include "common_macros.hpp"
 #include <eiface.h>
 #include <unordered_map>
+#include <cstring>
 
 namespace structures {
 
 v8::Eternal<v8::ObjectTemplate> keyValueDataTemplate;
 std::unordered_map<void*, v8::Persistent<v8::Object>> wrappedKeyValueData;
+
+KeyValueData* createKeyValueDataFromJS(v8::Isolate* isolate, const v8::Local<v8::Object>& jsObj) {
+    v8::Locker locker(isolate);
+    v8::HandleScope scope(isolate);
+    
+    KeyValueData* kvd = new KeyValueData();
+    memset(kvd, 0, sizeof(KeyValueData));
+    
+    // Get string properties and allocate C strings
+    auto context = isolate->GetCurrentContext();
+    
+    // szClassName
+    auto classNameKey = v8::String::NewFromUtf8(isolate, "szClassName").ToLocalChecked();
+    if (jsObj->Has(context, classNameKey).FromMaybe(false)) {
+        auto classNameVal = jsObj->Get(context, classNameKey).ToLocalChecked();
+        if (classNameVal->IsString()) {
+            v8::String::Utf8Value className(isolate, classNameVal);
+            kvd->szClassName = strdup(*className);
+        }
+    }
+    
+    // szKeyName
+    auto keyNameKey = v8::String::NewFromUtf8(isolate, "szKeyName").ToLocalChecked();
+    if (jsObj->Has(context, keyNameKey).FromMaybe(false)) {
+        auto keyNameVal = jsObj->Get(context, keyNameKey).ToLocalChecked();
+        if (keyNameVal->IsString()) {
+            v8::String::Utf8Value keyName(isolate, keyNameVal);
+            kvd->szKeyName = strdup(*keyName);
+        }
+    }
+    
+    // szValue
+    auto valueKey = v8::String::NewFromUtf8(isolate, "szValue").ToLocalChecked();
+    if (jsObj->Has(context, valueKey).FromMaybe(false)) {
+        auto valueVal = jsObj->Get(context, valueKey).ToLocalChecked();
+        if (valueVal->IsString()) {
+            v8::String::Utf8Value value(isolate, valueVal);
+            kvd->szValue = strdup(*value);
+        }
+    }
+    
+    // fHandled
+    auto handledKey = v8::String::NewFromUtf8(isolate, "fHandled").ToLocalChecked();
+    if (jsObj->Has(context, handledKey).FromMaybe(false)) {
+        auto handledVal = jsObj->Get(context, handledKey).ToLocalChecked();
+        if (handledVal->IsNumber()) {
+            kvd->fHandled = handledVal->Int32Value(context).FromMaybe(0);
+        }
+    }
+    
+    
+    return kvd;
+}
 
 KeyValueData* unwrapKeyValueData_internal(v8::Isolate* isolate, const v8::Local<v8::Value>& obj) {
     v8::Locker locker(isolate);
@@ -19,8 +73,16 @@ KeyValueData* unwrapKeyValueData_internal(v8::Isolate* isolate, const v8::Local<
         return nullptr;
     }
     
-    auto field = object.ToLocalChecked()->GetAlignedPointerFromInternalField(0);
-    return static_cast<KeyValueData*>(field);
+    auto objectLocal = object.ToLocalChecked();
+    
+    // Check if it's a wrapped KeyValueData (has internal field)
+    if (objectLocal->InternalFieldCount() > 0) {
+        auto field = objectLocal->GetAlignedPointerFromInternalField(0);
+        return static_cast<KeyValueData*>(field);
+    }
+    
+    // If it's a plain JavaScript object, create a new KeyValueData
+    return createKeyValueDataFromJS(isolate, objectLocal);
 }
 
 void createKeyValueDataTemplate(v8::Isolate* isolate) {
