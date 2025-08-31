@@ -16,6 +16,9 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, s ? s : "").ToLocalChecked(); // s (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -28,6 +31,9 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, s ? s : "").ToLocalChecked(); // s (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -52,6 +58,9 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, m ? m : "").ToLocalChecked(); // m (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -64,6 +73,9 @@
       v8_args[0] = v8::Number::New(isolate, modelIndex); // modelIndex (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -123,6 +135,9 @@
       v8_args[0] = utils::floatArrayToJS(isolate, rgflVector, 3); // rgflVector (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (float)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0.0f;
   }
 
@@ -185,6 +200,9 @@
       v8_args[2] = v8::String::NewFromUtf8(isolate, pszValue ? pszValue : "").ToLocalChecked(); // pszValue (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (edict_t*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -197,6 +215,9 @@
       v8_args[0] = structures::wrapEntity(isolate, pEnt); // pEnt (edict_t*)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -211,6 +232,9 @@
       v8_args[2] = v8::Number::New(isolate, rad); // rad (float)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (edict_t*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -223,6 +247,9 @@
       v8_args[0] = structures::wrapEntity(isolate, pEdict); // pEdict (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (edict_t*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -235,6 +262,9 @@
       v8_args[0] = structures::wrapEntity(isolate, pplayer); // pplayer (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (edict_t*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -267,6 +297,9 @@
   edict_t* eng_pfnCreateEntity () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("engCreateEntity", nullptr, 0);
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (edict_t*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -290,6 +323,9 @@
       v8_args[0] = v8::Number::New(isolate, className); // className (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (edict_t*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -313,6 +349,9 @@
       v8_args[0] = structures::wrapEntity(isolate, e); // e (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -325,6 +364,9 @@
       v8_args[0] = structures::wrapEntity(isolate, e); // e (edict_t*)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -340,6 +382,9 @@
       v8_args[3] = v8::Number::New(isolate, iMode); // iMode (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -431,6 +476,9 @@
       v8_args[5] = structures::wrapTraceResult(isolate, ptr); // ptr (TraceResult *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -476,6 +524,9 @@
       v8_args[2] = utils::floatArrayToJS(isolate, v2, 3); // v2 (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (const char *)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -572,6 +623,9 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, name ? name : "").ToLocalChecked(); // name (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -584,6 +638,9 @@
       v8_args[0] = utils::floatArrayToJS(isolate, rgflVector, 3); // rgflVector (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -715,6 +772,9 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, szVarName ? szVarName : "").ToLocalChecked(); // szVarName (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (float)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0.0f;
   }
 
@@ -727,6 +787,9 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, szVarName ? szVarName : "").ToLocalChecked(); // szVarName (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (const char*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -788,6 +851,9 @@
       v8_args[1] = v8::Number::New(isolate, cb); // cb (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (void*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -800,6 +866,9 @@
       v8_args[0] = structures::wrapEntity(isolate, pEdict); // pEdict (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (void*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -823,6 +892,9 @@
       v8_args[0] = v8::Number::New(isolate, iString); // iString (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (const char *)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -835,6 +907,9 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, szValue ? szValue : "").ToLocalChecked(); // szValue (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -847,6 +922,9 @@
       v8_args[0] = structures::wrapEntity(isolate, pEdict); // pEdict (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (struct entvars_s *)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -859,6 +937,9 @@
       v8_args[0] = v8::Number::New(isolate, iEntOffset); // iEntOffset (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (edict_t*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -871,6 +952,9 @@
       v8_args[0] = structures::wrapEntity(isolate, pEdict); // pEdict (const edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -883,6 +967,9 @@
       v8_args[0] = structures::wrapEntity(isolate, pEdict); // pEdict (const edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -895,6 +982,9 @@
       v8_args[0] = v8::Number::New(isolate, iEntIndex); // iEntIndex (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (edict_t*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -907,6 +997,9 @@
       v8_args[0] = structures::wrapEntvars(isolate, pvars); // pvars (struct entvars_s*)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (edict_t*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -919,6 +1012,9 @@
       v8_args[0] = structures::wrapEntity(isolate, pEdict); // pEdict (edict_t*)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (void*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -932,6 +1028,9 @@
       v8_args[1] = v8::Number::New(isolate, iSize); // iSize (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -970,6 +1069,9 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, pName ? pName : "").ToLocalChecked(); // pName (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (void*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -982,6 +1084,9 @@
       v8_args[0] = v8::External::New(isolate, function); // function (void *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (const char *)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -1013,6 +1118,9 @@
   const char * eng_pfnCmd_Args () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("engCmdArgs", nullptr, 0);
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (const char *)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -1025,6 +1133,9 @@
       v8_args[0] = v8::Number::New(isolate, argc); // argc (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (const char *)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -1032,6 +1143,9 @@
   int eng_pfnCmd_Argc () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("engCmdArgc", nullptr, 0);
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -1094,6 +1208,9 @@
       v8_args[0] = v8::Number::New(isolate, pulCRC); // pulCRC (CRC32_t)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (CRC32_t)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -1107,6 +1224,9 @@
       v8_args[1] = v8::Number::New(isolate, lHigh); // lHigh (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -1120,6 +1240,9 @@
       v8_args[1] = v8::Number::New(isolate, flHigh); // flHigh (float)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (float)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0.0f;
   }
 
@@ -1139,6 +1262,9 @@
   float eng_pfnTime () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("engTime", nullptr, 0);
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (float)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0.0f;
   }
 
@@ -1165,6 +1291,9 @@
       v8_args[1] = utils::intArrayToJS(isolate, pLength, 1); // pLength (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (byte*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -1201,6 +1330,9 @@
       v8_args[2] = utils::intArrayToJS(isolate, iCompare, 1); // iCompare (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -1262,6 +1394,9 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, netname ? netname : "").ToLocalChecked(); // netname (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (edict_t *)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -1287,6 +1422,9 @@
   int eng_pfnNumberOfEntities () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("engNumberOfEntities", nullptr, 0);
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -1299,6 +1437,9 @@
       v8_args[0] = structures::wrapEntity(isolate, e); // e (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (char*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -1312,6 +1453,9 @@
       v8_args[1] = v8::String::NewFromUtf8(isolate, key ? key : "").ToLocalChecked(); // key (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (char*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -1351,6 +1495,9 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, filename ? filename : "").ToLocalChecked(); // filename (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -1377,6 +1524,9 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, s ? s : "").ToLocalChecked(); // s (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -1389,6 +1539,9 @@
       v8_args[0] = structures::wrapEntity(isolate, e); // e (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -1417,6 +1570,9 @@
   int eng_pfnIsDedicatedServer () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("engIsDedicatedServer", nullptr, 0);
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -1429,6 +1585,9 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, szVarName ? szVarName : "").ToLocalChecked(); // szVarName (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (cvar_t *)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -1441,6 +1600,9 @@
       v8_args[0] = structures::wrapEntity(isolate, e); // e (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (unsigned int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -1466,6 +1628,9 @@
       v8_args[1] = v8::String::NewFromUtf8(isolate, key ? key : "").ToLocalChecked(); // key (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (const char *)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -1491,6 +1656,9 @@
       v8_args[0] = structures::wrapEntity(isolate, pClient); // pClient (const edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (const char *)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -1504,6 +1672,9 @@
       v8_args[1] = v8::String::NewFromUtf8(isolate, psz ? psz : "").ToLocalChecked(); // psz (const char*)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (unsigned short)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -1538,6 +1709,9 @@
       v8_args[0] = utils::floatArrayToJS(isolate, org, 3); // org (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (unsigned char *)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -1550,6 +1724,9 @@
       v8_args[0] = utils::floatArrayToJS(isolate, org, 3); // org (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (unsigned char *)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -1563,6 +1740,9 @@
       v8_args[1] = utils::byteArrayToJS(isolate, pset, 1); // pset (unsigned char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -1606,6 +1786,9 @@
   int eng_pfnGetCurrentPlayer () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("engGetCurrentPlayer", nullptr, 0);
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -1618,6 +1801,9 @@
       v8_args[0] = structures::wrapEntity(isolate, player); // player (const edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -1631,6 +1817,9 @@
       v8_args[1] = v8::String::NewFromUtf8(isolate, fieldname ? fieldname : "").ToLocalChecked(); // fieldname (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -1680,6 +1869,9 @@
       v8_args[1] = structures::wrapEntityState(isolate, baseline); // baseline (struct entity_state_s *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -1744,6 +1936,9 @@
       v8_args[1] = v8::Number::New(isolate, iSender); // iSender (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (qboolean)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -1758,6 +1953,9 @@
       v8_args[2] = v8::Boolean::New(isolate, bListen); // bListen (qboolean)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (qboolean)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -1770,6 +1968,9 @@
       v8_args[0] = structures::wrapEntity(isolate, e); // e (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (const char *)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -1783,6 +1984,9 @@
       v8_args[1] = v8::String::NewFromUtf8(isolate, entryName ? entryName : "").ToLocalChecked(); // entryName (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (void *)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -1797,6 +2001,9 @@
       v8_args[2] = utils::intArrayToJS(isolate, picked, 1); // picked (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (void *)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -1809,6 +2016,9 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, filename ? filename : "").ToLocalChecked(); // filename (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -1821,6 +2031,9 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, filepath ? filepath : "").ToLocalChecked(); // filepath (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (unsigned int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -1828,6 +2041,9 @@
   int eng_pfnIsCareerMatch () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("engIsCareerMatch", nullptr, 0);
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -1840,6 +2056,9 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, label ? label : "").ToLocalChecked(); // label (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -1863,6 +2082,9 @@
       v8_args[0] = v8::Number::New(isolate, mid); // mid (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -1929,6 +2151,9 @@
       v8_args[1] = utils::stringArrayToJS(isolate, ppnext); // ppnext (char **)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -1941,6 +2166,9 @@
       v8_args[0] = v8::Number::New(isolate, iEntIndex); // iEntIndex (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (edict_t*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -2116,6 +2344,9 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, s ? s : "").ToLocalChecked(); // s (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -2128,6 +2359,9 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, s ? s : "").ToLocalChecked(); // s (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -2152,6 +2386,9 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, m ? m : "").ToLocalChecked(); // m (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -2164,6 +2401,9 @@
       v8_args[0] = v8::Number::New(isolate, modelIndex); // modelIndex (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -2223,6 +2463,9 @@
       v8_args[0] = utils::floatArrayToJS(isolate, rgflVector, 3); // rgflVector (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (float)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0.0f;
   }
 
@@ -2285,6 +2528,9 @@
       v8_args[2] = v8::String::NewFromUtf8(isolate, pszValue ? pszValue : "").ToLocalChecked(); // pszValue (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (edict_t*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -2297,6 +2543,9 @@
       v8_args[0] = structures::wrapEntity(isolate, pEnt); // pEnt (edict_t*)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -2311,6 +2560,9 @@
       v8_args[2] = v8::Number::New(isolate, rad); // rad (float)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (edict_t*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -2323,6 +2575,9 @@
       v8_args[0] = structures::wrapEntity(isolate, pEdict); // pEdict (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (edict_t*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -2335,6 +2590,9 @@
       v8_args[0] = structures::wrapEntity(isolate, pplayer); // pplayer (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (edict_t*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -2367,6 +2625,9 @@
   edict_t* postEng_pfnCreateEntity () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("postEngCreateEntity", nullptr, 0);
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (edict_t*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -2390,6 +2651,9 @@
       v8_args[0] = v8::Number::New(isolate, className); // className (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (edict_t*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -2413,6 +2677,9 @@
       v8_args[0] = structures::wrapEntity(isolate, e); // e (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -2425,6 +2692,9 @@
       v8_args[0] = structures::wrapEntity(isolate, e); // e (edict_t*)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -2440,6 +2710,9 @@
       v8_args[3] = v8::Number::New(isolate, iMode); // iMode (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -2531,6 +2804,9 @@
       v8_args[5] = structures::wrapTraceResult(isolate, ptr); // ptr (TraceResult *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -2576,6 +2852,9 @@
       v8_args[2] = utils::floatArrayToJS(isolate, v2, 3); // v2 (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (const char *)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -2672,6 +2951,9 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, name ? name : "").ToLocalChecked(); // name (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -2684,6 +2966,9 @@
       v8_args[0] = utils::floatArrayToJS(isolate, rgflVector, 3); // rgflVector (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -2815,6 +3100,9 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, szVarName ? szVarName : "").ToLocalChecked(); // szVarName (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (float)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0.0f;
   }
 
@@ -2827,6 +3115,9 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, szVarName ? szVarName : "").ToLocalChecked(); // szVarName (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (const char*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -2888,6 +3179,9 @@
       v8_args[1] = v8::Number::New(isolate, cb); // cb (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (void*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -2900,6 +3194,9 @@
       v8_args[0] = structures::wrapEntity(isolate, pEdict); // pEdict (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (void*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -2923,6 +3220,9 @@
       v8_args[0] = v8::Number::New(isolate, iString); // iString (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (const char *)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -2935,6 +3235,9 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, szValue ? szValue : "").ToLocalChecked(); // szValue (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -2947,6 +3250,9 @@
       v8_args[0] = structures::wrapEntity(isolate, pEdict); // pEdict (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (struct entvars_s *)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -2959,6 +3265,9 @@
       v8_args[0] = v8::Number::New(isolate, iEntOffset); // iEntOffset (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (edict_t*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -2971,6 +3280,9 @@
       v8_args[0] = structures::wrapEntity(isolate, pEdict); // pEdict (const edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -2983,6 +3295,9 @@
       v8_args[0] = structures::wrapEntity(isolate, pEdict); // pEdict (const edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -2995,6 +3310,9 @@
       v8_args[0] = v8::Number::New(isolate, iEntIndex); // iEntIndex (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (edict_t*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -3007,6 +3325,9 @@
       v8_args[0] = structures::wrapEntvars(isolate, pvars); // pvars (struct entvars_s*)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (edict_t*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -3019,6 +3340,9 @@
       v8_args[0] = structures::wrapEntity(isolate, pEdict); // pEdict (edict_t*)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (void*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -3032,6 +3356,9 @@
       v8_args[1] = v8::Number::New(isolate, iSize); // iSize (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -3070,6 +3397,9 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, pName ? pName : "").ToLocalChecked(); // pName (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (void*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -3082,6 +3412,9 @@
       v8_args[0] = v8::External::New(isolate, function); // function (void *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (const char *)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -3113,6 +3446,9 @@
   const char * postEng_pfnCmd_Args () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("postEngCmdArgs", nullptr, 0);
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (const char *)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -3125,6 +3461,9 @@
       v8_args[0] = v8::Number::New(isolate, argc); // argc (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (const char *)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -3132,6 +3471,9 @@
   int postEng_pfnCmd_Argc () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("postEngCmdArgc", nullptr, 0);
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -3194,6 +3536,9 @@
       v8_args[0] = v8::Number::New(isolate, pulCRC); // pulCRC (CRC32_t)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (CRC32_t)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -3207,6 +3552,9 @@
       v8_args[1] = v8::Number::New(isolate, lHigh); // lHigh (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -3220,6 +3568,9 @@
       v8_args[1] = v8::Number::New(isolate, flHigh); // flHigh (float)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (float)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0.0f;
   }
 
@@ -3239,6 +3590,9 @@
   float postEng_pfnTime () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("postEngTime", nullptr, 0);
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (float)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0.0f;
   }
 
@@ -3265,6 +3619,9 @@
       v8_args[1] = utils::intArrayToJS(isolate, pLength, 1); // pLength (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (byte*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -3301,6 +3658,9 @@
       v8_args[2] = utils::intArrayToJS(isolate, iCompare, 1); // iCompare (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -3362,6 +3722,9 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, netname ? netname : "").ToLocalChecked(); // netname (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (edict_t *)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -3387,6 +3750,9 @@
   int postEng_pfnNumberOfEntities () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("postEngNumberOfEntities", nullptr, 0);
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -3399,6 +3765,9 @@
       v8_args[0] = structures::wrapEntity(isolate, e); // e (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (char*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -3412,6 +3781,9 @@
       v8_args[1] = v8::String::NewFromUtf8(isolate, key ? key : "").ToLocalChecked(); // key (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (char*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -3451,6 +3823,9 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, filename ? filename : "").ToLocalChecked(); // filename (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -3477,6 +3852,9 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, s ? s : "").ToLocalChecked(); // s (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -3489,6 +3867,9 @@
       v8_args[0] = structures::wrapEntity(isolate, e); // e (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -3517,6 +3898,9 @@
   int postEng_pfnIsDedicatedServer () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("postEngIsDedicatedServer", nullptr, 0);
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -3529,6 +3913,9 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, szVarName ? szVarName : "").ToLocalChecked(); // szVarName (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (cvar_t *)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -3541,6 +3928,9 @@
       v8_args[0] = structures::wrapEntity(isolate, e); // e (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (unsigned int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -3566,6 +3956,9 @@
       v8_args[1] = v8::String::NewFromUtf8(isolate, key ? key : "").ToLocalChecked(); // key (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (const char *)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -3591,6 +3984,9 @@
       v8_args[0] = structures::wrapEntity(isolate, pClient); // pClient (const edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (const char *)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -3604,6 +4000,9 @@
       v8_args[1] = v8::String::NewFromUtf8(isolate, psz ? psz : "").ToLocalChecked(); // psz (const char*)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (unsigned short)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -3638,6 +4037,9 @@
       v8_args[0] = utils::floatArrayToJS(isolate, org, 3); // org (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (unsigned char *)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -3650,6 +4052,9 @@
       v8_args[0] = utils::floatArrayToJS(isolate, org, 3); // org (const float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (unsigned char *)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -3663,6 +4068,9 @@
       v8_args[1] = utils::byteArrayToJS(isolate, pset, 1); // pset (unsigned char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -3706,6 +4114,9 @@
   int postEng_pfnGetCurrentPlayer () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("postEngGetCurrentPlayer", nullptr, 0);
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -3718,6 +4129,9 @@
       v8_args[0] = structures::wrapEntity(isolate, player); // player (const edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -3731,6 +4145,9 @@
       v8_args[1] = v8::String::NewFromUtf8(isolate, fieldname ? fieldname : "").ToLocalChecked(); // fieldname (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -3780,6 +4197,9 @@
       v8_args[1] = structures::wrapEntityState(isolate, baseline); // baseline (struct entity_state_s *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -3844,6 +4264,9 @@
       v8_args[1] = v8::Number::New(isolate, iSender); // iSender (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (qboolean)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -3858,6 +4281,9 @@
       v8_args[2] = v8::Boolean::New(isolate, bListen); // bListen (qboolean)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (qboolean)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -3870,6 +4296,9 @@
       v8_args[0] = structures::wrapEntity(isolate, e); // e (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (const char *)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -3883,6 +4312,9 @@
       v8_args[1] = v8::String::NewFromUtf8(isolate, entryName ? entryName : "").ToLocalChecked(); // entryName (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (void *)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -3897,6 +4329,9 @@
       v8_args[2] = utils::intArrayToJS(isolate, picked, 1); // picked (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (void *)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -3909,6 +4344,9 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, filename ? filename : "").ToLocalChecked(); // filename (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -3921,6 +4359,9 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, filepath ? filepath : "").ToLocalChecked(); // filepath (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (unsigned int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -3928,6 +4369,9 @@
   int postEng_pfnIsCareerMatch () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("postEngIsCareerMatch", nullptr, 0);
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -3940,6 +4384,9 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, label ? label : "").ToLocalChecked(); // label (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -3963,6 +4410,9 @@
       v8_args[0] = v8::Number::New(isolate, mid); // mid (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -4029,6 +4479,9 @@
       v8_args[1] = utils::stringArrayToJS(isolate, ppnext); // ppnext (char **)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -4041,6 +4494,9 @@
       v8_args[0] = v8::Number::New(isolate, iEntIndex); // iEntIndex (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (edict_t*)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 

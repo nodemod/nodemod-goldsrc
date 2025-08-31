@@ -355,9 +355,9 @@ const generator = {
         if (isStructureType) {
           return '';
         }
-        return `if (!info[${i}]->IsExternal()) {
-    printf("Warning: ${func.name} parameter ${i} (${arg.type}) is not External, using nullptr\\n");
-  }`;
+        return `//if (!info[${i}]->IsExternal()) {
+    //printf("Warning: ${func.name} parameter ${i} (${arg.type}) is not External, using nullptr\\n");
+  //}`;
       }
       return '';
     }).filter(check => check).join('\n  ');

@@ -25,16 +25,23 @@ function getFixedArgToValue(arg) {
 }
 
 function getReturnStatement(type) {
+  const getOverrideCheck = (returnCast) => {
+    return `
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return ${returnCast}gpMetaGlobals->override_ret;
+    }`;
+  };
+
   if (type.includes('*')) {
-    return '\n    return nullptr;';
+    return `${getOverrideCheck('('+type+')')}\n    return nullptr;`;
   } else if (type === 'int' || type === 'qboolean' || type === 'unsigned int') {
-    return '\n    return 0;';
+    return `${getOverrideCheck('('+type+')(intptr_t)')}\n    return 0;`;
   } else if (type === 'float') {
-    return '\n    return 0.0f;';
+    return `${getOverrideCheck('(float)(intptr_t)')}\n    return 0.0f;`;
   } else if (type === 'double') {
-    return '\n    return 0.0;';
+    return `${getOverrideCheck('(double)(intptr_t)')}\n    return 0.0;`;
   } else {
-    return '\n    return 0;';
+    return `${getOverrideCheck('('+type+')(intptr_t)')}\n    return 0;`;
   }
 }
 

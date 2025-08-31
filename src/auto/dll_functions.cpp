@@ -107,9 +107,9 @@ void sf_dll_pfnSaveWriteFields(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
 
-  if (!info[2]->IsExternal()) {
-    printf("Warning: pfnSaveWriteFields parameter 2 (void*) is not External, using nullptr\n");
-  }
+  //if (!info[2]->IsExternal()) {
+    //printf("Warning: pfnSaveWriteFields parameter 2 (void*) is not External, using nullptr\n");
+  //}
 
   (*gpGamedllFuncs->dllapi_table->pfnSaveWriteFields)(structures::unwrapSaveRestoreData(isolate, info[0]),
 utils::js2string(isolate, info[1]),
@@ -123,9 +123,9 @@ void sf_dll_pfnSaveReadFields(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
 
-  if (!info[2]->IsExternal()) {
-    printf("Warning: pfnSaveReadFields parameter 2 (void*) is not External, using nullptr\n");
-  }
+  //if (!info[2]->IsExternal()) {
+    //printf("Warning: pfnSaveReadFields parameter 2 (void*) is not External, using nullptr\n");
+  //}
 
   (*gpGamedllFuncs->dllapi_table->pfnSaveReadFields)(structures::unwrapSaveRestoreData(isolate, info[0]),
 utils::js2string(isolate, info[1]),
@@ -436,9 +436,9 @@ void sf_dll_pfnConnectionlessPacket(const v8::FunctionCallbackInfo<v8::Value>& i
 {
   V8_STUFF();
 
-  if (!info[3]->IsExternal()) {
-    printf("Warning: pfnConnectionlessPacket parameter 3 (int *) is not External, using nullptr\n");
-  }
+  //if (!info[3]->IsExternal()) {
+    //printf("Warning: pfnConnectionlessPacket parameter 3 (int *) is not External, using nullptr\n");
+  //}
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*gpGamedllFuncs->dllapi_table->pfnConnectionlessPacket)(structures::unwrapNetAdr(isolate, info[0]),
 utils::js2string(isolate, info[1]),
@@ -451,12 +451,12 @@ void sf_dll_pfnGetHullBounds(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
 
-  if (!info[1]->IsExternal()) {
-    printf("Warning: pfnGetHullBounds parameter 1 (float *) is not External, using nullptr\n");
-  }
-  if (!info[2]->IsExternal()) {
-    printf("Warning: pfnGetHullBounds parameter 2 (float *) is not External, using nullptr\n");
-  }
+  //if (!info[1]->IsExternal()) {
+    //printf("Warning: pfnGetHullBounds parameter 1 (float *) is not External, using nullptr\n");
+  //}
+  //if (!info[2]->IsExternal()) {
+    //printf("Warning: pfnGetHullBounds parameter 2 (float *) is not External, using nullptr\n");
+  //}
 
   info.GetReturnValue().Set(v8::Number::New(isolate, (*gpGamedllFuncs->dllapi_table->pfnGetHullBounds)(info[0]->Int32Value(context).ToChecked(),
 (float*)utils::jsToPointer(isolate, info[1]),

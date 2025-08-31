@@ -351,18 +351,18 @@ void event::call(argument_collector_t collectArguments)
 			if (maybeResult.ToLocal(&result)) {
 				// Capture return value for metamod override_ret if gpMetaGlobals is available
 				if (gpMetaGlobals && !result.IsEmpty()) {
-					if (result->IsNumber()) {
-						double num = result->NumberValue(ctx).ToChecked();
-						printf("JS returned number: %f\n", num);
-					} else if (result->IsBoolean()) {
-						bool val = result->BooleanValue(isolate);
-						printf("JS returned boolean: %s\n", val ? "true" : "false");
-					} else if (result->IsString()) {
-						v8::String::Utf8Value str(isolate, result);
-						printf("JS returned string: %s\n", *str);
-					}
+					// if (result->IsNumber()) {
+					// 	double num = result->NumberValue(ctx).ToChecked();
+					// 	printf("JS returned number: %f\n", num);
+					// } else if (result->IsBoolean()) {
+					// 	bool val = result->BooleanValue(isolate);
+					// 	printf("JS returned boolean: %s\n", val ? "true" : "false");
+					// } else if (result->IsString()) {
+					// 	v8::String::Utf8Value str(isolate, result);
+					// 	printf("JS returned string: %s\n", *str);
+					// }
 					gpMetaGlobals->override_ret = utils::jsToPointer(isolate, result);
-					if (gpMetaGlobals->override_ret) printf("override_ret = %p, override_ret (char*) = %s\n", (void*)gpMetaGlobals->override_ret, (char *) gpMetaGlobals->override_ret);
+					//if (gpMetaGlobals->override_ret) printf("override_ret = %p, override_ret (char*) = %s\n", (void*)gpMetaGlobals->override_ret, (char *) gpMetaGlobals->override_ret);
 				}
 			}
 

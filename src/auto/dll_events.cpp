@@ -22,6 +22,9 @@
       v8_args[0] = structures::wrapEntity(isolate, pent); // pent (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -107,6 +110,9 @@
       v8_args[2] = v8::Number::New(isolate, globalEntity); // globalEntity (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -191,6 +197,9 @@
       v8_args[3] = v8::String::NewFromUtf8(isolate, szRejectReason ? szRejectReason : "").ToLocalChecked(); // szRejectReason (char*)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (qboolean)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -323,6 +332,9 @@
   const char * dll_pfnGetGameDescription () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("dllGetGameDescription", nullptr, 0);
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (const char *)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -414,6 +426,9 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, name ? name : "").ToLocalChecked(); // name (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (char)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -459,6 +474,9 @@
       v8_args[6] = utils::byteArrayToJS(isolate, pSet, 1); // pSet (unsigned char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -495,6 +513,9 @@
       v8_args[1] = structures::wrapWeaponData(isolate, info); // info (struct weapon_data_s *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -534,6 +555,9 @@
       v8_args[3] = utils::intArrayToJS(isolate, response_buffer_size, 1); // response_buffer_size (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -548,6 +572,9 @@
       v8_args[2] = utils::floatArrayToJS(isolate, maxs, 3); // maxs (float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -568,6 +595,9 @@
       v8_args[2] = v8::String::NewFromUtf8(isolate, disconnect_message ? disconnect_message : "").ToLocalChecked(); // disconnect_message (char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -575,6 +605,9 @@
   int dll_pfnAllowLagCompensation () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("dllAllowLagCompensation", nullptr, 0);
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -647,6 +680,9 @@
       v8_args[0] = structures::wrapEntity(isolate, pent); // pent (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -732,6 +768,9 @@
       v8_args[2] = v8::Number::New(isolate, globalEntity); // globalEntity (int)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -816,6 +855,9 @@
       v8_args[3] = v8::String::NewFromUtf8(isolate, szRejectReason ? szRejectReason : "").ToLocalChecked(); // szRejectReason (char*)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (qboolean)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -948,6 +990,9 @@
   const char * postDll_pfnGetGameDescription () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("postDllGetGameDescription", nullptr, 0);
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (const char *)gpMetaGlobals->override_ret;
+    }
     return nullptr;
   }
 
@@ -1039,6 +1084,9 @@
       v8_args[0] = v8::String::NewFromUtf8(isolate, name ? name : "").ToLocalChecked(); // name (const char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (char)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -1084,6 +1132,9 @@
       v8_args[6] = utils::byteArrayToJS(isolate, pSet, 1); // pSet (unsigned char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -1120,6 +1171,9 @@
       v8_args[1] = structures::wrapWeaponData(isolate, info); // info (struct weapon_data_s *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -1159,6 +1213,9 @@
       v8_args[3] = utils::intArrayToJS(isolate, response_buffer_size, 1); // response_buffer_size (int *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -1173,6 +1230,9 @@
       v8_args[2] = utils::floatArrayToJS(isolate, maxs, 3); // maxs (float *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -1193,6 +1253,9 @@
       v8_args[2] = v8::String::NewFromUtf8(isolate, disconnect_message ? disconnect_message : "").ToLocalChecked(); // disconnect_message (char *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
@@ -1200,6 +1263,9 @@
   int postDll_pfnAllowLagCompensation () {
     SET_META_RESULT(MRES_IGNORED);
     event::findAndCall("postDllAllowLagCompensation", nullptr, 0);
+    if (gpMetaGlobals->mres == MRES_SUPERCEDE || gpMetaGlobals->mres == MRES_OVERRIDE) {
+      return (int)(intptr_t)gpMetaGlobals->override_ret;
+    }
     return 0;
   }
 
