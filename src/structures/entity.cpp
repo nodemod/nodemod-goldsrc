@@ -92,26 +92,6 @@ namespace structures
             }
         });
 
-    // Entvars property - returns wrapped entvars_t object
-    _entity->SetNativeDataProperty(v8::String::NewFromUtf8(isolate, "entvars").ToLocalChecked(),
-        [](v8::Local<v8::Name> property, const v8::PropertyCallbackInfo<v8::Value> &info) {
-            edict_t *edict = (edict_t *)structures::unwrapEntity(info.GetIsolate(), info.Holder());
-            if (edict == nullptr) {
-                info.GetReturnValue().Set(v8::Null(info.GetIsolate()));
-            } else {
-                info.GetReturnValue().Set(structures::wrapEntvars(info.GetIsolate(), &edict->v));
-            }
-        },
-        [](v8::Local<v8::Name> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void> &info) {
-            edict_t *edict = (edict_t *)structures::unwrapEntity(info.GetIsolate(), info.Holder());
-            if (edict == nullptr) return;
-            
-            entvars_t *newEntvars = structures::unwrapEntvars(info.GetIsolate(), value);
-            if (newEntvars != nullptr) {
-                edict->v = *newEntvars;  // Copy the entire entvars structure
-            }
-        });
-
     // getPrivateDataBuffer method using SetNativeDataProperty for proper context
     _entity->SetNativeDataProperty(v8::String::NewFromUtf8(isolate, "getPrivateDataBuffer").ToLocalChecked(),
         [](v8::Local<v8::Name> property, const v8::PropertyCallbackInfo<v8::Value> &info) {
