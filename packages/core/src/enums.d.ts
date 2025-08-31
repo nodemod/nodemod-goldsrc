@@ -111,6 +111,37 @@ declare namespace nodemod {
     SENDCVARVALUE2 = 58
   }
 
+  // Sound attenuation constants for pfnEmitSound
+  const enum ATTN {
+    NONE = 0,         // No attenuation
+    NORM = 0.8,       // Normal attenuation
+    IDLE = 2.0,       // Idle attenuation
+    STATIC = 1.25     // Static attenuation
+  }
+
+  // Sound flags for pfnEmitSound fFlags parameter
+  const enum SND {
+    SPAWNING = 256,     // 1<<8 - We're spawning, used in some cases for ambients
+    STOP = 32,          // 1<<5 - Stop sound
+    CHANGE_VOL = 64,    // 1<<6 - Change sound volume
+    CHANGE_PITCH = 128  // 1<<7 - Change sound pitch
+  }
+
+  // Console variable (cvar) flags
+  const enum FCVAR {
+    NONE = 0,                // No flags
+    ARCHIVE = 1,             // 1<<0 - Set to cause it to be saved to vars.rc
+    USERINFO = 2,            // 1<<1 - Changes the client's info string
+    SERVER = 4,              // 1<<2 - Notifies players when changed
+    EXTDLL = 8,              // 1<<3 - Defined by external DLL
+    CLIENTDLL = 16,          // 1<<4 - Defined by the client dll
+    PROTECTED = 32,          // 1<<5 - Server cvar, but we don't send the data since it's a password, etc.
+    SPONLY = 64,             // 1<<6 - This cvar cannot be changed by clients connected to a multiplayer server
+    PRINTABLEONLY = 128,     // 1<<7 - This cvar's string cannot contain unprintable characters
+    UNLOGGED = 256,          // 1<<8 - If this is a FCVAR_SERVER, don't log changes to the log file / console
+    NOEXTRAWHITEPACE = 512   // 1<<9 - Strip trailing/leading white space from this cvar
+  }
+
   /** pev(entity, pev_button) or pev(entity, pev_oldbuttons) values */
   const enum IN_BUTTON {
     ATTACK = 1,        // 1<<0
