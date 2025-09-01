@@ -80,7 +80,7 @@ You can run your TypeScript code using the [ts-node](https://www.npmjs.com/packa
 - [TheEVolk (Maksim Nikiforov)](https://github.com/theevolk) - Original Nodemod creator
 - [iAmir (Amyr Aahmady)](https://github.com/AmyrAhmady) - For his [samp-node project](https://github.com/AmyrAhmady/samp-node) inspiration
 - [SNMetamorph](https://github.com/SNMetamorph) - Code modernization to C++17 and build system refactoring
-- [stevenlafl](https://github.com/stevenlafl) - Complete modernization: Node.js v24.6.0 upgrade, added all engine/DLL functions, GitHub organization, npm packages, compiled distributions
+- [stevenlafl (Steven Linn)](https://github.com/stevenlafl) - Complete modernization: Node.js v24.6.0 upgrade, added all engine/DLL functions, GitHub organization, npm packages, compiled distributions
 
 
 LD_LIBRARY_PATH=. valgrind --tool=memcheck --leak-check=full --error-exitcode=0 ./hlds_linux -game ts +map ts_lobby
