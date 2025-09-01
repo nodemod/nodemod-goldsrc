@@ -1,10 +1,18 @@
 # Nodemod
-This is an Metamod plugin for integrating Node.js directly into Half-Life 1 engine. Plugin is intended as a more functional and convenient replacement for AMX Mod X or LuaMod. Also, it is compatible with Xash3D FWGS too.
+
+A Metamod plugin for integrating Node.js directly into Half-Life 1 engine. This plugin is intended as a more functional and convenient replacement for AMX Mod X or LuaMod. It is also compatible with Xash3D FWGS.
+
+**Note**: The original Nodemod concept was created by TheEVolk. This version represents a complete modernization and enhancement of the project:
+- Updated from legacy Node.js to Node.js v24.6.0
+- Added all remaining engine and DLL functions
+- Created GitHub organization and website
+- Published npm packages and examples
+- Provided compiled library distribution
 
 ## Directory structure
 ```
 |-- /
-|-- deps                       # 3rdparty dependencies
+|-- deps                       # 3rdparty dependencies (Node.js v24.6.0)
 |-- scripts                    # auxiliary scripts (generating the autocode)
 |-- src                        # nodemod source files
 |  |-- auto                    # auto-generated code
@@ -18,18 +26,26 @@ This is an Metamod plugin for integrating Node.js directly into Half-Life 1 engi
 ```
 
 ## Compilation
-> Disclaimer: for now, Nodemod locked for only x86 architecture. In future we plans to support other architectures too.
+> Note: Nodemod is currently locked to x86 architecture for compatibility with Half-Life servers.
 
-Pre-installing dependencies
+### Build Scripts
+```bash
+./build-docker.sh    # Build Docker image
+./build-node.sh      # Build Node.js from source
+./build-nodemod.sh   # Build the nodemod plugin
+```
+
+### Manual Build
+Pre-installing dependencies:
 ```
 sudo dpkg --add-architecture i386
 sudo apt-get update
-sudo apt-get install gcc-multilib g++-multilib cmake ninja-build
+sudo apt-get install gcc-multilib g++-multilib cmake ninja-build python3 python3-distutils
 ```
   
-Building instruction
+Building instructions:
 ```
-git clone --recursive https://github.com/TheEVolk/xash3d-nodemod.git
+git clone --recursive https://github.com/stevenlafl/xash3d-nodemod.git
 cd xash3d-nodemod
 cmake -E make_directory build
 cd build
@@ -61,9 +77,10 @@ You can run your TypeScript code using the [ts-node](https://www.npmjs.com/packa
 - Write a `@types/gs-nodemod` library, for easy coding on typescript.
 
 ## Credits
-- [iAmir (Amyr Aahmady)](https://github.com/AmyrAhmady) for his [samp-node project](https://github.com/AmyrAhmady/samp-node).
-- [TheEVolk (Maksim Nikiforov)](https://github.com/theevolk) that's me.
-- [SNMetamorph](https://github.com/SNMetamorph) for moving code to C++17 and build system refactoring
+- [TheEVolk (Maksim Nikiforov)](https://github.com/theevolk) - Original Nodemod creator
+- [iAmir (Amyr Aahmady)](https://github.com/AmyrAhmady) - For his [samp-node project](https://github.com/AmyrAhmady/samp-node) inspiration
+- [SNMetamorph](https://github.com/SNMetamorph) - Code modernization to C++17 and build system refactoring
+- [stevenlafl](https://github.com/stevenlafl) - Complete modernization: Node.js v24.6.0 upgrade, added all engine/DLL functions, GitHub organization, npm packages, compiled distributions
 
 
 LD_LIBRARY_PATH=. valgrind --tool=memcheck --leak-check=full --error-exitcode=0 ./hlds_linux -game ts +map ts_lobby
