@@ -190,6 +190,16 @@ void createEntvarsTemplate(v8::Isolate* isolate) {
             } else {
                 info.GetReturnValue().Set(wrapEntity(info.GetIsolate(), entvars->chain));
             }
+        },
+        [](v8::Local<v8::Name> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void> &info) {
+            entvars_t *entvars = unwrapEntvars_internal(info.GetIsolate(), info.Holder());
+            if (entvars == nullptr) return;
+            
+            if (value->IsNull() || value->IsUndefined()) {
+                entvars->chain = nullptr;
+            } else {
+                entvars->chain = unwrapEntity(info.GetIsolate(), value);
+            }
         });
     
     templ->SetNativeDataProperty(v8::String::NewFromUtf8(isolate, "dmg_inflictor").ToLocalChecked(),
@@ -199,6 +209,16 @@ void createEntvarsTemplate(v8::Isolate* isolate) {
                 info.GetReturnValue().Set(v8::Null(info.GetIsolate()));
             } else {
                 info.GetReturnValue().Set(wrapEntity(info.GetIsolate(), entvars->dmg_inflictor));
+            }
+        },
+        [](v8::Local<v8::Name> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void> &info) {
+            entvars_t *entvars = unwrapEntvars_internal(info.GetIsolate(), info.Holder());
+            if (entvars == nullptr) return;
+            
+            if (value->IsNull() || value->IsUndefined()) {
+                entvars->dmg_inflictor = nullptr;
+            } else {
+                entvars->dmg_inflictor = unwrapEntity(info.GetIsolate(), value);
             }
         });
     
@@ -210,6 +230,16 @@ void createEntvarsTemplate(v8::Isolate* isolate) {
             } else {
                 info.GetReturnValue().Set(wrapEntity(info.GetIsolate(), entvars->enemy));
             }
+        },
+        [](v8::Local<v8::Name> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void> &info) {
+            entvars_t *entvars = unwrapEntvars_internal(info.GetIsolate(), info.Holder());
+            if (entvars == nullptr) return;
+            
+            if (value->IsNull() || value->IsUndefined()) {
+                entvars->enemy = nullptr;
+            } else {
+                entvars->enemy = unwrapEntity(info.GetIsolate(), value);
+            }
         });
     
     templ->SetNativeDataProperty(v8::String::NewFromUtf8(isolate, "aiment").ToLocalChecked(),
@@ -219,6 +249,16 @@ void createEntvarsTemplate(v8::Isolate* isolate) {
                 info.GetReturnValue().Set(v8::Null(info.GetIsolate()));
             } else {
                 info.GetReturnValue().Set(wrapEntity(info.GetIsolate(), entvars->aiment));
+            }
+        },
+        [](v8::Local<v8::Name> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void> &info) {
+            entvars_t *entvars = unwrapEntvars_internal(info.GetIsolate(), info.Holder());
+            if (entvars == nullptr) return;
+            
+            if (value->IsNull() || value->IsUndefined()) {
+                entvars->aiment = nullptr;
+            } else {
+                entvars->aiment = unwrapEntity(info.GetIsolate(), value);
             }
         });
     
@@ -230,6 +270,16 @@ void createEntvarsTemplate(v8::Isolate* isolate) {
             } else {
                 info.GetReturnValue().Set(wrapEntity(info.GetIsolate(), entvars->owner));
             }
+        },
+        [](v8::Local<v8::Name> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void> &info) {
+            entvars_t *entvars = unwrapEntvars_internal(info.GetIsolate(), info.Holder());
+            if (entvars == nullptr) return;
+            
+            if (value->IsNull() || value->IsUndefined()) {
+                entvars->owner = nullptr;
+            } else {
+                entvars->owner = unwrapEntity(info.GetIsolate(), value);
+            }
         });
     
     templ->SetNativeDataProperty(v8::String::NewFromUtf8(isolate, "groundentity").ToLocalChecked(),
@@ -239,6 +289,16 @@ void createEntvarsTemplate(v8::Isolate* isolate) {
                 info.GetReturnValue().Set(v8::Null(info.GetIsolate()));
             } else {
                 info.GetReturnValue().Set(wrapEntity(info.GetIsolate(), entvars->groundentity));
+            }
+        },
+        [](v8::Local<v8::Name> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void> &info) {
+            entvars_t *entvars = unwrapEntvars_internal(info.GetIsolate(), info.Holder());
+            if (entvars == nullptr) return;
+            
+            if (value->IsNull() || value->IsUndefined()) {
+                entvars->groundentity = nullptr;
+            } else {
+                entvars->groundentity = unwrapEntity(info.GetIsolate(), value);
             }
         });
     
@@ -328,6 +388,16 @@ void createEntvarsTemplate(v8::Isolate* isolate) {
             } else {
                 info.GetReturnValue().Set(wrapEntity(info.GetIsolate(), entvars->euser1));
             }
+        },
+        [](v8::Local<v8::Name> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void> &info) {
+            entvars_t *entvars = unwrapEntvars_internal(info.GetIsolate(), info.Holder());
+            if (entvars == nullptr) return;
+            
+            if (value->IsNull() || value->IsUndefined()) {
+                entvars->euser1 = nullptr;
+            } else {
+                entvars->euser1 = unwrapEntity(info.GetIsolate(), value);
+            }
         });
     
     templ->SetNativeDataProperty(v8::String::NewFromUtf8(isolate, "euser2").ToLocalChecked(),
@@ -337,6 +407,16 @@ void createEntvarsTemplate(v8::Isolate* isolate) {
                 info.GetReturnValue().Set(v8::Null(info.GetIsolate()));
             } else {
                 info.GetReturnValue().Set(wrapEntity(info.GetIsolate(), entvars->euser2));
+            }
+        },
+        [](v8::Local<v8::Name> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void> &info) {
+            entvars_t *entvars = unwrapEntvars_internal(info.GetIsolate(), info.Holder());
+            if (entvars == nullptr) return;
+            
+            if (value->IsNull() || value->IsUndefined()) {
+                entvars->euser2 = nullptr;
+            } else {
+                entvars->euser2 = unwrapEntity(info.GetIsolate(), value);
             }
         });
     
@@ -348,6 +428,16 @@ void createEntvarsTemplate(v8::Isolate* isolate) {
             } else {
                 info.GetReturnValue().Set(wrapEntity(info.GetIsolate(), entvars->euser3));
             }
+        },
+        [](v8::Local<v8::Name> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void> &info) {
+            entvars_t *entvars = unwrapEntvars_internal(info.GetIsolate(), info.Holder());
+            if (entvars == nullptr) return;
+            
+            if (value->IsNull() || value->IsUndefined()) {
+                entvars->euser3 = nullptr;
+            } else {
+                entvars->euser3 = unwrapEntity(info.GetIsolate(), value);
+            }
         });
     
     templ->SetNativeDataProperty(v8::String::NewFromUtf8(isolate, "euser4").ToLocalChecked(),
@@ -357,6 +447,16 @@ void createEntvarsTemplate(v8::Isolate* isolate) {
                 info.GetReturnValue().Set(v8::Null(info.GetIsolate()));
             } else {
                 info.GetReturnValue().Set(wrapEntity(info.GetIsolate(), entvars->euser4));
+            }
+        },
+        [](v8::Local<v8::Name> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void> &info) {
+            entvars_t *entvars = unwrapEntvars_internal(info.GetIsolate(), info.Holder());
+            if (entvars == nullptr) return;
+            
+            if (value->IsNull() || value->IsUndefined()) {
+                entvars->euser4 = nullptr;
+            } else {
+                entvars->euser4 = unwrapEntity(info.GetIsolate(), value);
             }
         });
     

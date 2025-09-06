@@ -81,6 +81,16 @@ void createCvarTemplate(v8::Isolate* isolate) {
             } else {
                 info.GetReturnValue().Set(wrapCvar(info.GetIsolate(), cvar->next));
             }
+        },
+        [](v8::Local<v8::Name> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void> &info) {
+            cvar_t *cvar = unwrapCvar_internal(info.GetIsolate(), info.Holder());
+            if (cvar == nullptr) return;
+            
+            if (value->IsNull() || value->IsUndefined()) {
+                cvar->next = nullptr;
+            } else {
+                cvar->next = static_cast<cvar_t*>(unwrapCvar(info.GetIsolate(), value));
+            }
         });
     
     cvarTemplate.Set(isolate, templ);

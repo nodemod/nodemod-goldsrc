@@ -87,6 +87,16 @@ void createCustomizationTemplate(v8::Isolate* isolate) {
             } else {
                 info.GetReturnValue().Set(wrapCustomization(info.GetIsolate(), custom->pNext));
             }
+        },
+        [](v8::Local<v8::Name> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void> &info) {
+            customization_t *custom = unwrapCustomization_internal(info.GetIsolate(), info.Holder());
+            if (custom == nullptr) return;
+            
+            if (value->IsNull() || value->IsUndefined()) {
+                custom->pNext = nullptr;
+            } else {
+                custom->pNext = static_cast<customization_t*>(unwrapCustomization(info.GetIsolate(), value));
+            }
         });
     
     customizationTemplate.Set(isolate, templ);
