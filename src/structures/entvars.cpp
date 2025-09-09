@@ -72,8 +72,26 @@ void createEntvarsTemplate(v8::Isolate* isolate) {
                 (*g_engfuncs.pfnSetModel)(entvars->pContainingEntity, convert::js2str(info.GetIsolate(), value));
             }
         });
-    ACCESSOR_T(entvars_t, unwrapEntvars_internal, templ, "viewmodel", viewmodel, GETN, SETINT);
-    ACCESSOR_T(entvars_t, unwrapEntvars_internal, templ, "weaponmodel", weaponmodel, GETN, SETINT);
+    // Handle viewmodel as string_t (like model field)
+    templ->SetNativeDataProperty(v8::String::NewFromUtf8(isolate, "viewmodel").ToLocalChecked(),
+        GETTER_T(entvars_t, unwrapEntvars_internal, viewmodel, GETSTR),
+        [](v8::Local<v8::Name> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void> &info) {
+            entvars_t *entvars = unwrapEntvars_internal(info.GetIsolate(), info.Holder());
+            if (entvars == nullptr) return;
+            
+            // Convert JS string to string_t using engine's AllocString
+            entvars->viewmodel = (*g_engfuncs.pfnAllocString)(convert::js2str(info.GetIsolate(), value));
+        });
+    // Handle weaponmodel as string_t (like model field)
+    templ->SetNativeDataProperty(v8::String::NewFromUtf8(isolate, "weaponmodel").ToLocalChecked(),
+        GETTER_T(entvars_t, unwrapEntvars_internal, weaponmodel, GETSTR),
+        [](v8::Local<v8::Name> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void> &info) {
+            entvars_t *entvars = unwrapEntvars_internal(info.GetIsolate(), info.Holder());
+            if (entvars == nullptr) return;
+            
+            // Convert JS string to string_t using engine's AllocString
+            entvars->weaponmodel = (*g_engfuncs.pfnAllocString)(convert::js2str(info.GetIsolate(), value));
+        });
 
     ACCESSORL_T(entvars_t, unwrapEntvars_internal, templ, "absmin", absmin, GETVEC3, SETVEC3);
     ACCESSORL_T(entvars_t, unwrapEntvars_internal, templ, "absmax", absmax, GETVEC3, SETVEC3);
