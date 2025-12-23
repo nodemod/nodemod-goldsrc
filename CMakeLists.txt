@@ -98,15 +98,21 @@ else()
 	target_compile_options(${PROJECT_NAME} PRIVATE -Wfatal-errors)
 	target_compile_options(${PROJECT_NAME} PRIVATE -fpermissive)
 
-	# these will break compatibility with other architectures
-	# but for now it's required for our purposes
-	# Force older C++ ABI for compatibility with ReHLDS
-	target_compile_options(${PROJECT_NAME} PRIVATE -m32 -D_GLIBCXX_USE_CXX11_ABI=0)
-	target_link_options(${PROJECT_NAME} PRIVATE -m32)
-	
+	# Force older C++ ABI for compatibility with Node.js build (applies to both x86 and x64)
+	target_compile_options(${PROJECT_NAME} PRIVATE -D_GLIBCXX_USE_CXX11_ABI=0)
+
+	# Architecture-specific flags
+	if(VCPKG_TARGET_TRIPLET MATCHES "^x64")
+		# x64 build - no -m32 needed
+	else()
+		# x86 build
+		target_compile_options(${PROJECT_NAME} PRIVATE -m32)
+		target_link_options(${PROJECT_NAME} PRIVATE -m32)
+	endif()
+
 	# Use static C++ runtime to avoid conflicts with old libs in HLDS directories
 	target_link_options(${PROJECT_NAME} PRIVATE -static-libstdc++ -static-libgcc)
-	
+
 	# Use version script to control symbol visibility and avoid ReHLDS conflicts
 	target_link_options(${PROJECT_NAME} PRIVATE -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/nodemod.lds)
 endif()
@@ -130,8 +136,12 @@ endif()
 if(WIN32)
 	target_link_libraries(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/deps/node/lib/Release/win32/libnode.lib")
 else()
-	# Define base directory for Node.js fat archives
-	set(LIBNODE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/deps/node/out/Release/obj.target")
+	# Define base directory for Node.js fat archives based on target architecture
+	if(VCPKG_TARGET_TRIPLET MATCHES "^x64")
+		set(LIBNODE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/deps/node/out-x64/Release/obj.target")
+	else()
+		set(LIBNODE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/deps/node/out-ia32/Release/obj.target")
+	endif()
 	
 	# Link Node.js using Half-Life 1 metamod approach with static groups
 	target_link_libraries(${PROJECT_NAME} PRIVATE

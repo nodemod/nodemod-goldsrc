@@ -39,7 +39,7 @@ echo "Configuring Node.js for 32-bit static build..."
 export SKIP_GIT_CHECK=1
 export GIT_DIR=""
 # Let Node.js auto-detect Python instead of forcing a path
-./configure --fully-static --dest-cpu=ia32
+./configure --dest-cpu=ia32
 
 echo "Fixing documentation placeholder issues post-configure..."
 sed -i 's/REPLACEME/repl/g' doc/api/*.md 2>/dev/null || true

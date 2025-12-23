@@ -1,6 +1,8 @@
 #!/bin/bash
 
 # Run script for xash3d-nodemod Docker container
+# Builds x86 and/or x64 architectures based on NODEMOD_ARCH env var
+# Usage: NODEMOD_ARCH=x86|x64|all ./build-nodemod.sh
 
 set -e
 
@@ -16,40 +18,56 @@ docker rm -f "${CONTAINER_NAME}" 2>/dev/null || true
 # Run the container and build the code
 docker run --name "${CONTAINER_NAME}" \
     -v "$(pwd):/app" \
+    -e NODEMOD_ARCH="${NODEMOD_ARCH:-all}" \
     "${IMAGE_NAME}:${IMAGE_TAG}" \
     bash -c "
         echo 'Initializing and updating submodules...'
         git submodule update --init --recursive
-        
-        echo 'Building Node.js v24 from source...'
+
         cd /app
-        
+
         echo 'Bootstrapping vcpkg...'
         cd /app/deps/vcpkg && ./bootstrap-vcpkg.sh
-        
-        echo 'Creating build directory...'
         cd /app
-        cmake -E make_directory build
-        cd build
-        
-        echo 'Configuring project...'
-        cmake .. --preset linux-x86-debug
-        
-        echo 'Building xash3d-nodemod...'
-        cmake --build . --config Debug
+
+        # Build x86
+        if [ \"\$NODEMOD_ARCH\" = \"all\" ] || [ \"\$NODEMOD_ARCH\" = \"x86\" ] || [ \"\$NODEMOD_ARCH\" = \"ia32\" ]; then
+            echo ''
+            echo '=============================================='
+            echo 'Building nodemod for x86...'
+            echo '=============================================='
+            cmake --preset linux-x86-debug
+            cmake --build build-x86 --config Debug
+        fi
+
+        # Build x64
+        if [ \"\$NODEMOD_ARCH\" = \"all\" ] || [ \"\$NODEMOD_ARCH\" = \"x64\" ]; then
+            echo ''
+            echo '=============================================='
+            echo 'Building nodemod for x64...'
+            echo '=============================================='
+            cmake --preset linux-x64-debug
+            cmake --build build-x64 --config Debug
+        fi
     "
 
-echo "Container run completed. Built files are available in ./build/"
-echo "The compiled libnodemod.so should be in ./build/Debug/bin/"
+echo "Container run completed."
 
-# Copy the built .so file to the HLDS installation
-if [ -f "./build/Debug/bin/libnodemod.so" ]; then
-    echo "Copying libnodemod.so to HLDS installation..."
+# Show output paths based on what was built
+ARCH="${NODEMOD_ARCH:-all}"
+if [ "$ARCH" = "all" ] || [ "$ARCH" = "x86" ] || [ "$ARCH" = "ia32" ]; then
+    echo "  x86: ./build-x86/Debug/bin/libnodemod.so"
+fi
+if [ "$ARCH" = "all" ] || [ "$ARCH" = "x64" ]; then
+    echo "  x64: ./build-x64/Debug/bin/libnodemod.so"
+fi
+
+# Copy the built .so file to the HLDS installation (x86 for Half-Life)
+if [ -f "./build-x86/Debug/bin/libnodemod.so" ]; then
+    echo "Copying x86 libnodemod.so to HLDS installation..."
     mkdir -p "/home/stevenlafl/Containers/hlds/hlds/ts/addons/nodemod/dlls/"
-    cp "./build/Debug/bin/libnodemod.so" "/home/stevenlafl/Containers/hlds/hlds/ts/addons/nodemod/dlls/"
-    cp "./build/Debug/bin/libnodemod.so" "/home/stevenlafl/Containers/hlds/hlds-new/ts/addons/nodemod/dlls/"
-    cp "./build/Debug/bin/libnodemod.so" "/home/stevenlafl/Containers/hlds/hlds-notloggedin/ts/addons/nodemod/dlls/"
-    echo "✓ libnodemod.so copied successfully to /home/stevenlafl/Containers/hlds/hlds/ts/addons/nodemod/dlls/"
-else
-    echo "✗ libnodemod.so not found in ./build/Debug/bin/"
+    cp "./build-x86/Debug/bin/libnodemod.so" "/home/stevenlafl/Containers/hlds/hlds/ts/addons/nodemod/dlls/"
+    cp "./build-x86/Debug/bin/libnodemod.so" "/home/stevenlafl/Containers/hlds/hlds-new/ts/addons/nodemod/dlls/"
+    cp "./build-x86/Debug/bin/libnodemod.so" "/home/stevenlafl/Containers/hlds/hlds-notloggedin/ts/addons/nodemod/dlls/"
+    echo "Done"
 fi
