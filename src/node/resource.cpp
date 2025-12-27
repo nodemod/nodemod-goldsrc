@@ -69,11 +69,6 @@ static node::IsolateData* GetNodeIsolate()
 
 		args.emplace_back(entryFile.c_str());
 
-		for (auto& flag : args)
-		{
-			L_DEBUG << "node flags: " << flag;
-		}
-
 		std::vector<std::string> exec_args;
 
 		v8::Locker locker(GetV8Isolate());
@@ -143,7 +138,6 @@ static node::IsolateData* GetNodeIsolate()
 		// Check if we got a module back and look for default export
 		if (!loadResult.IsEmpty()) {
 			v8::Local<v8::Value> mod = loadResult.ToLocalChecked();
-			L_DEBUG << "Module loaded, type: " << (mod->IsObject() ? "Object" : "Other");
 
 			if (mod->IsObject()) {
 				v8::Local<v8::Object> modObj = mod.As<v8::Object>();
@@ -152,7 +146,6 @@ static node::IsolateData* GetNodeIsolate()
 
 				if (!maybeDefault.IsEmpty()) {
 					v8::Local<v8::Value> defaultExport = maybeDefault.ToLocalChecked();
-					L_DEBUG << "default export type: " << (defaultExport->IsFunction() ? "Function" : defaultExport->IsObject() ? "Object" : "Other");
 
 					// Handle double-wrapped default (TypeScript interop)
 					if (defaultExport->IsObject() && !defaultExport->IsFunction()) {
@@ -161,7 +154,6 @@ static node::IsolateData* GetNodeIsolate()
 						if (!maybeInnerDefault.IsEmpty()) {
 							v8::Local<v8::Value> innerDefault = maybeInnerDefault.ToLocalChecked();
 							if (innerDefault->IsFunction()) {
-								L_DEBUG << "Found double-wrapped default export";
 								defaultExport = innerDefault;
 							}
 						}
@@ -176,14 +168,11 @@ static node::IsolateData* GetNodeIsolate()
 
 							if (retVal->IsPromise()) {
 								v8::Local<v8::Promise> promise = retVal.As<v8::Promise>();
-								L_DEBUG << "Waiting for async init to complete...";
 
 								while (promise->State() == v8::Promise::kPending) {
 									uv_run(loop, UV_RUN_ONCE);
 									GetV8Isolate()->PerformMicrotaskCheckpoint();
 								}
-
-								L_DEBUG << "Promise settled with state: " << (promise->State() == v8::Promise::kFulfilled ? "Fulfilled" : "Rejected");
 
 								if (promise->State() == v8::Promise::kRejected) {
 									v8::String::Utf8Value error(GetV8Isolate(), promise->Result());
