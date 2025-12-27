@@ -118,11 +118,85 @@ static node::IsolateData* GetNodeIsolate()
 		
 		// Create environment with correct working directory for ES module resolution
 		auto env = node::CreateEnvironment(GetNodeIsolate(), _context, args, exec_args, flags);
-		node::LoadEnvironment(env, node::StartExecutionCallback{});
-		
-		std::filesystem::current_path(old_cwd);
+
+		// Load module and return it via StartExecutionCallback
+		std::string loaderScript = R"(
+			const { createRequire } = require('module');
+			const path = require('path');
+			const customRequire = createRequire(path.join(process.cwd(), 'package.json'));
+			const resolved = customRequire.resolve(')" + entryFile + R"(');
+			return customRequire(resolved);
+		)";
+
+		v8::MaybeLocal<v8::Value> loadResult = node::LoadEnvironment(env, [&](const node::StartExecutionCallbackInfo& info) -> v8::MaybeLocal<v8::Value> {
+			v8::Local<v8::Value> script_arg = v8::String::NewFromUtf8(GetV8Isolate(), loaderScript.c_str()).ToLocalChecked();
+			return info.run_cjs->Call(_context, v8::Null(GetV8Isolate()), 1, &script_arg);
+		});
 
 		nodeEnvironment.reset(env);
+
+		// Run the UV loop to allow modules to load
+		uv_loop_t* loop = nodeImpl.GetUVLoop()->GetLoop();
+		uv_run(loop, UV_RUN_NOWAIT);
+		GetV8Isolate()->PerformMicrotaskCheckpoint();
+
+		// Check if we got a module back and look for default export
+		if (!loadResult.IsEmpty()) {
+			v8::Local<v8::Value> mod = loadResult.ToLocalChecked();
+			L_DEBUG << "Module loaded, type: " << (mod->IsObject() ? "Object" : "Other");
+
+			if (mod->IsObject()) {
+				v8::Local<v8::Object> modObj = mod.As<v8::Object>();
+				v8::Local<v8::String> defaultKey = v8::String::NewFromUtf8(GetV8Isolate(), "default").ToLocalChecked();
+				v8::MaybeLocal<v8::Value> maybeDefault = modObj->Get(_context, defaultKey);
+
+				if (!maybeDefault.IsEmpty()) {
+					v8::Local<v8::Value> defaultExport = maybeDefault.ToLocalChecked();
+					L_DEBUG << "default export type: " << (defaultExport->IsFunction() ? "Function" : defaultExport->IsObject() ? "Object" : "Other");
+
+					// Handle double-wrapped default (TypeScript interop)
+					if (defaultExport->IsObject() && !defaultExport->IsFunction()) {
+						v8::Local<v8::Object> defaultObj = defaultExport.As<v8::Object>();
+						v8::MaybeLocal<v8::Value> maybeInnerDefault = defaultObj->Get(_context, defaultKey);
+						if (!maybeInnerDefault.IsEmpty()) {
+							v8::Local<v8::Value> innerDefault = maybeInnerDefault.ToLocalChecked();
+							if (innerDefault->IsFunction()) {
+								L_DEBUG << "Found double-wrapped default export";
+								defaultExport = innerDefault;
+							}
+						}
+					}
+
+					if (defaultExport->IsFunction()) {
+						v8::Local<v8::Function> initFunc = defaultExport.As<v8::Function>();
+						v8::MaybeLocal<v8::Value> callResult = initFunc->Call(_context, v8::Undefined(GetV8Isolate()), 0, nullptr);
+
+						if (!callResult.IsEmpty()) {
+							v8::Local<v8::Value> retVal = callResult.ToLocalChecked();
+
+							if (retVal->IsPromise()) {
+								v8::Local<v8::Promise> promise = retVal.As<v8::Promise>();
+								L_DEBUG << "Waiting for async init to complete...";
+
+								while (promise->State() == v8::Promise::kPending) {
+									uv_run(loop, UV_RUN_ONCE);
+									GetV8Isolate()->PerformMicrotaskCheckpoint();
+								}
+
+								L_DEBUG << "Promise settled with state: " << (promise->State() == v8::Promise::kFulfilled ? "Fulfilled" : "Rejected");
+
+								if (promise->State() == v8::Promise::kRejected) {
+									v8::String::Utf8Value error(GetV8Isolate(), promise->Result());
+									L_ERROR << "Async initialization rejected: " << *error;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		std::filesystem::current_path(old_cwd);
 
 		return;
 	}

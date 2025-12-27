@@ -308,7 +308,7 @@ function parseFunction(line) {
   
   // Write each type file
   for (const [filename, content] of Object.entries(typeFiles)) {
-    await fs.writeFile(`./packages/core/src/${filename}`, content);
+    await fs.writeFile(`./types/${filename}`, content);
   }
   const { engineFunctionsFile, dllFunctionsFile } = fileMaker.makeFunctions(computed);
   await fs.writeFile('./src/auto/engine_functions.cpp', engineFunctionsFile);

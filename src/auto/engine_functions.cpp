@@ -980,7 +980,7 @@ void sf_eng_pfnClientPrintf(const v8::FunctionCallbackInfo<v8::Value>& info)
   V8_STUFF();
 
   (*g_engfuncs.pfnClientPrintf)(structures::unwrapEntity(isolate, info[0]),
-*(PRINT_TYPE*)utils::jsToBytes(isolate, info[1]),
+(PRINT_TYPE)info[1]->Int32Value(context).ToChecked(),
 utils::js2string(isolate, info[2]));
 }
 
@@ -1240,15 +1240,18 @@ utils::js2string(isolate, info[1]),
 utils::js2string(isolate, info[2]));
 }
 
-// nodemod.eng.setClientKeyValue(clientIndex: number, infobuffer: string, key: string, value: string);
+// nodemod.eng.setClientKeyValue();
 void sf_eng_pfnSetClientKeyValue(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
 
-  (*g_engfuncs.pfnSetClientKeyValue)(info[0]->Int32Value(context).ToChecked(),
-utils::js2string(isolate, info[1]),
-utils::js2string(isolate, info[2]),
-utils::js2string(isolate, info[3]));
+  int clientIndex = info[0]->Int32Value(context).ToChecked();
+  edict_t* entity = structures::unwrapEntity(isolate, info[1]);
+  char* infobuffer = (*g_engfuncs.pfnGetInfoKeyBuffer)(entity);
+  (*g_engfuncs.pfnSetClientKeyValue)(clientIndex,
+    infobuffer,
+    utils::js2string(isolate, info[2]),
+    utils::js2string(isolate, info[3]));;
 }
 
 // nodemod.eng.isMapValid(filename: string);
@@ -1655,7 +1658,7 @@ void sf_eng_pfnForceUnmodified(const v8::FunctionCallbackInfo<v8::Value>& info)
     //printf("Warning: pfnForceUnmodified parameter 2 (const float *) is not External, using nullptr\n");
   //}
 
-  (*g_engfuncs.pfnForceUnmodified)(*(FORCE_TYPE*)utils::jsToBytes(isolate, info[0]),
+  (*g_engfuncs.pfnForceUnmodified)((FORCE_TYPE)info[0]->Int32Value(context).ToChecked(),
 (const float*)utils::jsToPointer(isolate, info[1]),
 (const float*)utils::jsToPointer(isolate, info[2]),
 utils::js2string(isolate, info[3]));

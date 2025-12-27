@@ -50,19 +50,28 @@ inline void js2vect(v8::Isolate *isolate, v8::Local<v8::Array> array, vec3_t &ve
 	}
 
 	// TODO fix terrible memory leaking
-	inline const char* js2string(v8:: Isolate * isolate, const v8::Local<v8::Value>& value) {
-	v8::String::Utf8Value _str(isolate, value);
-					const char* str(*_str);
-					size_t slen = strlen(str);
-					char* mystr = new char[slen + 1];
-					for (size_t x = 0; x < slen; x++)
-					{
-						mystr[x] = str[x];
-					}
-					mystr[slen] = '\0';
-
-	return mystr;
-}
+	inline const char* js2string(v8::Isolate* isolate, const v8::Local<v8::Value>& value) {
+		if (value.IsEmpty() || value->IsNullOrUndefined()) {
+			char* empty = new char[1];
+			empty[0] = '\0';
+			return empty;
+		}
+		v8::String::Utf8Value _str(isolate, value);
+		const char* str(*_str);
+		if (!str) {
+			char* empty = new char[1];
+			empty[0] = '\0';
+			return empty;
+		}
+		size_t slen = strlen(str);
+		char* mystr = new char[slen + 1];
+		for (size_t x = 0; x < slen; x++)
+		{
+			mystr[x] = str[x];
+		}
+		mystr[slen] = '\0';
+		return mystr;
+	}
 
 	inline std::vector<std::string> split(const std::string& s, char delimiter)
 	{

@@ -409,6 +409,25 @@ structures::unwrapEntity(isolate, info[4]),
         ]
       }
     },
+    pfnSetClientKeyValue: {
+      api: {
+        body: `int clientIndex = info[0]->Int32Value(context).ToChecked();
+  edict_t* entity = structures::unwrapEntity(isolate, info[1]);
+  char* infobuffer = (*g_engfuncs.pfnGetInfoKeyBuffer)(entity);
+  (*g_engfuncs.pfnSetClientKeyValue)(clientIndex,
+    infobuffer,
+    utils::js2string(isolate, info[2]),
+    utils::js2string(isolate, info[3]));`
+      },
+      typescript: {
+        parameters: [
+          { name: 'clientIndex', type: 'number', originalType: 'int' },
+          { name: 'entity', type: 'Entity', originalType: 'edict_t *' },
+          { name: 'key', type: 'string', originalType: 'const char *' },
+          { name: 'value', type: 'string', originalType: 'const char *' }
+        ]
+      }
+    },
     pfnDeltaAddEncoder: {
       api: {
         body: `// Handle JavaScript function callbacks for delta encoders

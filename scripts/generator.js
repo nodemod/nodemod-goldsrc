@@ -60,12 +60,12 @@ const TYPE_MAPPINGS = {
       js2cpp: (value) => `(ALERT_TYPE)${value}->Int32Value(context).ToChecked()`,
       cpp2js: (value) => `v8::Number::New(isolate, ${value})`
     },
-    'FORCE_TYPE': { 
-      js2cpp: (value) => `*(FORCE_TYPE*)utils::jsToBytes(isolate, ${value})`,
+    'FORCE_TYPE': {
+      js2cpp: (value) => `(FORCE_TYPE)${value}->Int32Value(context).ToChecked()`,
       cpp2js: (value) => `v8::Number::New(isolate, ${value})`
     },
-    'PRINT_TYPE': { 
-      js2cpp: (value) => `*(PRINT_TYPE*)utils::jsToBytes(isolate, ${value})`,
+    'PRINT_TYPE': {
+      js2cpp: (value) => `(PRINT_TYPE)${value}->Int32Value(context).ToChecked()`,
       cpp2js: (value) => `v8::Number::New(isolate, ${value})`
     },
     'CRC32_t': { 

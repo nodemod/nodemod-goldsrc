@@ -74,6 +74,17 @@ namespace bindings
           info.GetReturnValue().Set(v8::Number::New(isolate, gpGlobals->time));
         });
 
+    nodemodObject->SetNativeDataProperty(
+        convert::str2js(isolate, "frametime"),
+        [](v8::Local<v8::Name> property, const v8::PropertyCallbackInfo<v8::Value> &info)
+        {
+          v8::Isolate* isolate = info.GetIsolate();
+          v8::Locker locker(isolate);
+          v8::HandleScope scope(isolate);
+
+          info.GetReturnValue().Set(v8::Number::New(isolate, gpGlobals->frametime));
+        });
+
     global->Set(convert::str2js(isolate, "nodemod"), nodemodObject);
     structures::createEntityTemplate(isolate, global);
   }
