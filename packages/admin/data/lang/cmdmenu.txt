@@ -1,0 +1,149 @@
+[en]
+CMD_MENU = Commands Menu
+CONF_MENU = Configs Menu
+SPE_MENU = Speech Menu
+CVAR_MENU = Cvars Menu
+
+[de]
+CMD_MENU = Menü > Befehle
+CONF_MENU = Menü > Konfiguration
+SPE_MENU = Menü > Sprechen
+CVAR_MENU = CVars Menü
+
+[sr]
+CMD_MENU = Komandne
+CONF_MENU = Podesavanja
+SPE_MENU = Govorne Komande
+CVAR_MENU = CVars Meni
+
+[tr]
+CMD_MENU = Komut Menu
+CONF_MENU = Config Menu
+SPE_MENU = Konusma Menusu
+CVAR_MENU = CVars Menu
+
+[fr]
+CMD_MENU = Menu Commandes
+CONF_MENU = Menu Configurations
+SPE_MENU = Menu Voix/Paroles
+CVAR_MENU = Menu CVars
+
+[sv]
+CMD_MENU = Kommandomeny
+CONF_MENU = Konfigurationsmeny
+SPE_MENU = Talmeny
+CVAR_MENU = CVars-meny
+
+[da]
+CMD_MENU = Kommando Menu
+CONF_MENU = Konfigurations Menu
+SPE_MENU = Tale Menu
+CVAR_MENU = CVars Menu
+
+[pl]
+CMD_MENU = Menu komend
+CONF_MENU = Menu konfiguracji
+SPE_MENU = Menu rozmowy
+CVAR_MENU = Menu CVars
+
+[nl]
+CMD_MENU = Commandomenu
+CONF_MENU = Configuratiemenu
+SPE_MENU = Spraakmenu
+CVAR_MENU = CVars-menu
+
+[es]
+CMD_MENU = Menu de Comandos
+CONF_MENU = Menu de Configuracion
+SPE_MENU = Menu de Voz
+CVAR_MENU = Menu de CVars
+
+[bp]
+CMD_MENU = Menu de Comandos
+CONF_MENU = Menu de Configs
+SPE_MENU = Menu de Vozes
+CVAR_MENU = Menu de CVars
+
+[cz]
+CMD_MENU = Menu prikazu
+CONF_MENU = Menu nastaveni
+SPE_MENU = Nastaveni reci
+CVAR_MENU = Menu CVars
+
+[fi]
+CMD_MENU = Komentovalikko
+CONF_MENU = Saatovalikko
+SPE_MENU = Puhevalikko
+CVAR_MENU = CVars-valikko
+
+[bg]
+CMD_MENU = Menu s komandi
+CONF_MENU = Konfiguracionno menu
+SPE_MENU = Menu za govorene
+CVAR_MENU = CVars menu
+
+[ro]
+CMD_MENU = Meniu comenzi
+CONF_MENU = Meniu configuri
+SPE_MENU = Meniu Speech
+CVAR_MENU = Meniu CVars
+
+[hu]
+CMD_MENU = Parancs Menü
+CONF_MENU = Beállítás Menü
+SPE_MENU = Beszéd Menü
+CVAR_MENU = CVars Menü
+
+[lt]
+CMD_MENU = Komandu meniu
+CONF_MENU = Konfigu meniu
+SPE_MENU = Kalbos meniu
+CVAR_MENU = CVars meniu
+
+[sk]
+CMD_MENU = Menu prikazov
+CONF_MENU = Menu nastaveni
+SPE_MENU = Nastavenie reci
+CVAR_MENU = Menu CVars
+
+[mk]
+CMD_MENU = Meni so komandi
+CONF_MENU = Meni so konfiguracii
+SPE_MENU = Meni so glasovni komandi
+CVAR_MENU = Meni so CVars
+
+[hr]
+CMD_MENU = Naredbe
+CONF_MENU = Podesavanja
+SPE_MENU = Izbornik govora
+CVAR_MENU = CVars Izbornik
+
+[bs]
+CMD_MENU = Komande
+CONF_MENU = Podesavanja
+SPE_MENU = Govorne Komande
+CVAR_MENU = CVars Meni
+
+[ru]
+CMD_MENU = Меню команд
+CONF_MENU = Меню настроек
+SPE_MENU = Меню звуков
+CVAR_MENU = Меню CVars
+
+[cn]
+CMD_MENU = 命令菜单
+CONF_MENU = 配置菜单
+SPE_MENU = 语音菜单
+CVAR_MENU = CVars菜单
+
+[al]
+CMD_MENU = Lista Komandave
+CONF_MENU = Lista Konfigurimeve
+SPE_MENU = Lista Fjalëve
+CVAR_MENU = Lista CVars
+
+[pt]
+CMD_MENU = Menu de Comandos
+CONF_MENU = Menu de Configurações
+SPE_MENU = Menu de Voz
+CVAR_MENU = Menu de CVars

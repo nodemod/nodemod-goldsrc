@@ -1,0 +1,124 @@
+[en]
+DROPPED_RES = Dropped due to slot reservation
+CVAR_RESERVATION = Amount of slots to reserve
+CVAR_HIDESLOTS = If you set this to 1, you can hide slots on your server.^nIf the server's public and hidden slots are full, you must manually connect with the "connect" console command.
+
+[de]
+DROPPED_RES = Sorry, dieser Slot ist reserviert
+CVAR_RESERVATION = Anzahl der zu reservierenden Slots
+CVAR_HIDESLOTS = Wenn diese CVAR auf 1 gesetzt wird, können Slots auf Ihrem Server ausgeblendet werden.^nWenn die öffentlichen Slots auf dem Server "voll" sind und weitere freie Slots ausgeblendet sind, müssen Sie die Verbindung manuell über den Konsolenbefehl "connect" herstellen.
+
+[sr]
+DROPPED_RES = Server je pun, nemate pristup rezervisanim mestima
+CVAR_RESERVATION = Broj slotova za rezervaciju
+CVAR_HIDESLOTS = Ako postavite ovo na 1, možete sakriti slotove na serveru.^nAko su javni i skriveni slotovi puni, morate se ručno povezati komandom "connect".
+
+[tr]
+DROPPED_RES = Slot rezervasyonundan dolayi dusuruldun
+CVAR_RESERVATION = Rezerve edilecek slot miktarı
+CVAR_HIDESLOTS = Bunu 1 olarak ayarlarsanız, sunucunuzdaki slotları gizleyebilirsiniz.^nSunucunun açık ve gizli slotları doluysa, "connect" konsol komutuyla manuel olarak bağlanmalısınız.
+
+[fr]
+DROPPED_RES = Desole, un admin vient de prendre sa place reservee, tu as ete ejecte du serveur
+CVAR_RESERVATION = Nombre de places à réserver
+CVAR_HIDESLOTS = Si vous réglez ceci sur 1, vous pouvez masquer des emplacements sur votre serveur.^nSi les emplacements publics et masqués du serveur sont pleins, vous devez vous connecter manuellement avec la commande console "connect".
+
+[sv]
+DROPPED_RES = Nerkopplad pga platsreservation
+CVAR_RESERVATION = Antal platser att reservera
+CVAR_HIDESLOTS = Om du ställer in detta till 1 kan du dölja platser på din server.^nOm serverns publika och dolda platser är fulla måste du ansluta manuellt med "connect" konsolkommandot.
+
+[da]
+DROPPED_RES = Frakoblet pga. plads reservation
+CVAR_RESERVATION = Antal pladser der skal reserveres
+CVAR_HIDESLOTS = Hvis du sætter dette til 1, kan du skjule pladser på din server.^nHvis serverens offentlige og skjulte pladser er fulde, skal du manuelt forbinde med "connect" konsolkommandoen.
+
+[pl]
+DROPPED_RES = Wyrzucony z powodu rezerwacji slotow
+CVAR_RESERVATION = Liczba slotów do zarezerwowania
+CVAR_HIDESLOTS = Jeśli ustawisz na 1, możesz ukryć sloty na serwerze.^nJeśli publiczne i ukryte sloty są pełne, musisz się połączyć ręcznie komendą "connect".
+
+[bp]
+DROPPED_RES = Desconectado pois o slot esta reservado
+CVAR_RESERVATION = Quantidade de slots para reservar
+CVAR_HIDESLOTS = Se você definir isso para 1, você pode esconder slots no seu servidor.^nSe os slots públicos e escondidos do servidor estiverem cheios, você deverá conectar manualmente com o comando de console "connect".
+
+[nl]
+DROPPED_RES = Sorry, deze plaats is gereserveerd
+CVAR_RESERVATION = Aantal plaatsen om te reserveren
+CVAR_HIDESLOTS = Als je dit op 1 zet, kun je plaatsen verbergen op je server.^nAls de publieke en verborgen plaatsen vol zijn, moet je handmatig verbinden met het "connect" console commando.
+
+[es]
+DROPPED_RES = Desconectado por reserva de plazas
+CVAR_RESERVATION = Cantidad de slots a reservar
+CVAR_HIDESLOTS = Si configuras esto a 1, puedes ocultar slots en tu servidor.^nSi los slots públicos y ocultos del servidor están llenos, debes conectarte manualmente con el comando de consola "connect".
+
+[cz]
+DROPPED_RES = Vyhozen, slot je rezervovan
+CVAR_RESERVATION = Počet slotů k rezervaci
+CVAR_HIDESLOTS = Pokud nastavíte na 1, můžete skrýt sloty na serveru.^nPokud jsou veřejné a skryté sloty plné, musíte se připojit ručně příkazem "connect".
+
+[fi]
+DROPPED_RES = Pudotettiin palvelimelta slotvarauksen takia (adminslot)
+CVAR_RESERVATION = Varattavien paikkojen määrä
+CVAR_HIDESLOTS = Jos asetat tämän arvoon 1, voit piilottaa paikkoja palvelimellasi.^nJos palvelimen julkiset ja piilotetut paikat ovat täynnä, sinun täytyy yhdistää manuaalisesti "connect" konsolikomennolla.
+
+[bg]
+DROPPED_RES = Premahnat poradi rezervaciq na slot
+CVAR_RESERVATION = Broi slotove za rezervirane
+CVAR_HIDESLOTS = Ako nastroite na 1, mozhete da skriete slotove na servera.^nAko publichnite i skritite slotove sa pulni, trqbva da se svurzhete ruchno s komanda "connect".
+
+[ro]
+DROPPED_RES = Ai primit kick deoarece locul pe server este rezervat.
+CVAR_RESERVATION = Numărul de locuri rezervate
+CVAR_HIDESLOTS = Dacă setezi asta pe 1, poți ascunde locuri de pe server.^nDacă locurile publice și ascunse ale serverului sunt pline, trebuie să te conectezi manual în consolă cu comanda "connect".
+
+[hu]
+DROPPED_RES = Helyfenntartás miatt kidobva.
+CVAR_RESERVATION = Lefoglalt helyek száma
+CVAR_HIDESLOTS = Ha 1-re állítod, elrejtheted a helyeket a szervereden.^nHa a szerver nyilvános és rejtett helyei teliek, manuálisan kell csatlakoznod a "connect" konzolparanccsal.
+
+[lt]
+DROPPED_RES = Atjungtas, nes nera laisvos vietos
+CVAR_RESERVATION = Rezervuojamų vietų skaičius
+CVAR_HIDESLOTS = Jei nustatysite 1, galite paslėpti vietas savo serveryje.^nJei viešos ir paslėptos vietos yra pilnos, turite prisijungti rankiniu būdu komanda "connect".
+
+[sk]
+DROPPED_RES = Prepac,ale slot je rezervovany
+CVAR_RESERVATION = Počet slotov na rezerváciu
+CVAR_HIDESLOTS = Ak to nastavíte na 1, môžete skryť sloty na serveri.^nAk sú verejné a skryté sloty plné, musíte sa pripojiť manuálne príkazom "connect".
+
+[mk]
+DROPPED_RES = Otstranet poradi rezervacija na slot
+CVAR_RESERVATION = Broj na slotovi za rezervacija
+CVAR_HIDESLOTS = Ako go postavite na 1, mozhete da gi skriete slotovite na serverot.^nAko javnite i skrienite slotovi se polni, morate da se povrzete racno so komanda "connect".
+
+[hr]
+DROPPED_RES = Server je pun, nemate pristup rezerviranim mjestima
+CVAR_RESERVATION = Broj mjesta za rezervaciju
+CVAR_HIDESLOTS = Ako postavite ovo na 1, možete sakriti mjesta na serveru.^nAko su javna i skrivena mjesta puna, morate se ručno povezati naredbom "connect".
+
+[bs]
+DROPPED_RES = Server je pun, nemate pristup rezervisanim mjestima
+CVAR_RESERVATION = Broj slotova za rezervaciju
+CVAR_HIDESLOTS = Ako postavite ovo na 1, možete sakriti slotove na serveru.^nAko su javni i skriveni slotovi puni, morate se ručno povezati komandom "connect".
+
+[ru]
+DROPPED_RES = Извините мест нет, это зарезервированный слот!
+CVAR_RESERVATION = Количество слотов для резервирования
+CVAR_HIDESLOTS = Если установить 1, можно скрыть слоты на вашем сервере.^nЕсли публичные и скрытые слоты сервера заняты, вам нужно подключиться вручную командой "connect".
+
+[cn]
+DROPPED_RES = 由于你无法使用预留通道,以至于与服务器连接断开
+CVAR_RESERVATION = 要保留的位置数量
+CVAR_HIDESLOTS = 如果将此设置为1，您可以在服务器上隐藏位置。^n如果服务器的公共和隐藏位置已满，您必须使用"connect"控制台命令手动连接。
+
+[al]
+DROPPED_RES = U largua për shkak të rezervimit të vendit që është plugini aktiv në server!
+CVAR_RESERVATION = Sasia e vendeve për rezervim
+CVAR_HIDESLOTS = Nëse e vendos në 1, mund të fshehësh vendët në serverin tënd.^nNëse vendet publike dhe të fshehura janë plot, duhet të lidhesh manualisht me komandën "connect".
+
+[pt]
+DROPPED_RES = Foste desconectado por causa da reservação de slots
+CVAR_RESERVATION = Quantidade de slots para reservar
+CVAR_HIDESLOTS = Se tu definires isto para 1, tu podes esconder slots no teu servidor.^nSe os slots públicos e escondidos do servidor estiverem cheios, tu deverás manualmente conectar com o comando de consola "connect".

@@ -3,6 +3,17 @@
 **/node_modules/**
 **/logs/**
 yarn.lock
+package-lock.json
+pnpm-lock.yaml
+
+# TypeScript output in packages
+packages/*/dist/
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Release packages
+release/
 
 # User-specific files
 *.suo

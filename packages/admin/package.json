@@ -1,0 +1,32 @@
+{
+  "name": "@nodemod/admin",
+  "version": "1.0.0",
+  "description": "Admin plugins for nodemod Half-Life server",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "clean": "rm -rf dist",
+    "prebuild": "npm run clean",
+    "dev": "npm run build:watch"
+  },
+  "keywords": [
+    "nodemod",
+    "half-life",
+    "admin",
+    "plugins"
+  ],
+  "author": "NodeMod Team",
+  "license": "MIT",
+  "type": "commonjs",
+  "dependencies": {
+    "@nodemod/core": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^24.6.0",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

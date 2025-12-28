@@ -306,9 +306,9 @@ function parseFunction(line) {
   // Generate split type files
   const typeFiles = fileMaker.typings.makeIndex(computed, structureInterfaces, eventNames, eventInterfaces);
   
-  // Write each type file
+  // Write each type file to packages/core/types
   for (const [filename, content] of Object.entries(typeFiles)) {
-    await fs.writeFile(`./types/${filename}`, content);
+    await fs.writeFile(`./packages/core/types/${filename}`, content);
   }
   const { engineFunctionsFile, dllFunctionsFile } = fileMaker.makeFunctions(computed);
   await fs.writeFile('./src/auto/engine_functions.cpp', engineFunctionsFile);

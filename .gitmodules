@@ -4,3 +4,6 @@
 [submodule "deps/node"]
 	path = deps/node
 	url = https://github.com/nodejs/node.git
+[submodule "packages/core"]
+	path = packages/core
+	url = https://github.com/nodemod/core-goldsrc.git
