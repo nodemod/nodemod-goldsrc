@@ -896,7 +896,7 @@ class AdminCommands extends BasePlugin implements Plugin {
 
         this.sendConsole(entity, '');
         this.sendConsole(entity, `${this.getLang(entity, 'CLIENTS_ON_SERVER')}:`);
-        this.sendConsole(entity, ` #  nick                 authid               userid immu res  access`);
+        this.sendConsole(entity, ` #  nick                 authid                                   userid immu res  access`);
 
         let playerCount = 0;
         for (const player of adminSystem.getPlayers()) {
@@ -908,7 +908,7 @@ class AdminCommands extends BasePlugin implements Plugin {
             const hasImmunity = (flags & ADMIN_IMMUNITY) ? this.getLang(entity, 'YES') : this.getLang(entity, 'NO');
             const hasReservation = (flags & ADMIN_RESERVATION) ? this.getLang(entity, 'YES') : this.getLang(entity, 'NO');
 
-            this.sendConsole(entity, `${String(nodemod.eng.indexOfEdict(player)).padStart(2)}  ${playerName.padEnd(20).substring(0, 20)} ${authId.padEnd(20).substring(0, 20)} ${String(userId).padEnd(6)} ${hasImmunity.padEnd(4)} ${hasReservation.padEnd(4)} ${flagsStr}`);
+            this.sendConsole(entity, `${String(nodemod.eng.indexOfEdict(player)).padStart(2)}  ${playerName.padEnd(20).substring(0, 20)} ${authId.padEnd(40).substring(0, 40)} ${String(userId).padEnd(6)} ${hasImmunity.padEnd(4)} ${hasReservation.padEnd(4)} ${flagsStr}`);
             playerCount++;
         }
 

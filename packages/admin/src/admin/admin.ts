@@ -704,17 +704,10 @@ class AdminSystem extends BasePlugin implements Plugin {
     }
 
     private async cmdReload(client: nodemod.Entity | null = null): Promise<void> {
-        this.removeServerUserFlags();
+        // reloadAdmins already calls removeServerUserFlags and re-checks all players
         await this.reloadAdmins();
 
         const count = this.admins.length;
-
-        for (const player of nodemod.players) {
-            if (player && this.isPlayerIngame(player)) {
-                const name = player.netname;
-                this.accessUser(player, name);
-            }
-        }
 
         if (client) {
             if (count === 1) {
@@ -773,7 +766,8 @@ class AdminSystem extends BasePlugin implements Plugin {
         let finalAuth = target;
 
         if (idType & ADMIN_STEAM) {
-            if (!target.includes("STEAM_0:")) {
+            // Support both Steam IDs (STEAM_0:) and Xash3D IDs (ID_)
+            if (!target.includes("STEAM_0:") && !target.startsWith("ID_")) {
                 idType |= ADMIN_LOOKUP;
                 player = utils.findPlayerByName(target);
             } else {

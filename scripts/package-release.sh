@@ -53,15 +53,19 @@ package_arch() {
     # Copy plugins (src, dist, config files)
     cp -r packages/admin/src "$out_dir/addons/nodemod/plugins/"
     cp -r packages/admin/dist "$out_dir/addons/nodemod/plugins/"
-    cp packages/admin/package.json "$out_dir/addons/nodemod/plugins/"
     cp packages/admin/tsconfig.json "$out_dir/addons/nodemod/plugins/"
     cp packages/admin/.gitignore "$out_dir/addons/nodemod/plugins/"
 
-    # Create node_modules with @nodemod/core
-    mkdir -p "$out_dir/addons/nodemod/plugins/node_modules/@nodemod/core"
-    cp -r packages/core/dist "$out_dir/addons/nodemod/plugins/node_modules/@nodemod/core/"
-    cp packages/core/package.json "$out_dir/addons/nodemod/plugins/node_modules/@nodemod/core/"
-    cp packages/core/README.md "$out_dir/addons/nodemod/plugins/node_modules/@nodemod/core/" 2>/dev/null || true
+    # Copy package.json and replace workspace dependency with npm version
+    local core_version=$(node -p "require('./packages/core/package.json').version")
+    sed "s/\"@nodemod\/core\": \"\\*\"/\"@nodemod\/core\": \"^${core_version}\"/" \
+        packages/admin/package.json > "$out_dir/addons/nodemod/plugins/package.json"
+
+    # Install production dependencies only
+    echo "Installing production dependencies (@nodemod/core@$core_version)..."
+    cd "$out_dir/addons/nodemod/plugins"
+    npm install --omit=dev
+    cd "$PROJECT_ROOT"
 
     # Create tarball
     cd "$out_dir"

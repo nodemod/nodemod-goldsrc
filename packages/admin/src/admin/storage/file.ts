@@ -149,6 +149,7 @@ export class FileStorageAdapter implements StorageAdapter {
 ;
 ; Examples of admin accounts:
 ; "STEAM_0:0:123456" "" "abcdefghijklmnopqrstu" "ce"
+; "ID_deadbeefdeadbeef" "" "abcdefghijklmnopqrstu" "ce"  ; Xash3D ID format
 ; "123.45.67.89" "" "abcdefghijklmnopqrstu" "de"
 ; "My Name" "my_password" "abcdefghijklmnopqrstu" "a"
 
