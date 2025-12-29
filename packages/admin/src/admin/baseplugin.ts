@@ -249,7 +249,7 @@ export abstract class BasePlugin {
      * Log an AMXX-style message
      */
     protected logAmx(message: string): void {
-        console.log(`[AMXX] ${message}`);
+        console.log(`[NodeMod] ${message}`);
     }
 
     // ========================================================================

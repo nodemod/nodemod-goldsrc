@@ -524,11 +524,11 @@ class AdminSystem extends BasePlugin implements Plugin {
 
         const count = this.admins.length;
         if (count === 0) {
-            console.log(`[AMXX] ${this.formatLangString('NO_ADMINS')}`);
+            console.log(`[NodeMod] ${this.formatLangString('NO_ADMINS')}`);
         } else if (count === 1) {
-            console.log(`[AMXX] ${this.formatLangString('LOADED_ADMIN')}`);
+            console.log(`[NodeMod] ${this.formatLangString('LOADED_ADMIN')}`);
         } else {
-            console.log(`[AMXX] ${this.formatLangString('LOADED_ADMINS', count)}`);
+            console.log(`[NodeMod] ${this.formatLangString('LOADED_ADMINS', count)}`);
         }
     }
 
@@ -711,9 +711,9 @@ class AdminSystem extends BasePlugin implements Plugin {
 
         if (client) {
             if (count === 1) {
-                utils.sendClientMessage(client, `[AMXX] ${this.formatLangString('LOADED_ADMIN')}`);
+                utils.sendClientMessage(client, `[NodeMod] ${this.formatLangString('LOADED_ADMIN')}`);
             } else {
-                utils.sendClientMessage(client, `[AMXX] ${this.formatLangString('LOADED_ADMINS', count)}`);
+                utils.sendClientMessage(client, `[NodeMod] ${this.formatLangString('LOADED_ADMINS', count)}`);
             }
         }
     }
@@ -837,7 +837,7 @@ class AdminSystem extends BasePlugin implements Plugin {
 
     private async addAdmin(entity: nodemod.Entity | null, auth: string, accessFlags: string, password: string, flags: string): Promise<void> {
         if (await storage.exists('auth', auth)) {
-            const msg = `[AMXX] ${auth} already exists!`;
+            const msg = `[NodeMod] ${auth} already exists!`;
             if (entity) {
                 utils.sendClientMessage(entity, msg);
             } else {
@@ -855,14 +855,14 @@ class AdminSystem extends BasePlugin implements Plugin {
 
         const success = await storage.save(entry);
         if (success) {
-            const msg = `[AMXX] Adding: ${auth} ${accessFlags} ${flags}`;
+            const msg = `[NodeMod] Adding: ${auth} ${accessFlags} ${flags}`;
             if (entity) {
                 utils.sendClientMessage(entity, msg);
             } else {
                 console.log(msg);
             }
         } else {
-            const msg = `[AMXX] Failed to add admin: ${auth}`;
+            const msg = `[NodeMod] Failed to add admin: ${auth}`;
             if (entity) {
                 utils.sendClientMessage(entity, msg);
             } else {

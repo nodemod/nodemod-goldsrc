@@ -328,7 +328,7 @@ class AdminCommands extends BasePlugin implements Plugin {
             }
         }
 
-        this.sendConsole(entity, `[AMXX] ${this.getLang(entity, 'CLIENT_KICKED', targetName)}`);
+        this.sendConsole(entity, `[NodeMod] ${this.getLang(entity, 'CLIENT_KICKED', targetName)}`);
     }
 
     /**
@@ -394,7 +394,7 @@ class AdminCommands extends BasePlugin implements Plugin {
         }
         this.showActivity(entity, activityMsg);
 
-        this.sendConsole(entity, `[AMXX] ${this.getLang(entity, 'CLIENT_BANNED', targetName)}`);
+        this.sendConsole(entity, `[NodeMod] ${this.getLang(entity, 'CLIENT_BANNED', targetName)}`);
     }
 
     /**
@@ -416,7 +416,7 @@ class AdminCommands extends BasePlugin implements Plugin {
         // Check for invalid steam IDs
         const invalidIds = ['STEAM_ID_PENDING', 'STEAM_ID_LAN', 'HLTV', '4294967295', 'VALVE_ID_LAN', 'VALVE_ID_PENDING'];
         if (invalidIds.some(id => target.toUpperCase() === id)) {
-            this.sendConsole(entity, `[AMXX] ${this.getLang(entity, 'CANNOT_BAN', target)}`);
+            this.sendConsole(entity, `[NodeMod] ${this.getLang(entity, 'CANNOT_BAN', target)}`);
             return;
         }
 
@@ -434,7 +434,7 @@ class AdminCommands extends BasePlugin implements Plugin {
                 const match = isIp ? (info.ip === target) : (info.steamId === target);
                 if (match) {
                     if (info.access & ADMIN_IMMUNITY) {
-                        this.sendConsole(entity, `[AMXX] ${target} : ${this.getLang(entity, 'CLIENT_IMM', info.name)}`);
+                        this.sendConsole(entity, `[NodeMod] ${target} : ${this.getLang(entity, 'CLIENT_IMM', info.name)}`);
                         return;
                     }
                     canBan = true;
@@ -443,7 +443,7 @@ class AdminCommands extends BasePlugin implements Plugin {
             }
 
             if (!canBan) {
-                this.sendConsole(entity, `[AMXX] ${this.getLang(entity, 'ADDBAN_ONLY_RECENT')}`);
+                this.sendConsole(entity, `[NodeMod] ${this.getLang(entity, 'ADDBAN_ONLY_RECENT')}`);
                 return;
             }
         }
@@ -454,11 +454,11 @@ class AdminCommands extends BasePlugin implements Plugin {
         if (isIp) {
             nodemod.eng.serverCommand(`addip "${minutes}" "${target}"\n`);
             nodemod.eng.serverCommand(`writeip\n`);
-            this.sendConsole(entity, `[AMXX] ${this.getLang(entity, 'IP_ADDED', target)}`);
+            this.sendConsole(entity, `[NodeMod] ${this.getLang(entity, 'IP_ADDED', target)}`);
         } else {
             nodemod.eng.serverCommand(`banid ${minutes} ${target}\n`);
             nodemod.eng.serverCommand(`writeid\n`);
-            this.sendConsole(entity, `[AMXX] ${this.getLang(entity, 'AUTHID_ADDED', target)}`);
+            this.sendConsole(entity, `[NodeMod] ${this.getLang(entity, 'AUTHID_ADDED', target)}`);
         }
 
         this.showActivity(entity, this.getLang(null, 'ADMIN_ADDBAN', adminName, target));
@@ -489,11 +489,11 @@ class AdminCommands extends BasePlugin implements Plugin {
         if (isIp) {
             nodemod.eng.serverCommand(`removeip "${target}"\n`);
             nodemod.eng.serverCommand(`writeip\n`);
-            this.sendConsole(entity, `[AMXX] ${this.getLang(entity, 'IP_REMOVED', target)}`);
+            this.sendConsole(entity, `[NodeMod] ${this.getLang(entity, 'IP_REMOVED', target)}`);
         } else {
             nodemod.eng.serverCommand(`removeid ${target}\n`);
             nodemod.eng.serverCommand(`writeid\n`);
-            this.sendConsole(entity, `[AMXX] ${this.getLang(entity, 'AUTHID_REMOVED', target)}`);
+            this.sendConsole(entity, `[NodeMod] ${this.getLang(entity, 'AUTHID_REMOVED', target)}`);
         }
 
         this.showActivity(entity, this.getLang(null, 'ADMIN_UNBAN', adminName, target));
@@ -536,7 +536,7 @@ class AdminCommands extends BasePlugin implements Plugin {
         }
 
         this.showActivity(entity, this.getLang(null, 'ADMIN_SLAYED', adminName, targetName));
-        this.sendConsole(entity, `[AMXX] ${this.getLang(entity, 'CLIENT_SLAYED', targetName)}`);
+        this.sendConsole(entity, `[NodeMod] ${this.getLang(entity, 'CLIENT_SLAYED', targetName)}`);
     }
 
     /**
@@ -583,7 +583,7 @@ class AdminCommands extends BasePlugin implements Plugin {
         }
 
         this.showActivity(entity, this.getLang(null, 'ADMIN_SLAPPED', adminName, targetName, damage));
-        this.sendConsole(entity, `[AMXX] ${this.getLang(entity, 'CLIENT_SLAPPED', targetName, damage)}`);
+        this.sendConsole(entity, `[NodeMod] ${this.getLang(entity, 'CLIENT_SLAPPED', targetName, damage)}`);
     }
 
     /**
@@ -602,7 +602,7 @@ class AdminCommands extends BasePlugin implements Plugin {
 
         // Check if map is valid
         if (!nodemod.eng.isMapValid(mapName)) {
-            this.sendConsole(entity, `[AMXX] ${this.getLang(entity, 'MAP_NOT_FOUND')}`);
+            this.sendConsole(entity, `[NodeMod] ${this.getLang(entity, 'MAP_NOT_FOUND')}`);
             return;
         }
 
@@ -641,20 +641,20 @@ class AdminCommands extends BasePlugin implements Plugin {
         // Handle "add" subcommand (RCON only)
         if (cvarName.toLowerCase() === 'add' && args.length >= 2) {
             if (!adminSystem.hasAccess(entity, ADMIN_RCON)) {
-                this.sendConsole(entity, `[AMXX] ${this.getLang(entity, 'NO_ACCESS')}`);
+                this.sendConsole(entity, `[NodeMod] ${this.getLang(entity, 'NO_ACCESS')}`);
                 return;
             }
             // Add CVAR to protected list (requires RCON access to modify)
             const targetCvar = args[1];
             this.addProtectedCvar(targetCvar);
-            this.sendConsole(entity, `[AMXX] ${this.getLang(entity, 'CVAR_PROTECTED_ADDED', targetCvar)}`);
+            this.sendConsole(entity, `[NodeMod] ${this.getLang(entity, 'CVAR_PROTECTED_ADDED', targetCvar)}`);
             return;
         }
 
         // Check if CVAR exists
         const cvarWrapper = cvar.wrap(cvarName);
         if (!cvarWrapper) {
-            this.sendConsole(entity, `[AMXX] ${this.getLang(entity, 'UNKNOWN_CVAR', cvarName)}`);
+            this.sendConsole(entity, `[NodeMod] ${this.getLang(entity, 'UNKNOWN_CVAR', cvarName)}`);
             return;
         }
 
@@ -664,7 +664,7 @@ class AdminCommands extends BasePlugin implements Plugin {
             if (cvarName.toLowerCase() === 'sv_password' && adminSystem.hasAccess(entity, ADMIN_PASSWORD)) {
                 // Allow
             } else {
-                this.sendConsole(entity, `[AMXX] ${this.getLang(entity, 'CVAR_NO_ACC')}`);
+                this.sendConsole(entity, `[NodeMod] ${this.getLang(entity, 'CVAR_NO_ACC')}`);
                 return;
             }
         }
@@ -672,7 +672,7 @@ class AdminCommands extends BasePlugin implements Plugin {
         // If no value provided, show current value
         if (args.length < 2) {
             const currentValue = cvarWrapper.value || '';
-            this.sendConsole(entity, `[AMXX] ${this.getLang(entity, 'CVAR_IS', cvarName, currentValue)}`);
+            this.sendConsole(entity, `[NodeMod] ${this.getLang(entity, 'CVAR_IS', cvarName, currentValue)}`);
             return;
         }
 
@@ -694,7 +694,7 @@ class AdminCommands extends BasePlugin implements Plugin {
             : newValue;
 
         this.showActivity(entity, this.getLang(null, 'SET_CVAR_TO', cvarName, displayValue));
-        this.sendConsole(entity, `[AMXX] ${this.getLang(entity, 'CVAR_CHANGED', cvarName, newValue)}`);
+        this.sendConsole(entity, `[NodeMod] ${this.getLang(entity, 'CVAR_CHANGED', cvarName, newValue)}`);
     }
 
     /**
@@ -716,7 +716,7 @@ class AdminCommands extends BasePlugin implements Plugin {
         const filePath = path.join(configsDir, filename);
 
         if (!fs.existsSync(filePath)) {
-            this.sendConsole(entity, `[AMXX] ${this.getLang(entity, 'FILE_NOT_FOUND', filename)}`);
+            this.sendConsole(entity, `[NodeMod] ${this.getLang(entity, 'FILE_NOT_FOUND', filename)}`);
             return;
         }
 
@@ -727,7 +727,7 @@ class AdminCommands extends BasePlugin implements Plugin {
             this.logAmx(`Cmd: "${adminName}<${adminUserId}><${adminAuthId}><>" execute cfg (file "${filename}")`);
         }
 
-        this.sendConsole(entity, `[AMXX] ${this.getLang(entity, 'EXECUTING_FILE', filename)}`);
+        this.sendConsole(entity, `[NodeMod] ${this.getLang(entity, 'EXECUTING_FILE', filename)}`);
         nodemod.eng.serverCommand(`exec ${filePath}\n`);
 
         this.showActivity(entity, this.getLang(null, 'ADMIN_CFG', adminName, filename));
@@ -764,7 +764,7 @@ class AdminCommands extends BasePlugin implements Plugin {
         }
 
         this.showActivity(entity, this.getLang(null, 'ADMIN_NICK', adminName, oldName, newNick));
-        this.sendConsole(entity, `[AMXX] ${this.getLang(entity, 'CHANGED_NICK', oldName, newNick)}`);
+        this.sendConsole(entity, `[NodeMod] ${this.getLang(entity, 'CHANGED_NICK', oldName, newNick)}`);
     }
 
     /**
@@ -789,17 +789,17 @@ class AdminCommands extends BasePlugin implements Plugin {
             // Check if player name contains any of the tags
             const hasTag = tags.some(tag => playerName.toLowerCase().includes(tag.toLowerCase()));
             if (hasTag) {
-                this.sendConsole(entity, `[AMXX] ${this.getLang(entity, 'SKIP_MATCH', playerName, tags.find(t => playerName.toLowerCase().includes(t.toLowerCase())))}`);
+                this.sendConsole(entity, `[NodeMod] ${this.getLang(entity, 'SKIP_MATCH', playerName, tags.find(t => playerName.toLowerCase().includes(t.toLowerCase())))}`);
                 continue;
             }
 
             // Check immunity
             if (adminSystem.getUserFlags(player) & ADMIN_IMMUNITY) {
-                this.sendConsole(entity, `[AMXX] ${this.getLang(entity, 'SKIP_IMM', playerName)}`);
+                this.sendConsole(entity, `[NodeMod] ${this.getLang(entity, 'SKIP_IMM', playerName)}`);
                 continue;
             }
 
-            this.sendConsole(entity, `[AMXX] ${this.getLang(entity, 'KICK_PL', playerName)}`);
+            this.sendConsole(entity, `[NodeMod] ${this.getLang(entity, 'KICK_PL', playerName)}`);
 
             const userId = nodemod.eng.getPlayerUserId(player);
             if (utils.isBot(player)) {
@@ -811,7 +811,7 @@ class AdminCommands extends BasePlugin implements Plugin {
             kickCount++;
         }
 
-        this.sendConsole(entity, `[AMXX] ${this.getLang(entity, 'KICKED_CLIENTS', kickCount)}`);
+        this.sendConsole(entity, `[NodeMod] ${this.getLang(entity, 'KICKED_CLIENTS', kickCount)}`);
 
         // Log the action
         if (entity) {
@@ -846,7 +846,7 @@ class AdminCommands extends BasePlugin implements Plugin {
         }
 
         if (!slayer) {
-            this.sendConsole(entity, `[AMXX] ${this.getLang(entity, 'UNABLE_PAUSE')}`);
+            this.sendConsole(entity, `[NodeMod] ${this.getLang(entity, 'UNABLE_PAUSE')}`);
             return;
         }
 
@@ -866,7 +866,7 @@ class AdminCommands extends BasePlugin implements Plugin {
             this.logAmx(`Cmd: "${adminName}<${adminUserId}><${adminAuthId}><>" ${this.paused ? 'unpause' : 'pause'} server`);
         }
 
-        this.sendConsole(entity, `[AMXX] ${this.getLang(entity, this.paused ? 'UNPAUSING' : 'PAUSING')}`);
+        this.sendConsole(entity, `[NodeMod] ${this.getLang(entity, this.paused ? 'UNPAUSING' : 'PAUSING')}`);
         this.showActivity(entity, `${this.getLang(null, this.paused ? 'UNPAUSE' : 'PAUSE')} server`);
     }
 
@@ -880,7 +880,7 @@ class AdminCommands extends BasePlugin implements Plugin {
         cvar.setFloat('pausable', this.savedPausable);
 
         const statusMsg = this.paused ? 'UNPAUSED' : 'PAUSED';
-        this.sendConsole(this.pauseInitiator, `[AMXX] Server ${this.getLang(this.pauseInitiator, statusMsg)}`);
+        this.sendConsole(this.pauseInitiator, `[NodeMod] Server ${this.getLang(this.pauseInitiator, statusMsg)}`);
 
         this.pauseAllowed = false;
         this.paused = !this.paused;
@@ -943,7 +943,7 @@ class AdminCommands extends BasePlugin implements Plugin {
             this.logAmx(`Cmd: "${adminName}<${adminUserId}><${adminAuthId}><>" server console (cmdline "${command}")`);
         }
 
-        this.sendConsole(entity, `[AMXX] ${this.getLang(entity, 'COM_SENT_SERVER', command)}`);
+        this.sendConsole(entity, `[NodeMod] ${this.getLang(entity, 'COM_SENT_SERVER', command)}`);
         nodemod.eng.serverCommand(`${command}\n`);
     }
 
