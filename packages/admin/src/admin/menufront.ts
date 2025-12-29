@@ -254,7 +254,7 @@ class MenuFront extends BasePlugin implements Plugin {
     }
 
     private displayAdminMenu(entity: nodemod.Entity) {
-        const title = 'AMX Mod X Menu';
+        const title = 'NodeMod Admin Menu';
 
         // Build items - only show accessible items from loaded plugins
         const items: any[] = [];
@@ -315,7 +315,7 @@ class MenuFront extends BasePlugin implements Plugin {
     }
 
     private displayClientMenu(entity: nodemod.Entity) {
-        const title = 'AMX Mod X Client Menu';
+        const title = 'NodeMod Client Menu';
 
         // Build items - only show accessible items from loaded plugins
         const items: any[] = [];
