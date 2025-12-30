@@ -10,3 +10,6 @@
 [submodule "packages/admin"]
 	path = packages/admin
 	url = git@github.com:nodemod/admin-goldsrc.git
+[submodule "packages/examples"]
+	path = packages/examples
+	url = git@github.com:nodemod/examples-goldsrc.git
