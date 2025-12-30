@@ -7,8 +7,9 @@
   "scripts": {
     "build:types": "node scripts/buildEvents.js",
     "build:core": "npm run build -w @nodemod/core",
-    "build:admin": "npm run build -w packages/admin",
-    "build:all": "npm run build:types && npm run build:core && npm run build:admin",
+    "build:admin": "npm run build -w @nodemod/admin",
+    "build:examples": "npm run build -w @nodemod/examples",
+    "build:all": "npm run build:types && npm run build:core && npm run build:admin && npm run build:examples",
     "package:x86": "./scripts/package-release.sh x86",
     "package:x64": "./scripts/package-release.sh x64",
     "package:all": "./scripts/package-release.sh both"
