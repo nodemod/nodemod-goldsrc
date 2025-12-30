@@ -7,3 +7,6 @@
 [submodule "packages/core"]
 	path = packages/core
 	url = https://github.com/nodemod/core-goldsrc.git
+[submodule "packages/admin"]
+	path = packages/admin
+	url = git@github.com:nodemod/admin-goldsrc.git
