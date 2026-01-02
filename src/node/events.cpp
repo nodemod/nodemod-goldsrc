@@ -312,6 +312,11 @@ extern meta_globals_t *gpMetaGlobals;
 
 				L_ERROR << "Event handling function in resource: " << *str << "\nstack:\n" << *stack << "\n";
 			}
+
+			// If listener set SUPERCEDE, stop processing further listeners
+			if (gpMetaGlobals && gpMetaGlobals->mres == MRES_SUPERCEDE) {
+				break;
+			}
 		}
 
 		if (argCount > 0) delete[] args;
@@ -373,6 +378,11 @@ void event::call(argument_collector_t collectArguments)
 				v8::String::Utf8Value stack(isolate, eh.StackTrace(listener.context.Get(isolate)).ToLocalChecked());
 
 				L_ERROR << "Event handling function in resource: " << *str << "\nstack:\n" << *stack << "\n";
+			}
+
+			// If listener set SUPERCEDE, stop processing further listeners
+			if (gpMetaGlobals && gpMetaGlobals->mres == MRES_SUPERCEDE) {
+				break;
 			}
 		}
 	}

@@ -108,3 +108,10 @@ void setMetaResult(const v8::FunctionCallbackInfo<v8::Value>& info) {
 
 	SET_META_RESULT((META_RES)info[0]->Int32Value(context).ToChecked());
 }
+
+void getMetaResult(const v8::FunctionCallbackInfo<v8::Value>& info) {
+	v8::Locker locker(info.GetIsolate());
+	v8::HandleScope scope(info.GetIsolate());
+
+	info.GetReturnValue().Set(v8::Integer::New(info.GetIsolate(), (int)gpMetaGlobals->mres));
+}

@@ -66,6 +66,8 @@ package_arch() {
     mkdir -p "$out_dir/addons/nodemod/plugins/packages"
     cp -r packages/admin "$out_dir/addons/nodemod/plugins/packages/"
     rm -f "$out_dir/addons/nodemod/plugins/packages/admin/.git"
+    rm -rf "$out_dir/addons/nodemod/plugins/packages/admin/configs"
+    rm -rf "$out_dir/addons/nodemod/plugins/packages/admin/data"
 
     # Copy package.json with local admin reference and npm core version
     local core_version=$(node -p "require('./packages/core/package.json').version")
