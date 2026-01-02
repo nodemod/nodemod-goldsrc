@@ -17,6 +17,7 @@ npm install
 npm run build:types
 npm run build:core
 npm run build:admin
+npm run build:examples
 
 package_arch() {
     local arch=$1
@@ -50,19 +51,33 @@ package_arch() {
     cp -r packages/admin/configs "$out_dir/addons/nodemod/"
     cp -r packages/admin/data "$out_dir/addons/nodemod/"
 
-    # Copy plugins (src, dist, config files)
-    cp -r packages/admin/src "$out_dir/addons/nodemod/plugins/"
-    cp -r packages/admin/dist "$out_dir/addons/nodemod/plugins/"
-    cp packages/admin/tsconfig.json "$out_dir/addons/nodemod/plugins/"
-    cp packages/admin/.gitignore "$out_dir/addons/nodemod/plugins/"
+    # Copy plugins from examples package (src, dist, config files)
+    cp -r packages/examples/src "$out_dir/addons/nodemod/plugins/"
+    cp -r packages/examples/dist "$out_dir/addons/nodemod/plugins/"
+    cp packages/examples/tsconfig.json "$out_dir/addons/nodemod/plugins/"
+    cp packages/examples/.gitignore "$out_dir/addons/nodemod/plugins/"
+    cp packages/examples/README.md "$out_dir/addons/nodemod/plugins/"
 
-    # Copy package.json and replace workspace dependency with npm version
+    # Remove examples folder (standalone examples, not needed in release)
+    rm -rf "$out_dir/addons/nodemod/plugins/src/examples"
+    rm -rf "$out_dir/addons/nodemod/plugins/dist/examples"
+
+    # Copy admin package as local package (entire folder)
+    mkdir -p "$out_dir/addons/nodemod/plugins/packages"
+    cp -r packages/admin "$out_dir/addons/nodemod/plugins/packages/"
+    rm -f "$out_dir/addons/nodemod/plugins/packages/admin/.git"
+
+    # Copy package.json with local admin reference and npm core version
     local core_version=$(node -p "require('./packages/core/package.json').version")
-    sed "s/\"@nodemod\/core\": \"\\*\"/\"@nodemod\/core\": \"^${core_version}\"/" \
-        packages/admin/package.json > "$out_dir/addons/nodemod/plugins/package.json"
+    node -e "
+        const pkg = require('./packages/examples/package.json');
+        pkg.dependencies['@nodemod/core'] = '^${core_version}';
+        pkg.dependencies['@nodemod/admin'] = 'file:./packages/admin';
+        console.log(JSON.stringify(pkg, null, 2));
+    " > "$out_dir/addons/nodemod/plugins/package.json"
 
-    # Install production dependencies only
-    echo "Installing production dependencies (@nodemod/core@$core_version)..."
+    # Install production dependencies
+    echo "Installing production dependencies (@nodemod/core@$core_version, @nodemod/admin from local)..."
     cd "$out_dir/addons/nodemod/plugins"
     npm install --omit=dev
     cd "$PROJECT_ROOT"
