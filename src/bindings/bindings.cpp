@@ -5,8 +5,11 @@
 #include <string>
 #include <vector>
 #include <filesystem>
+#include "extdll.h"
+#include "enginecallback.h"
 
 extern std::vector<std::pair<std::string, v8::FunctionCallback>> nodemodFunctions;
+extern enginefuncs_t g_engfuncs;
 extern v8::Local<v8::ObjectTemplate> registerEngineFunctions(v8::Isolate *isolate);
 extern v8::Local<v8::ObjectTemplate> registerDllFunctions(v8::Isolate *isolate);
 namespace players
@@ -48,6 +51,18 @@ namespace bindings
         convert::str2js(isolate, cwd.string().c_str()));
 
     // add getters
+    nodemodObject->SetNativeDataProperty(
+        convert::str2js(isolate, "gameDir"),
+        [](v8::Local<v8::Name> property, const v8::PropertyCallbackInfo<v8::Value> &info)
+        {
+          v8::Isolate* isolate = info.GetIsolate();
+          v8::Locker locker(isolate);
+          v8::HandleScope scope(isolate);
+
+          char gameDir[256];
+          (*g_engfuncs.pfnGetGameDir)(gameDir);
+          info.GetReturnValue().Set(convert::str2js(isolate, gameDir));
+        });
     nodemodObject->SetNativeDataProperty(
         convert::str2js(isolate, "players"),
         players::getPlayers);
