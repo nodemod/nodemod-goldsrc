@@ -6,18 +6,18 @@ const fileMaker = {
     return `${prefix} {\n${body.split('\n').map(v => `  ${v}`).join('\n')}\n};`;
   },
   typings: {
-    makeIndex(computed, structureInterfaces = [], eventNames = [], eventInterfaces = []) {
+    makeIndex(computed, structureInterfaces = [], eventNames = [], eventInterfaces = [], hamData = null) {
       // Split into multiple files for better organization
-      const enums = this.makeEnums();
+      const enums = this.makeEnums(hamData);
       const eventTypes = this.makeEventTypes(eventNames, eventInterfaces);
       const structures = this.makeStructures(structureInterfaces);
       const engine = this.makeEngine(computed);
       const dll = this.makeDLL(computed);
-      const core = this.makeCore();
-      
+      const core = this.makeCore(hamData);
+
       return {
         'enums.d.ts': enums,
-        'events.d.ts': eventTypes, 
+        'events.d.ts': eventTypes,
         'structures.d.ts': structures,
         'engine.d.ts': engine,
         'dll.d.ts': dll,
@@ -25,14 +25,26 @@ const fileMaker = {
       };
     },
     
-    makeEnums() {
+    makeEnums(hamData = null) {
+      // Generate HAM enums from parsed C++ files if available
+      const hamResultEnum = hamData ? hamData.generateHamResultEnum() : `  /** Ham (Hamsandwich) hook result values */
+  const enum HAM_RESULT {
+    UNSET = 0,      // Default state
+    IGNORED = 1,    // Hook had no effect, continue normally
+    HANDLED = 2,    // Hook processed the call, but still call original
+    OVERRIDE = 3,   // Use hook's return value instead of original
+    SUPERCEDE = 4   // Don't call original function at all
+  }`;
+
+      const hamFuncEnum = hamData ? hamData.generateHamFuncEnum() : '  const enum HAM_FUNC {}';
+
       return fileMaker.makeFile(
         'declare namespace nodemod {',
         '  // Metamod result constants',
         '  const enum META_RES {',
         '    UNSET = 0,    // Uninitialized (causes error)',
         '    IGNORED = 1,  // Plugin didn\'t take any action, continue normally',
-        '    HANDLED = 2,  // Plugin did something, but original function still executes',  
+        '    HANDLED = 2,  // Plugin did something, but original function still executes',
         '    OVERRIDE = 3, // Execute original function, but use plugin\'s return value',
         '    SUPERCEDE = 4 // Skip original function entirely, use plugin\'s behavior',
         '  }',
@@ -459,6 +471,10 @@ const fileMaker = {
         '    SERVER = 32,    // 1<<5 - Only send if the event was created on the server',
         '    CLIENT = 64     // 1<<6 - Only issue event client side',
         '  }',
+        '',
+        hamResultEnum,
+        '',
+        hamFuncEnum,
         '}'
       );
     },
@@ -538,7 +554,13 @@ const fileMaker = {
       );
     },
 
-    makeCore() {
+    makeCore(hamData = null) {
+      // Generate HamCallbackFor type from parsed C++ files if available
+      const hamCallbackType = hamData ? hamData.generateHamCallbackType() : `  // Ham callback type mappings - maps HAM_FUNC to callback signature
+  // All callbacks receive 'this_' (the hooked entity) as the first parameter
+  type HamCallbackFor<T extends HAM_FUNC> =
+    (this_: Entity, ...args: any[]) => HAM_RESULT | void;`;
+
       return fileMaker.makeFile(
         '/// <reference path="./enums.d.ts" />',
         '/// <reference path="./events.d.ts" />',
@@ -579,6 +601,35 @@ const fileMaker = {
         `  function setMetaResult(result: META_RES): void;`,
         `  function getMetaResult(): META_RES;`,
         `  function continueServer(): void;`,
+        ``,
+        hamCallbackType,
+        ``,
+        `  // Ham (Hamsandwich) virtual function hooking`,
+        `  interface Ham {`,
+        `    /** Register a ham hook on an entity class's virtual function with typed callback */`,
+        `    register<F extends HAM_FUNC>(functionId: F, entityClass: string, callback: HamCallbackFor<F>, isPre: boolean): number;`,
+        `    /** Unregister a ham hook by ID */`,
+        `    unregister(hookId: number): void;`,
+        `    /** Set the return value for the hooked function */`,
+        `    setReturn(value: any): void;`,
+        `    /** Get the current return value */`,
+        `    getReturn(): any;`,
+        `    /** Get the original return value */`,
+        `    getOrigReturn(): any;`,
+        `    /** Set result to SUPERCEDE (skip original function) */`,
+        `    supercede(): void;`,
+        `    /** Set result to OVERRIDE (use hook's return value) */`,
+        `    override(): void;`,
+        `    /** Set result to HANDLED (original still executes) */`,
+        `    handled(): void;`,
+        `    /** Set result to IGNORED (no effect) */`,
+        `    ignored(): void;`,
+        `    /** Ham function constants */`,
+        `    readonly funcs: typeof HAM_FUNC;`,
+        `    /** Ham result constants */`,
+        `    readonly result: typeof HAM_RESULT;`,
+        `  }`,
+        `  const ham: Ham;`,
         `}`
       );
     },

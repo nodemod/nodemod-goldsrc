@@ -4,6 +4,7 @@ import customs from './customs.js';
 import fileMaker from './fileMaker.js';
 import generator from './generator.js';
 import { camelize } from './util.js';
+import { parseHamFiles } from './hamParser.js';
 
 function argToValue(arg) {
   return generator.cpp2js(arg.type, arg.name) || 'v8::Boolean::New(isolate, false)';
@@ -303,9 +304,12 @@ function parseFunction(line) {
     ...engineFunctions.filter(v => !v.name.includes('CRC32')).map(v => computeEventInterface(v, 'postEng'))
   ];
 
+  // Parse Ham files for type generation
+  const hamData = await parseHamFiles();
+
   // Generate split type files
-  const typeFiles = fileMaker.typings.makeIndex(computed, structureInterfaces, eventNames, eventInterfaces);
-  
+  const typeFiles = fileMaker.typings.makeIndex(computed, structureInterfaces, eventNames, eventInterfaces, hamData);
+
   // Write each type file to packages/core/types
   for (const [filename, content] of Object.entries(typeFiles)) {
     await fs.writeFile(`./packages/core/types/${filename}`, content);

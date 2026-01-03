@@ -160,6 +160,12 @@ bool NodeImpl::reload()
 		}
 		events.clear();
 		
+		// Clear Ham hooks to restore vtables and free trampolines
+		{
+			extern void shutdownHamManager();
+			shutdownHamManager();
+		}
+
 		// Clear server command callbacks to prevent crashes after reload
 		// Note: These extern declarations match the static variables in customs.js
 		{

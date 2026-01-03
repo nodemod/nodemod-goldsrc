@@ -55,6 +55,12 @@ list(APPEND SOURCES_LIST
 	"src/structures/saverestoredata.cpp"
 	"src/structures/typedescription.cpp"
 	"src/structures/weapondata.cpp"
+	"src/ham/trampoline.cpp"
+	"src/ham/gamedata.cpp"
+	"src/ham/hook.cpp"
+	"src/ham/ham_manager.cpp"
+	"src/ham/hook_callbacks.cpp"
+	"src/ham/ham_bindings.cpp"
 )
 
 # required for proper plugin loading from metamod, don't touch

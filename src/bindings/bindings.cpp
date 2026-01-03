@@ -1,6 +1,7 @@
 #include "bindings.hpp"
 #include "util/convert.hpp"
 #include "structures/structures.hpp"
+#include "ham/ham_bindings.h"
 #include <v8.h>
 #include <string>
 #include <vector>
@@ -43,7 +44,12 @@ namespace bindings
     nodemodObject->Set(
         convert::str2js(isolate, "dll"),
         registerDllFunctions(isolate));
-    
+
+    // add ham functions
+    nodemodObject->Set(
+        convert::str2js(isolate, "ham"),
+        Ham::createHamBindings(isolate));
+
     auto cwd = std::filesystem::current_path();
 
     nodemodObject->Set(
