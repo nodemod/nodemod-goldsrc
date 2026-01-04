@@ -350,22 +350,8 @@ void sf_eng_pfnTraceLine(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
 
-  //if (!info[0]->IsExternal()) {
-    //printf("Warning: pfnTraceLine parameter 0 (const float *) is not External, using nullptr\n");
-  //}
-  //if (!info[1]->IsExternal()) {
-    //printf("Warning: pfnTraceLine parameter 1 (const float *) is not External, using nullptr\n");
-  //}
-
   // Allocate TraceResult on stack
   TraceResult trace;
-  
-  if (!info[0]->IsExternal()) {
-    printf("Warning: pfnTraceLine parameter 0 (const float *) is not External, using nullptr\n");
-  }
-  if (!info[1]->IsExternal()) {
-    printf("Warning: pfnTraceLine parameter 1 (const float *) is not External, using nullptr\n");
-  }
 
   (*g_engfuncs.pfnTraceLine)((const float*)utils::jsToPointer(isolate, info[0]),
 (const float*)utils::jsToPointer(isolate, info[1]),
@@ -398,22 +384,8 @@ void sf_eng_pfnTraceMonsterHull(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
 
-  //if (!info[1]->IsExternal()) {
-    //printf("Warning: pfnTraceMonsterHull parameter 1 (const float *) is not External, using nullptr\n");
-  //}
-  //if (!info[2]->IsExternal()) {
-    //printf("Warning: pfnTraceMonsterHull parameter 2 (const float *) is not External, using nullptr\n");
-  //}
-
   // Allocate TraceResult on stack
   TraceResult trace;
-  
-  if (!info[1]->IsExternal()) {
-    printf("Warning: pfnTraceMonsterHull parameter 1 (const float *) is not External, using nullptr\n");
-  }
-  if (!info[2]->IsExternal()) {
-    printf("Warning: pfnTraceMonsterHull parameter 2 (const float *) is not External, using nullptr\n");
-  }
 
   int result = (*g_engfuncs.pfnTraceMonsterHull)(structures::unwrapEntity(isolate, info[0]),
 (const float*)utils::jsToPointer(isolate, info[1]),
@@ -434,22 +406,8 @@ void sf_eng_pfnTraceHull(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
 
-  //if (!info[0]->IsExternal()) {
-    //printf("Warning: pfnTraceHull parameter 0 (const float *) is not External, using nullptr\n");
-  //}
-  //if (!info[1]->IsExternal()) {
-    //printf("Warning: pfnTraceHull parameter 1 (const float *) is not External, using nullptr\n");
-  //}
-
   // Allocate TraceResult on stack
   TraceResult trace;
-  
-  if (!info[0]->IsExternal()) {
-    printf("Warning: pfnTraceHull parameter 0 (const float *) is not External, using nullptr\n");
-  }
-  if (!info[1]->IsExternal()) {
-    printf("Warning: pfnTraceHull parameter 1 (const float *) is not External, using nullptr\n");
-  }
 
   (*g_engfuncs.pfnTraceHull)((const float*)utils::jsToPointer(isolate, info[0]),
 (const float*)utils::jsToPointer(isolate, info[1]),
@@ -467,22 +425,8 @@ void sf_eng_pfnTraceModel(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
 
-  //if (!info[0]->IsExternal()) {
-    //printf("Warning: pfnTraceModel parameter 0 (const float *) is not External, using nullptr\n");
-  //}
-  //if (!info[1]->IsExternal()) {
-    //printf("Warning: pfnTraceModel parameter 1 (const float *) is not External, using nullptr\n");
-  //}
-
   // Allocate TraceResult on stack
   TraceResult trace;
-  
-  if (!info[0]->IsExternal()) {
-    printf("Warning: pfnTraceModel parameter 0 (const float *) is not External, using nullptr\n");
-  }
-  if (!info[1]->IsExternal()) {
-    printf("Warning: pfnTraceModel parameter 1 (const float *) is not External, using nullptr\n");
-  }
 
   (*g_engfuncs.pfnTraceModel)((const float*)utils::jsToPointer(isolate, info[0]),
 (const float*)utils::jsToPointer(isolate, info[1]),
@@ -517,22 +461,8 @@ void sf_eng_pfnTraceSphere(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
 
-  //if (!info[0]->IsExternal()) {
-    //printf("Warning: pfnTraceSphere parameter 0 (const float *) is not External, using nullptr\n");
-  //}
-  //if (!info[1]->IsExternal()) {
-    //printf("Warning: pfnTraceSphere parameter 1 (const float *) is not External, using nullptr\n");
-  //}
-
   // Allocate TraceResult on stack
   TraceResult trace;
-  
-  if (!info[0]->IsExternal()) {
-    printf("Warning: pfnTraceSphere parameter 0 (const float *) is not External, using nullptr\n");
-  }
-  if (!info[1]->IsExternal()) {
-    printf("Warning: pfnTraceSphere parameter 1 (const float *) is not External, using nullptr\n");
-  }
 
   (*g_engfuncs.pfnTraceSphere)((const float*)utils::jsToPointer(isolate, info[0]),
 (const float*)utils::jsToPointer(isolate, info[1]),
@@ -722,10 +652,6 @@ void sf_eng_pfnCVarRegister(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
 
-  //if (!info[0]->IsExternal()) {
-    //printf("Warning: pfnCVarRegister parameter 0 (cvar_t *) is not External, using nullptr\n");
-  //}
-
   // Create a new cvar_t structure from JavaScript object
   if (!info[0]->IsObject()) {
     printf("Error: pfnCVarRegister requires an object\n");
@@ -811,10 +737,6 @@ void sf_eng_pfnAlertMessage(const v8::FunctionCallbackInfo<v8::Value>& info)
 void sf_eng_pfnEngineFprintf(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
-
-  //if (!info[0]->IsExternal()) {
-    //printf("Warning: pfnEngineFprintf parameter 0 (FILE *) is not External, using nullptr\n");
-  //}
 
   fprintf((FILE*)utils::jsToPointer(isolate, info[0]), "%s", utils::js2string(isolate, info[1]));;
 }
@@ -1086,10 +1008,6 @@ void sf_eng_pfnLoadFileForMe(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
 
-  //if (!info[1]->IsExternal()) {
-    //printf("Warning: pfnLoadFileForMe parameter 1 (int *) is not External, using nullptr\n");
-  //}
-
   int fileLength = 0;
   byte* result = (*g_engfuncs.pfnLoadFileForMe)(utils::js2string(isolate, info[0]), &fileLength);
   if (result && fileLength > 0) {
@@ -1147,10 +1065,6 @@ void sf_eng_pfnGetGameDir(const v8::FunctionCallbackInfo<v8::Value>& info)
 void sf_eng_pfnCvar_RegisterVariable(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
-
-  //if (!info[0]->IsExternal()) {
-    //printf("Warning: pfnCvar_RegisterVariable parameter 0 (cvar_t *) is not External, using nullptr\n");
-  //}
 
   (*g_engfuncs.pfnCvar_RegisterVariable)((cvar_t*)structures::unwrapCvar(isolate, info[0]));;
 }
@@ -1417,10 +1331,6 @@ void sf_eng_pfnSetFatPVS(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
 
-  //if (!info[0]->IsExternal()) {
-    //printf("Warning: pfnSetFatPVS parameter 0 (const float *) is not External, using nullptr\n");
-  //}
-
   byte* result = (*g_engfuncs.pfnSetFatPVS)((const float*)utils::jsToPointer(isolate, info[0]));
   if (result) {
     // FatPVS size is implementation-dependent, use a reasonable default
@@ -1434,10 +1344,6 @@ void sf_eng_pfnSetFatPVS(const v8::FunctionCallbackInfo<v8::Value>& info)
 void sf_eng_pfnSetFatPAS(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
-
-  //if (!info[0]->IsExternal()) {
-    //printf("Warning: pfnSetFatPAS parameter 0 (const float *) is not External, using nullptr\n");
-  //}
 
   byte* result = (*g_engfuncs.pfnSetFatPAS)((const float*)utils::jsToPointer(isolate, info[0]));
   if (result) {
@@ -1479,10 +1385,6 @@ utils::js2string(isolate, info[1]));
 void sf_eng_pfnDeltaAddEncoder(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
-
-  //if (!info[1]->IsExternal()) {
-    //printf("Warning: pfnDeltaAddEncoder parameter 1 (void*) is not External, using nullptr\n");
-  //}
 
   // Handle JavaScript function callbacks for delta encoders
   if (!info[0]->IsString()) {
@@ -1685,10 +1587,6 @@ void sf_eng_pfnGetPlayerStats(const v8::FunctionCallbackInfo<v8::Value>& info)
 void sf_eng_pfnAddServerCommand(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
   V8_STUFF();
-
-  //if (!info[1]->IsExternal()) {
-    //printf("Warning: pfnAddServerCommand parameter 1 (void*) is not External, using nullptr\n");
-  //}
 
   // Handle JavaScript function callbacks for server commands
   if (!info[0]->IsString()) {

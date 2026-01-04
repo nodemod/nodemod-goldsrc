@@ -450,11 +450,14 @@ const generator = {
       }
     }).join(',\n');
     
+    // Skip nullCheckSection when there's a custom body (custom implementations handle their own logic)
+    const effectiveNullCheckSection = customBody ? '' : nullCheckSection;
+
     return `void ${prefix}_${func.name}(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
-  V8_STUFF();${paramConversions}
-${nullCheckSection}
-  ${customBody || this.packReturn(func, `(*${source}${source.includes('->') ? '->' : '.'}${func.name})(${callParams})`)};${cleanupCode}
+  V8_STUFF();${customBody ? '' : paramConversions}
+${effectiveNullCheckSection}
+  ${customBody || this.packReturn(func, `(*${source}${source.includes('->') ? '->' : '.'}${func.name})(${callParams})`)};${customBody ? '' : cleanupCode}
 }`;
   }
 }

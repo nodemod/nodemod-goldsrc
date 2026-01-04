@@ -95,7 +95,11 @@ function generateHookFunction(funcName, sig, paramNames, isVectorReturn = false)
     lines.push('            v8::Isolate::Scope isolateScope(isolate);');
     lines.push('            v8::HandleScope handleScope(isolate);');
     lines.push('');
-    lines.push(`            v8::Local<v8::Value> extraArgs[${paramCount}] = {`);
+    lines.push('            v8::Local<v8::Context> context = mgr.getContext();');
+    lines.push('            if (!context.IsEmpty()) {');
+    lines.push('                v8::Context::Scope contextScope(context);');
+    lines.push('');
+    lines.push(`                v8::Local<v8::Value> extraArgs[${paramCount}] = {`);
 
     for (let i = 0; i < paramCount; i++) {
       const pType = paramTypes[i];
@@ -103,11 +107,12 @@ function generateHookFunction(funcName, sig, paramNames, isVectorReturn = false)
       const info = typeInfo[pType];
       const v8Code = info?.v8Convert ? info.v8Convert(pName) : `v8::Null(isolate).As<v8::Value>()`;
       const comma = i < paramCount - 1 ? ',' : '';
-      lines.push(`                ${v8Code}${comma}`);
+      lines.push(`                    ${v8Code}${comma}`);
     }
 
-    lines.push('            };');
-    lines.push('            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);');
+    lines.push('                };');
+    lines.push('                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);');
+    lines.push('            }');
     lines.push('        }');
     lines.push('    }');
   } else {
@@ -161,7 +166,11 @@ function generateHookFunction(funcName, sig, paramNames, isVectorReturn = false)
     lines.push('            v8::Isolate::Scope isolateScope(isolate);');
     lines.push('            v8::HandleScope handleScope(isolate);');
     lines.push('');
-    lines.push(`            v8::Local<v8::Value> extraArgs[${paramCount}] = {`);
+    lines.push('            v8::Local<v8::Context> context = mgr.getContext();');
+    lines.push('            if (!context.IsEmpty()) {');
+    lines.push('                v8::Context::Scope contextScope(context);');
+    lines.push('');
+    lines.push(`                v8::Local<v8::Value> extraArgs[${paramCount}] = {`);
 
     for (let i = 0; i < paramCount; i++) {
       const pType = paramTypes[i];
@@ -169,11 +178,12 @@ function generateHookFunction(funcName, sig, paramNames, isVectorReturn = false)
       const info = typeInfo[pType];
       const v8Code = info?.v8Convert ? info.v8Convert(pName) : `v8::Null(isolate).As<v8::Value>()`;
       const comma = i < paramCount - 1 ? ',' : '';
-      lines.push(`                ${v8Code}${comma}`);
+      lines.push(`                    ${v8Code}${comma}`);
     }
 
-    lines.push('            };');
-    lines.push('            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);');
+    lines.push('                };');
+    lines.push('                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);');
+    lines.push('            }');
     lines.push('        }');
     lines.push('    }');
   } else {
@@ -316,7 +326,11 @@ function generateCompleteFunctionBody(funcName, sig, paramNames, isVectorReturn)
     lines.push('            v8::Isolate::Scope isolateScope(isolate);');
     lines.push('            v8::HandleScope handleScope(isolate);');
     lines.push('');
-    lines.push(`            v8::Local<v8::Value> extraArgs[${paramCount}] = {`);
+    lines.push('            v8::Local<v8::Context> context = mgr.getContext();');
+    lines.push('            if (!context.IsEmpty()) {');
+    lines.push('                v8::Context::Scope contextScope(context);');
+    lines.push('');
+    lines.push(`                v8::Local<v8::Value> extraArgs[${paramCount}] = {`);
 
     for (let i = 0; i < paramCount; i++) {
       const pType = paramTypes[i];
@@ -324,11 +338,12 @@ function generateCompleteFunctionBody(funcName, sig, paramNames, isVectorReturn)
       const info = typeInfo[pType];
       const v8Code = info?.v8Convert ? info.v8Convert(pName) : `v8::Null(isolate).As<v8::Value>()`;
       const comma = i < paramCount - 1 ? ',' : '';
-      lines.push(`                ${v8Code}${comma}`);
+      lines.push(`                    ${v8Code}${comma}`);
     }
 
-    lines.push('            };');
-    lines.push('            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);');
+    lines.push('                };');
+    lines.push('                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);');
+    lines.push('            }');
     lines.push('        }');
     lines.push('    }');
   } else {
@@ -381,7 +396,11 @@ function generateCompleteFunctionBody(funcName, sig, paramNames, isVectorReturn)
     lines.push('            v8::Isolate::Scope isolateScope(isolate);');
     lines.push('            v8::HandleScope handleScope(isolate);');
     lines.push('');
-    lines.push(`            v8::Local<v8::Value> extraArgs[${paramCount}] = {`);
+    lines.push('            v8::Local<v8::Context> context = mgr.getContext();');
+    lines.push('            if (!context.IsEmpty()) {');
+    lines.push('                v8::Context::Scope contextScope(context);');
+    lines.push('');
+    lines.push(`                v8::Local<v8::Value> extraArgs[${paramCount}] = {`);
 
     for (let i = 0; i < paramCount; i++) {
       const pType = paramTypes[i];
@@ -389,11 +408,12 @@ function generateCompleteFunctionBody(funcName, sig, paramNames, isVectorReturn)
       const info = typeInfo[pType];
       const v8Code = info?.v8Convert ? info.v8Convert(pName) : `v8::Null(isolate).As<v8::Value>()`;
       const comma = i < paramCount - 1 ? ',' : '';
-      lines.push(`                ${v8Code}${comma}`);
+      lines.push(`                    ${v8Code}${comma}`);
     }
 
-    lines.push('            };');
-    lines.push('            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);');
+    lines.push('                };');
+    lines.push('                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);');
+    lines.push('            }');
     lines.push('        }');
     lines.push('    }');
   } else {

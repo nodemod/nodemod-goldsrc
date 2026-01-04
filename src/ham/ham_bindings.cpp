@@ -25,17 +25,12 @@ static std::string getHamDllPath() {
 }
 
 static void RegisterHamHook(const v8::FunctionCallbackInfo<v8::Value>& args) {
-    // DEBUG: Set to true to skip ALL ham binding code - just return immediately
-    static bool skipBinding = false;
-    if (skipBinding) {
-        printf("[HAM] DEBUG: Skipping ham binding entirely\n");
-        args.GetReturnValue().Set(v8::Integer::New(args.GetIsolate(), 9999));
-        return;
-    }
-
     v8::Isolate* isolate = args.GetIsolate();
     v8::HandleScope handleScope(isolate);
     v8::Local<v8::Context> context = isolate->GetCurrentContext();
+
+    // Store context for callbacks (must be done from JavaScript execution context)
+    HamManager::instance().setContext(isolate, context);
 
     if (args.Length() < 4) {
         isolate->ThrowException(v8::Exception::TypeError(
@@ -75,15 +70,6 @@ static void RegisterHamHook(const v8::FunctionCallbackInfo<v8::Value>& args) {
     if (functionId < 0 || functionId >= Ham_EndMarker) {
         isolate->ThrowException(v8::Exception::RangeError(
             convert::str2js(isolate, "Invalid Ham function ID")));
-        return;
-    }
-
-    // DEBUG: Set to true to skip manager call (test if arg parsing alone causes issues)
-    static bool skipManagerCall = false;
-    if (skipManagerCall) {
-        printf("[HAM] DEBUG: Parsed args - functionId=%d entityClass=%s isPre=%d - skipping manager call\n",
-               functionId, *entityClass, isPre);
-        args.GetReturnValue().Set(v8::Integer::New(isolate, 8888));
         return;
     }
 
@@ -198,7 +184,7 @@ v8::Local<v8::ObjectTemplate> createHamBindings(v8::Isolate* isolate) {
     // HAM_FUNC and HAM_RESULT are TypeScript const enums - they compile to literal
     // numbers, so no C++ bindings needed (same pattern as META_RES)
 
-    // Store isolate reference for callbacks
+    // Store isolate reference for callbacks (context is stored when hooks are registered)
     HamManager::instance().setIsolate(isolate);
 
     // Initialize HamManager with gamedata
@@ -216,16 +202,12 @@ v8::Local<v8::ObjectTemplate> createHamBindings(v8::Isolate* isolate) {
 
     std::string gamedataFile = std::filesystem::weakly_canonical(gamedataPath).string();
 
-    printf("[HAM] Attempting to load gamedata: %s\n", gamedataFile.c_str());
     if (!HamManager::instance().initialize(gamedataFile)) {
         // Try #default (valve) as fallback
         gamedataPath = std::filesystem::path(dllPath)
             / ".." / "data" / "gamedata" / "common.games" / "virtual.games" / "valve" / "offsets-common.txt";
         gamedataFile = std::filesystem::weakly_canonical(gamedataPath).string();
-        printf("[HAM] Fallback to valve gamedata: %s\n", gamedataFile.c_str());
         HamManager::instance().initialize(gamedataFile);
-    } else {
-        printf("[HAM] Loaded gamedata successfully. Base offset: 0x%x\n", HamManager::instance().getBaseOffset());
     }
 
     return handleScope.Escape(hamObject);

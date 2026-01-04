@@ -98,13 +98,6 @@ export default {
       api: {
         body: `// Allocate TraceResult on stack
   TraceResult trace;
-  
-  if (!info[0]->IsExternal()) {
-    printf("Warning: pfnTraceLine parameter 0 (const float *) is not External, using nullptr\\n");
-  }
-  if (!info[1]->IsExternal()) {
-    printf("Warning: pfnTraceLine parameter 1 (const float *) is not External, using nullptr\\n");
-  }
 
   (*g_engfuncs.pfnTraceLine)((const float*)utils::jsToPointer(isolate, info[0]),
 (const float*)utils::jsToPointer(isolate, info[1]),
@@ -149,13 +142,6 @@ structures::unwrapEntity(isolate, info[1]),
       api: {
         body: `// Allocate TraceResult on stack
   TraceResult trace;
-  
-  if (!info[1]->IsExternal()) {
-    printf("Warning: pfnTraceMonsterHull parameter 1 (const float *) is not External, using nullptr\\n");
-  }
-  if (!info[2]->IsExternal()) {
-    printf("Warning: pfnTraceMonsterHull parameter 2 (const float *) is not External, using nullptr\\n");
-  }
 
   int result = (*g_engfuncs.pfnTraceMonsterHull)(structures::unwrapEntity(isolate, info[0]),
 (const float*)utils::jsToPointer(isolate, info[1]),
@@ -185,13 +171,6 @@ structures::unwrapEntity(isolate, info[4]),
       api: {
         body: `// Allocate TraceResult on stack
   TraceResult trace;
-  
-  if (!info[0]->IsExternal()) {
-    printf("Warning: pfnTraceHull parameter 0 (const float *) is not External, using nullptr\\n");
-  }
-  if (!info[1]->IsExternal()) {
-    printf("Warning: pfnTraceHull parameter 1 (const float *) is not External, using nullptr\\n");
-  }
 
   (*g_engfuncs.pfnTraceHull)((const float*)utils::jsToPointer(isolate, info[0]),
 (const float*)utils::jsToPointer(isolate, info[1]),
@@ -218,13 +197,6 @@ structures::unwrapEntity(isolate, info[4]),
       api: {
         body: `// Allocate TraceResult on stack
   TraceResult trace;
-  
-  if (!info[0]->IsExternal()) {
-    printf("Warning: pfnTraceModel parameter 0 (const float *) is not External, using nullptr\\n");
-  }
-  if (!info[1]->IsExternal()) {
-    printf("Warning: pfnTraceModel parameter 1 (const float *) is not External, using nullptr\\n");
-  }
 
   (*g_engfuncs.pfnTraceModel)((const float*)utils::jsToPointer(isolate, info[0]),
 (const float*)utils::jsToPointer(isolate, info[1]),
@@ -249,13 +221,6 @@ structures::unwrapEntity(isolate, info[3]),
       api: {
         body: `// Allocate TraceResult on stack
   TraceResult trace;
-  
-  if (!info[0]->IsExternal()) {
-    printf("Warning: pfnTraceSphere parameter 0 (const float *) is not External, using nullptr\\n");
-  }
-  if (!info[1]->IsExternal()) {
-    printf("Warning: pfnTraceSphere parameter 1 (const float *) is not External, using nullptr\\n");
-  }
 
   (*g_engfuncs.pfnTraceSphere)((const float*)utils::jsToPointer(isolate, info[0]),
 (const float*)utils::jsToPointer(isolate, info[1]),

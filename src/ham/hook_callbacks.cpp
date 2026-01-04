@@ -6,68 +6,8 @@
 #include "extdll.h"
 #include <v8.h>
 #include <cstring>
-#include <cstdio>
-#include <unistd.h>  // for write()
 
 extern enginefuncs_t g_engfuncs;
-
-// Debug: trace all callback entries
-static void debugCallbackEntry(const char* name, void* hook, void* pthis) {
-    printf("[HAM-TRACE] %s: hook=%p pthis=%p\n", name, hook, pthis);
-    fflush(stdout);
-}
-
-// Debug wrapper - this gets called by the trampoline to verify it's working
-extern "C" void debug_trampoline_test(void* arg1, void* arg2, void* arg3, void* arg4, void* arg5, void* arg6) {
-    printf("[HAM-TRAMPOLINE] Test called! args: %p %p %p %p %p %p\n",
-           arg1, arg2, arg3, arg4, arg5, arg6);
-    fflush(stdout);
-}
-
-// Early trampoline entry debug - called before any parameter setup
-extern "C" void ham_trampoline_entry_debug() {
-    printf("[HAM-TRAMPOLINE] *** TRAMPOLINE ENTRY ***\n");
-    fflush(stdout);
-
-#if defined(__i386__) || defined(_M_IX86)
-    // On x86, at this point we're inside the trampoline
-    // Let's print the raw stack to see what the game passed
-    void* esp_val;
-    void* ebp_val;
-    __asm__ volatile("mov %%esp, %0" : "=r"(esp_val));
-    __asm__ volatile("mov %%ebp, %0" : "=r"(ebp_val));
-    printf("[HAM-TRAMPOLINE] ESP=%p EBP=%p\n", esp_val, ebp_val);
-
-    // Dump raw stack around EBP
-    uint32_t* stack = reinterpret_cast<uint32_t*>(ebp_val);
-    printf("[HAM-TRAMPOLINE] Stack dump from EBP:\n");
-    for (int i = 0; i < 12; i++) {
-        printf("  [EBP+%2d] = 0x%08x\n", i * 4, stack[i]);
-    }
-    fflush(stdout);
-#endif
-}
-
-// Debug: Dump the current stack to help diagnose calling convention issues
-static void dumpStack(const char* label, int numWords) {
-    printf("[HAM-STACK] %s - Dumping %d words from stack:\n", label, numWords);
-    fflush(stdout);
-
-#if defined(__i386__) || defined(_M_IX86)
-    void* esp;
-    void* ebp;
-    __asm__ volatile("mov %%esp, %0" : "=r"(esp));
-    __asm__ volatile("mov %%ebp, %0" : "=r"(ebp));
-    printf("  ESP=%p EBP=%p\n", esp, ebp);
-
-    // Dump stack contents relative to EBP (frame pointer)
-    uint32_t* stackPtr = reinterpret_cast<uint32_t*>(ebp);
-    for (int i = -2; i < numWords; i++) {
-        printf("  [EBP%+d] = 0x%08x\n", i * 4, stackPtr[i]);
-    }
-    fflush(stdout);
-#endif
-}
 
 namespace Ham {
 
@@ -1180,11 +1120,6 @@ void Hook_Void_Void(Hook* hook, void* pthis) {
 }
 
 int Hook_Int_Void(Hook* hook, void* pthis) {
-    printf("[HAM] Hook_Int_Void ENTRY: hook=%p pthis=%p\n", hook, pthis);
-    fflush(stdout);
-    printf("[HAM] Hook_Int_Void called: hook=%p pthis=%p entity=%s\n",
-           hook, pthis, hook ? hook->getEntityName().c_str() : "null");
-    fflush(stdout);
     PUSH_INT()
 
     executeCallbacks(hook, pthis, true);
@@ -1227,10 +1162,15 @@ void Hook_Void_Int(Hook* hook, void* pthis, int value) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                v8::Integer::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    v8::Integer::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -1248,10 +1188,15 @@ void Hook_Void_Int(Hook* hook, void* pthis, int value) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                v8::Integer::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    v8::Integer::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -1268,10 +1213,15 @@ void Hook_Void_Float(Hook* hook, void* pthis, float value) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                v8::Number::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    v8::Number::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -1289,10 +1239,15 @@ void Hook_Void_Float(Hook* hook, void* pthis, float value) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                v8::Number::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    v8::Number::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -1309,10 +1264,15 @@ void Hook_Void_Entvar(Hook* hook, void* pthis, void* entvars) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                entvars ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars)) : v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    entvars ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars)) : v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -1330,10 +1290,15 @@ void Hook_Void_Entvar(Hook* hook, void* pthis, void* entvars) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                entvars ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars)) : v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    entvars ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars)) : v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -1350,10 +1315,15 @@ void Hook_Void_Cbase(Hook* hook, void* pthis, void* entity) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -1371,10 +1341,15 @@ void Hook_Void_Cbase(Hook* hook, void* pthis, void* entity) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -1391,10 +1366,15 @@ void Hook_Void_Edict(Hook* hook, void* pthis, void* edict) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                edict ? structures::wrapEntity(isolate, static_cast<edict_t*>(edict)) : v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    edict ? structures::wrapEntity(isolate, static_cast<edict_t*>(edict)) : v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -1412,10 +1392,15 @@ void Hook_Void_Edict(Hook* hook, void* pthis, void* edict) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                edict ? structures::wrapEntity(isolate, static_cast<edict_t*>(edict)) : v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    edict ? structures::wrapEntity(isolate, static_cast<edict_t*>(edict)) : v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -1432,10 +1417,15 @@ int Hook_Int_Int(Hook* hook, void* pthis, int value) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                v8::Integer::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    v8::Integer::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -1453,10 +1443,15 @@ int Hook_Int_Int(Hook* hook, void* pthis, int value) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                v8::Integer::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    v8::Integer::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -1474,10 +1469,15 @@ int Hook_Int_Float(Hook* hook, void* pthis, float value) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                v8::Number::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    v8::Number::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -1495,10 +1495,15 @@ int Hook_Int_Float(Hook* hook, void* pthis, float value) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                v8::Number::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    v8::Number::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -1516,10 +1521,15 @@ int Hook_Int_Entvar(Hook* hook, void* pthis, void* entvars) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                entvars ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars)) : v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    entvars ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars)) : v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -1537,10 +1547,15 @@ int Hook_Int_Entvar(Hook* hook, void* pthis, void* entvars) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                entvars ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars)) : v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    entvars ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars)) : v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -1558,10 +1573,15 @@ int Hook_Int_Cbase(Hook* hook, void* pthis, void* entity) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -1579,10 +1599,15 @@ int Hook_Int_Cbase(Hook* hook, void* pthis, void* entity) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -1600,10 +1625,15 @@ int Hook_Int_pVector(Hook* hook, void* pthis, float* vec) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                utils::vect2js(isolate, vec)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    utils::vect2js(isolate, vec)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -1621,10 +1651,15 @@ int Hook_Int_pVector(Hook* hook, void* pthis, float* vec) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                utils::vect2js(isolate, vec)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    utils::vect2js(isolate, vec)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -1674,11 +1709,16 @@ void Hook_Void_Int_Int(Hook* hook, void* pthis, int score, int allowNegative) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                v8::Integer::New(isolate, score),
-                v8::Integer::New(isolate, allowNegative)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    v8::Integer::New(isolate, score),
+                    v8::Integer::New(isolate, allowNegative)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -1696,11 +1736,16 @@ void Hook_Void_Int_Int(Hook* hook, void* pthis, int score, int allowNegative) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                v8::Integer::New(isolate, score),
-                v8::Integer::New(isolate, allowNegative)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    v8::Integer::New(isolate, score),
+                    v8::Integer::New(isolate, allowNegative)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -1717,11 +1762,16 @@ void Hook_Void_Float_Float(Hook* hook, void* pthis, float value1, float value2) 
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                v8::Number::New(isolate, value1),
-                v8::Number::New(isolate, value2)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    v8::Number::New(isolate, value1),
+                    v8::Number::New(isolate, value2)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -1739,11 +1789,16 @@ void Hook_Void_Float_Float(Hook* hook, void* pthis, float value1, float value2) 
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                v8::Number::New(isolate, value1),
-                v8::Number::New(isolate, value2)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    v8::Number::New(isolate, value1),
+                    v8::Number::New(isolate, value2)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -1760,11 +1815,16 @@ void Hook_Void_Float_Int(Hook* hook, void* pthis, float duration, int mode) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                v8::Number::New(isolate, duration),
-                v8::Integer::New(isolate, mode)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    v8::Number::New(isolate, duration),
+                    v8::Integer::New(isolate, mode)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -1782,11 +1842,16 @@ void Hook_Void_Float_Int(Hook* hook, void* pthis, float duration, int mode) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                v8::Number::New(isolate, duration),
-                v8::Integer::New(isolate, mode)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    v8::Number::New(isolate, duration),
+                    v8::Integer::New(isolate, mode)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -1803,11 +1868,16 @@ void Hook_Void_Entvar_Int(Hook* hook, void* pthis, void* attacker, int gibType) 
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                attacker ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(attacker)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Integer::New(isolate, gibType)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    attacker ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(attacker)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Integer::New(isolate, gibType)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -1825,11 +1895,16 @@ void Hook_Void_Entvar_Int(Hook* hook, void* pthis, void* attacker, int gibType) 
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                attacker ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(attacker)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Integer::New(isolate, gibType)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    attacker ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(attacker)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Integer::New(isolate, gibType)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -1846,11 +1921,16 @@ void Hook_Void_Entvar_Float(Hook* hook, void* pthis, void* entvars, float value)
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                entvars ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Number::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    entvars ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Number::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -1868,11 +1948,16 @@ void Hook_Void_Entvar_Float(Hook* hook, void* pthis, void* entvars, float value)
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                entvars ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Number::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    entvars ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Number::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -1889,11 +1974,16 @@ void Hook_Void_Cbase_Int(Hook* hook, void* pthis, void* entity, int value) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Integer::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Integer::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -1911,11 +2001,16 @@ void Hook_Void_Cbase_Int(Hook* hook, void* pthis, void* entity, int value) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Integer::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Integer::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -1932,11 +2027,16 @@ void Hook_Void_Cbase_Float(Hook* hook, void* pthis, void* entity, float value) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Number::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Number::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -1954,11 +2054,16 @@ void Hook_Void_Cbase_Float(Hook* hook, void* pthis, void* entity, float value) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Number::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Number::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -1975,11 +2080,16 @@ int Hook_Int_Int_Int(Hook* hook, void* pthis, int value1, int value2) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                v8::Integer::New(isolate, value1),
-                v8::Integer::New(isolate, value2)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    v8::Integer::New(isolate, value1),
+                    v8::Integer::New(isolate, value2)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -1997,11 +2107,16 @@ int Hook_Int_Int_Int(Hook* hook, void* pthis, int value1, int value2) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                v8::Integer::New(isolate, value1),
-                v8::Integer::New(isolate, value2)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    v8::Integer::New(isolate, value1),
+                    v8::Integer::New(isolate, value2)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -2019,11 +2134,16 @@ int Hook_Int_Float_Int(Hook* hook, void* pthis, float value, int value2) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                v8::Number::New(isolate, value),
-                v8::Integer::New(isolate, value2)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    v8::Number::New(isolate, value),
+                    v8::Integer::New(isolate, value2)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -2041,11 +2161,16 @@ int Hook_Int_Float_Int(Hook* hook, void* pthis, float value, int value2) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                v8::Number::New(isolate, value),
-                v8::Integer::New(isolate, value2)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    v8::Number::New(isolate, value),
+                    v8::Integer::New(isolate, value2)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -2063,11 +2188,16 @@ int Hook_Int_Float_Float(Hook* hook, void* pthis, float value1, float value2) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                v8::Number::New(isolate, value1),
-                v8::Number::New(isolate, value2)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    v8::Number::New(isolate, value1),
+                    v8::Number::New(isolate, value2)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -2085,11 +2215,16 @@ int Hook_Int_Float_Float(Hook* hook, void* pthis, float value1, float value2) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                v8::Number::New(isolate, value1),
-                v8::Number::New(isolate, value2)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    v8::Number::New(isolate, value1),
+                    v8::Number::New(isolate, value2)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -2107,11 +2242,16 @@ int Hook_Int_pVector_pVector(Hook* hook, void* pthis, float* vec1, float* vec2) 
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                utils::vect2js(isolate, vec1),
-                utils::vect2js(isolate, vec2)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    utils::vect2js(isolate, vec1),
+                    utils::vect2js(isolate, vec2)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -2129,11 +2269,16 @@ int Hook_Int_pVector_pVector(Hook* hook, void* pthis, float* vec1, float* vec2) 
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                utils::vect2js(isolate, vec1),
-                utils::vect2js(isolate, vec2)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    utils::vect2js(isolate, vec1),
+                    utils::vect2js(isolate, vec2)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -2151,12 +2296,17 @@ void Hook_Void_Int_Int_Int(Hook* hook, void* pthis, int value1, int value2, int 
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[3] = {
-                v8::Integer::New(isolate, value1),
-                v8::Integer::New(isolate, value2),
-                v8::Integer::New(isolate, value3)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[3] = {
+                    v8::Integer::New(isolate, value1),
+                    v8::Integer::New(isolate, value2),
+                    v8::Integer::New(isolate, value3)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -2174,12 +2324,17 @@ void Hook_Void_Int_Int_Int(Hook* hook, void* pthis, int value1, int value2, int 
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[3] = {
-                v8::Integer::New(isolate, value1),
-                v8::Integer::New(isolate, value2),
-                v8::Integer::New(isolate, value3)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[3] = {
+                    v8::Integer::New(isolate, value1),
+                    v8::Integer::New(isolate, value2),
+                    v8::Integer::New(isolate, value3)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -2196,12 +2351,17 @@ void Hook_Void_Entvar_Entvar_Float(Hook* hook, void* pthis, void* entvars1, void
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[3] = {
-                entvars1 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars1)) : v8::Null(isolate).As<v8::Value>(),
-                entvars2 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars2)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Number::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[3] = {
+                    entvars1 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars1)) : v8::Null(isolate).As<v8::Value>(),
+                    entvars2 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars2)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Number::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -2219,12 +2379,17 @@ void Hook_Void_Entvar_Entvar_Float(Hook* hook, void* pthis, void* entvars1, void
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[3] = {
-                entvars1 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars1)) : v8::Null(isolate).As<v8::Value>(),
-                entvars2 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars2)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Number::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[3] = {
+                    entvars1 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars1)) : v8::Null(isolate).As<v8::Value>(),
+                    entvars2 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars2)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Number::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -2241,12 +2406,17 @@ void Hook_Void_Entvar_Float_Float(Hook* hook, void* pthis, void* entvars, float 
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[3] = {
-                entvars ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Number::New(isolate, value1),
-                v8::Number::New(isolate, value2)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[3] = {
+                    entvars ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Number::New(isolate, value1),
+                    v8::Number::New(isolate, value2)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -2264,12 +2434,17 @@ void Hook_Void_Entvar_Float_Float(Hook* hook, void* pthis, void* entvars, float 
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[3] = {
-                entvars ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Number::New(isolate, value1),
-                v8::Number::New(isolate, value2)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[3] = {
+                    entvars ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Number::New(isolate, value1),
+                    v8::Number::New(isolate, value2)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -2286,12 +2461,17 @@ int Hook_Int_Int_Str_Int(Hook* hook, void* pthis, int amount, const char* name, 
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[3] = {
-                v8::Integer::New(isolate, amount),
-                name ? v8::String::NewFromUtf8(isolate, name).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
-                v8::Integer::New(isolate, max)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[3] = {
+                    v8::Integer::New(isolate, amount),
+                    name ? v8::String::NewFromUtf8(isolate, name).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
+                    v8::Integer::New(isolate, max)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -2309,12 +2489,17 @@ int Hook_Int_Int_Str_Int(Hook* hook, void* pthis, int amount, const char* name, 
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[3] = {
-                v8::Integer::New(isolate, amount),
-                name ? v8::String::NewFromUtf8(isolate, name).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
-                v8::Integer::New(isolate, max)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[3] = {
+                    v8::Integer::New(isolate, amount),
+                    name ? v8::String::NewFromUtf8(isolate, name).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
+                    v8::Integer::New(isolate, max)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -2332,11 +2517,16 @@ int Hook_Int_Cbase_Int(Hook* hook, void* pthis, void* entity, int value) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Integer::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Integer::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -2354,11 +2544,16 @@ int Hook_Int_Cbase_Int(Hook* hook, void* pthis, void* entity, int value) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Integer::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Integer::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -2376,13 +2571,18 @@ void Hook_Void_Cbase_Cbase_Int_Float(Hook* hook, void* pthis, void* activator, v
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[4] = {
-                getEdictFromThis(activator) ? structures::wrapEntity(isolate, getEdictFromThis(activator)) : v8::Null(isolate).As<v8::Value>(),
-                getEdictFromThis(caller) ? structures::wrapEntity(isolate, getEdictFromThis(caller)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Integer::New(isolate, useType),
-                v8::Number::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[4] = {
+                    getEdictFromThis(activator) ? structures::wrapEntity(isolate, getEdictFromThis(activator)) : v8::Null(isolate).As<v8::Value>(),
+                    getEdictFromThis(caller) ? structures::wrapEntity(isolate, getEdictFromThis(caller)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Integer::New(isolate, useType),
+                    v8::Number::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -2400,13 +2600,18 @@ void Hook_Void_Cbase_Cbase_Int_Float(Hook* hook, void* pthis, void* activator, v
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[4] = {
-                getEdictFromThis(activator) ? structures::wrapEntity(isolate, getEdictFromThis(activator)) : v8::Null(isolate).As<v8::Value>(),
-                getEdictFromThis(caller) ? structures::wrapEntity(isolate, getEdictFromThis(caller)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Integer::New(isolate, useType),
-                v8::Number::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[4] = {
+                    getEdictFromThis(activator) ? structures::wrapEntity(isolate, getEdictFromThis(activator)) : v8::Null(isolate).As<v8::Value>(),
+                    getEdictFromThis(caller) ? structures::wrapEntity(isolate, getEdictFromThis(caller)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Integer::New(isolate, useType),
+                    v8::Number::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -2423,13 +2628,18 @@ int Hook_Int_Entvar_Entvar_Float_Int(Hook* hook, void* pthis, void* inflictor, v
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[4] = {
-                inflictor ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(inflictor)) : v8::Null(isolate).As<v8::Value>(),
-                attacker ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(attacker)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Number::New(isolate, damage),
-                v8::Integer::New(isolate, damageBits)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[4] = {
+                    inflictor ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(inflictor)) : v8::Null(isolate).As<v8::Value>(),
+                    attacker ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(attacker)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Number::New(isolate, damage),
+                    v8::Integer::New(isolate, damageBits)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -2447,13 +2657,18 @@ int Hook_Int_Entvar_Entvar_Float_Int(Hook* hook, void* pthis, void* inflictor, v
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[4] = {
-                inflictor ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(inflictor)) : v8::Null(isolate).As<v8::Value>(),
-                attacker ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(attacker)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Number::New(isolate, damage),
-                v8::Integer::New(isolate, damageBits)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[4] = {
+                    inflictor ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(inflictor)) : v8::Null(isolate).As<v8::Value>(),
+                    attacker ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(attacker)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Number::New(isolate, damage),
+                    v8::Integer::New(isolate, damageBits)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -2471,13 +2686,18 @@ void Hook_Void_Float_Float_Float_Int(Hook* hook, void* pthis, float value1, floa
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[4] = {
-                v8::Number::New(isolate, value1),
-                v8::Number::New(isolate, value2),
-                v8::Number::New(isolate, value3),
-                v8::Integer::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[4] = {
+                    v8::Number::New(isolate, value1),
+                    v8::Number::New(isolate, value2),
+                    v8::Number::New(isolate, value3),
+                    v8::Integer::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -2495,13 +2715,18 @@ void Hook_Void_Float_Float_Float_Int(Hook* hook, void* pthis, float value1, floa
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[4] = {
-                v8::Number::New(isolate, value1),
-                v8::Number::New(isolate, value2),
-                v8::Number::New(isolate, value3),
-                v8::Integer::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[4] = {
+                    v8::Number::New(isolate, value1),
+                    v8::Number::New(isolate, value2),
+                    v8::Number::New(isolate, value3),
+                    v8::Integer::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -2518,13 +2743,18 @@ void Hook_Void_Float_Vector_Trace_Int(Hook* hook, void* pthis, float damage, flo
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[4] = {
-                v8::Number::New(isolate, damage),
-                v8::Null(isolate).As<v8::Value>(),
-                trace ? structures::wrapTraceResult(isolate, static_cast<TraceResult*>(trace)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Integer::New(isolate, damageBits)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[4] = {
+                    v8::Number::New(isolate, damage),
+                    v8::Null(isolate).As<v8::Value>(),
+                    trace ? structures::wrapTraceResult(isolate, static_cast<TraceResult*>(trace)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Integer::New(isolate, damageBits)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -2542,13 +2772,18 @@ void Hook_Void_Float_Vector_Trace_Int(Hook* hook, void* pthis, float damage, flo
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[4] = {
-                v8::Number::New(isolate, damage),
-                v8::Null(isolate).As<v8::Value>(),
-                trace ? structures::wrapTraceResult(isolate, static_cast<TraceResult*>(trace)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Integer::New(isolate, damageBits)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[4] = {
+                    v8::Number::New(isolate, damage),
+                    v8::Null(isolate).As<v8::Value>(),
+                    trace ? structures::wrapTraceResult(isolate, static_cast<TraceResult*>(trace)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Integer::New(isolate, damageBits)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -2565,14 +2800,19 @@ int Hook_Int_Entvar_Entvar_Float_Float_Int(Hook* hook, void* pthis, void* entvar
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[5] = {
-                entvars1 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars1)) : v8::Null(isolate).As<v8::Value>(),
-                entvars2 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars2)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Number::New(isolate, value1),
-                v8::Number::New(isolate, value2),
-                v8::Integer::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[5] = {
+                    entvars1 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars1)) : v8::Null(isolate).As<v8::Value>(),
+                    entvars2 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars2)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Number::New(isolate, value1),
+                    v8::Number::New(isolate, value2),
+                    v8::Integer::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -2590,14 +2830,19 @@ int Hook_Int_Entvar_Entvar_Float_Float_Int(Hook* hook, void* pthis, void* entvar
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[5] = {
-                entvars1 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars1)) : v8::Null(isolate).As<v8::Value>(),
-                entvars2 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars2)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Number::New(isolate, value1),
-                v8::Number::New(isolate, value2),
-                v8::Integer::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[5] = {
+                    entvars1 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars1)) : v8::Null(isolate).As<v8::Value>(),
+                    entvars2 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars2)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Number::New(isolate, value1),
+                    v8::Number::New(isolate, value2),
+                    v8::Integer::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -2615,14 +2860,19 @@ void Hook_Void_Entvar_Float_Vector_Trace_Int(Hook* hook, void* pthis, void* atta
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[5] = {
-                attacker ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(attacker)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Number::New(isolate, damage),
-                v8::Null(isolate).As<v8::Value>(),
-                trace ? structures::wrapTraceResult(isolate, static_cast<TraceResult*>(trace)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Integer::New(isolate, damageBits)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[5] = {
+                    attacker ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(attacker)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Number::New(isolate, damage),
+                    v8::Null(isolate).As<v8::Value>(),
+                    trace ? structures::wrapTraceResult(isolate, static_cast<TraceResult*>(trace)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Integer::New(isolate, damageBits)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -2640,14 +2890,19 @@ void Hook_Void_Entvar_Float_Vector_Trace_Int(Hook* hook, void* pthis, void* atta
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[5] = {
-                attacker ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(attacker)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Number::New(isolate, damage),
-                v8::Null(isolate).As<v8::Value>(),
-                trace ? structures::wrapTraceResult(isolate, static_cast<TraceResult*>(trace)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Integer::New(isolate, damageBits)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[5] = {
+                    attacker ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(attacker)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Number::New(isolate, damage),
+                    v8::Null(isolate).As<v8::Value>(),
+                    trace ? structures::wrapTraceResult(isolate, static_cast<TraceResult*>(trace)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Integer::New(isolate, damageBits)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -3022,10 +3277,15 @@ void Hook_Void_Bool(Hook* hook, void* pthis, bool flag) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                v8::Boolean::New(isolate, flag)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    v8::Boolean::New(isolate, flag)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -3043,10 +3303,15 @@ void Hook_Void_Bool(Hook* hook, void* pthis, bool flag) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                v8::Boolean::New(isolate, flag)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    v8::Boolean::New(isolate, flag)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -3063,10 +3328,15 @@ void Hook_Void_Short(Hook* hook, void* pthis, short value) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                v8::Integer::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    v8::Integer::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -3084,10 +3354,15 @@ void Hook_Void_Short(Hook* hook, void* pthis, short value) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                v8::Integer::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    v8::Integer::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -3104,10 +3379,15 @@ void Hook_Void_Str(Hook* hook, void* pthis, const char* str) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -3125,10 +3405,15 @@ void Hook_Void_Str(Hook* hook, void* pthis, const char* str) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -3145,10 +3430,15 @@ void Hook_Void_Vector(Hook* hook, void* pthis, float* vec) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -3166,10 +3456,15 @@ void Hook_Void_Vector(Hook* hook, void* pthis, float* vec) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -3186,11 +3481,16 @@ void Hook_Void_Int_Bool(Hook* hook, void* pthis, int value, bool flag) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                v8::Integer::New(isolate, value),
-                v8::Boolean::New(isolate, flag)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    v8::Integer::New(isolate, value),
+                    v8::Boolean::New(isolate, flag)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -3208,11 +3508,16 @@ void Hook_Void_Int_Bool(Hook* hook, void* pthis, int value, bool flag) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                v8::Integer::New(isolate, value),
-                v8::Boolean::New(isolate, flag)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    v8::Integer::New(isolate, value),
+                    v8::Boolean::New(isolate, flag)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -3229,11 +3534,16 @@ void Hook_Void_Bool_Bool(Hook* hook, void* pthis, bool flag1, bool flag2) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                v8::Boolean::New(isolate, flag1),
-                v8::Boolean::New(isolate, flag2)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    v8::Boolean::New(isolate, flag1),
+                    v8::Boolean::New(isolate, flag2)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -3251,11 +3561,16 @@ void Hook_Void_Bool_Bool(Hook* hook, void* pthis, bool flag1, bool flag2) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                v8::Boolean::New(isolate, flag1),
-                v8::Boolean::New(isolate, flag2)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    v8::Boolean::New(isolate, flag1),
+                    v8::Boolean::New(isolate, flag2)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -3272,11 +3587,16 @@ void Hook_Void_Str_Int(Hook* hook, void* pthis, const char* str, int value) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
-                v8::Integer::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
+                    v8::Integer::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -3294,11 +3614,16 @@ void Hook_Void_Str_Int(Hook* hook, void* pthis, const char* str, int value) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
-                v8::Integer::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
+                    v8::Integer::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -3315,11 +3640,16 @@ void Hook_Void_Str_Bool(Hook* hook, void* pthis, const char* str, bool flag) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
-                v8::Boolean::New(isolate, flag)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
+                    v8::Boolean::New(isolate, flag)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -3337,11 +3667,16 @@ void Hook_Void_Str_Bool(Hook* hook, void* pthis, const char* str, bool flag) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
-                v8::Boolean::New(isolate, flag)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
+                    v8::Boolean::New(isolate, flag)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -3358,11 +3693,16 @@ void Hook_Void_Cbase_Bool(Hook* hook, void* pthis, void* entity, bool flag) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Boolean::New(isolate, flag)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Boolean::New(isolate, flag)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -3380,11 +3720,16 @@ void Hook_Void_Cbase_Bool(Hook* hook, void* pthis, void* entity, bool flag) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Boolean::New(isolate, flag)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Boolean::New(isolate, flag)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -3401,11 +3746,16 @@ void Hook_Void_pFloat_pFloat(Hook* hook, void* pthis, float* value1, float* valu
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                value1 ? v8::Number::New(isolate, *value1) : v8::Null(isolate).As<v8::Value>(),
-                value2 ? v8::Number::New(isolate, *value2) : v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    value1 ? v8::Number::New(isolate, *value1) : v8::Null(isolate).As<v8::Value>(),
+                    value2 ? v8::Number::New(isolate, *value2) : v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -3423,11 +3773,16 @@ void Hook_Void_pFloat_pFloat(Hook* hook, void* pthis, float* value1, float* valu
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                value1 ? v8::Number::New(isolate, *value1) : v8::Null(isolate).As<v8::Value>(),
-                value2 ? v8::Number::New(isolate, *value2) : v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    value1 ? v8::Number::New(isolate, *value1) : v8::Null(isolate).As<v8::Value>(),
+                    value2 ? v8::Number::New(isolate, *value2) : v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -3444,11 +3799,16 @@ void Hook_Void_Vector_Vector(Hook* hook, void* pthis, float* vec1, float* vec2) 
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                v8::Null(isolate).As<v8::Value>(),
-                v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    v8::Null(isolate).As<v8::Value>(),
+                    v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -3466,11 +3826,16 @@ void Hook_Void_Vector_Vector(Hook* hook, void* pthis, float* vec1, float* vec2) 
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                v8::Null(isolate).As<v8::Value>(),
-                v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    v8::Null(isolate).As<v8::Value>(),
+                    v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -3487,12 +3852,17 @@ void Hook_Void_Entvar_Entvar_Int(Hook* hook, void* pthis, void* entvars1, void* 
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[3] = {
-                entvars1 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars1)) : v8::Null(isolate).As<v8::Value>(),
-                entvars2 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars2)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Integer::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[3] = {
+                    entvars1 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars1)) : v8::Null(isolate).As<v8::Value>(),
+                    entvars2 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars2)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Integer::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -3510,12 +3880,17 @@ void Hook_Void_Entvar_Entvar_Int(Hook* hook, void* pthis, void* entvars1, void* 
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[3] = {
-                entvars1 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars1)) : v8::Null(isolate).As<v8::Value>(),
-                entvars2 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars2)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Integer::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[3] = {
+                    entvars1 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars1)) : v8::Null(isolate).As<v8::Value>(),
+                    entvars2 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars2)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Integer::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -3532,12 +3907,17 @@ void Hook_Void_Int_Str_Bool(Hook* hook, void* pthis, int value, const char* str,
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[3] = {
-                v8::Integer::New(isolate, value),
-                str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
-                v8::Boolean::New(isolate, flag)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[3] = {
+                    v8::Integer::New(isolate, value),
+                    str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
+                    v8::Boolean::New(isolate, flag)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -3555,12 +3935,17 @@ void Hook_Void_Int_Str_Bool(Hook* hook, void* pthis, int value, const char* str,
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[3] = {
-                v8::Integer::New(isolate, value),
-                str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
-                v8::Boolean::New(isolate, flag)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[3] = {
+                    v8::Integer::New(isolate, value),
+                    str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
+                    v8::Boolean::New(isolate, flag)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -3577,12 +3962,17 @@ void Hook_Void_Str_Str_Int(Hook* hook, void* pthis, const char* str1, const char
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[3] = {
-                str1 ? v8::String::NewFromUtf8(isolate, str1).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
-                str2 ? v8::String::NewFromUtf8(isolate, str2).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
-                v8::Integer::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[3] = {
+                    str1 ? v8::String::NewFromUtf8(isolate, str1).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
+                    str2 ? v8::String::NewFromUtf8(isolate, str2).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
+                    v8::Integer::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -3600,12 +3990,17 @@ void Hook_Void_Str_Str_Int(Hook* hook, void* pthis, const char* str1, const char
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[3] = {
-                str1 ? v8::String::NewFromUtf8(isolate, str1).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
-                str2 ? v8::String::NewFromUtf8(isolate, str2).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
-                v8::Integer::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[3] = {
+                    str1 ? v8::String::NewFromUtf8(isolate, str1).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
+                    str2 ? v8::String::NewFromUtf8(isolate, str2).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
+                    v8::Integer::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -3622,11 +4017,16 @@ void Hook_Void_Float_Cbase(Hook* hook, void* pthis, float value, void* entity) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                v8::Number::New(isolate, value),
-                getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    v8::Number::New(isolate, value),
+                    getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -3644,11 +4044,16 @@ void Hook_Void_Float_Cbase(Hook* hook, void* pthis, float value, void* entity) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                v8::Number::New(isolate, value),
-                getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    v8::Number::New(isolate, value),
+                    getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -3665,12 +4070,17 @@ void Hook_Void_Cbase_Int_Float(Hook* hook, void* pthis, void* entity, int value,
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[3] = {
-                getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Integer::New(isolate, value),
-                v8::Number::New(isolate, value2)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[3] = {
+                    getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Integer::New(isolate, value),
+                    v8::Number::New(isolate, value2)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -3688,12 +4098,17 @@ void Hook_Void_Cbase_Int_Float(Hook* hook, void* pthis, void* entity, int value,
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[3] = {
-                getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Integer::New(isolate, value),
-                v8::Number::New(isolate, value2)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[3] = {
+                    getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Integer::New(isolate, value),
+                    v8::Number::New(isolate, value2)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -3710,12 +4125,17 @@ void Hook_Void_Cbase_pVector_Float(Hook* hook, void* pthis, void* entity, float*
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[3] = {
-                getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
-                utils::vect2js(isolate, vec),
-                v8::Number::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[3] = {
+                    getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
+                    utils::vect2js(isolate, vec),
+                    v8::Number::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -3733,12 +4153,17 @@ void Hook_Void_Cbase_pVector_Float(Hook* hook, void* pthis, void* entity, float*
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[3] = {
-                getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
-                utils::vect2js(isolate, vec),
-                v8::Number::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[3] = {
+                    getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
+                    utils::vect2js(isolate, vec),
+                    v8::Number::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -3755,13 +4180,18 @@ void Hook_Void_Str_Float_Float_Float(Hook* hook, void* pthis, const char* str, f
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[4] = {
-                str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
-                v8::Number::New(isolate, value1),
-                v8::Number::New(isolate, value2),
-                v8::Number::New(isolate, value3)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[4] = {
+                    str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
+                    v8::Number::New(isolate, value1),
+                    v8::Number::New(isolate, value2),
+                    v8::Number::New(isolate, value3)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -3779,13 +4209,18 @@ void Hook_Void_Str_Float_Float_Float(Hook* hook, void* pthis, const char* str, f
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[4] = {
-                str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
-                v8::Number::New(isolate, value1),
-                v8::Number::New(isolate, value2),
-                v8::Number::New(isolate, value3)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[4] = {
+                    str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
+                    v8::Number::New(isolate, value1),
+                    v8::Number::New(isolate, value2),
+                    v8::Number::New(isolate, value3)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -3802,15 +4237,20 @@ void Hook_Void_Str_Float_Float_Float_Int_Cbase(Hook* hook, void* pthis, const ch
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[6] = {
-                str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
-                v8::Number::New(isolate, value1),
-                v8::Number::New(isolate, value2),
-                v8::Number::New(isolate, value3),
-                v8::Integer::New(isolate, value),
-                getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[6] = {
+                    str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
+                    v8::Number::New(isolate, value1),
+                    v8::Number::New(isolate, value2),
+                    v8::Number::New(isolate, value3),
+                    v8::Integer::New(isolate, value),
+                    getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -3828,15 +4268,20 @@ void Hook_Void_Str_Float_Float_Float_Int_Cbase(Hook* hook, void* pthis, const ch
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[6] = {
-                str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
-                v8::Number::New(isolate, value1),
-                v8::Number::New(isolate, value2),
-                v8::Number::New(isolate, value3),
-                v8::Integer::New(isolate, value),
-                getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[6] = {
+                    str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
+                    v8::Number::New(isolate, value1),
+                    v8::Number::New(isolate, value2),
+                    v8::Number::New(isolate, value3),
+                    v8::Integer::New(isolate, value),
+                    getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -3853,15 +4298,20 @@ void Hook_Void_Str_Float_Float_Float_Bool_Cbase(Hook* hook, void* pthis, const c
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[6] = {
-                str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
-                v8::Number::New(isolate, value1),
-                v8::Number::New(isolate, value2),
-                v8::Number::New(isolate, value3),
-                v8::Boolean::New(isolate, flag),
-                getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[6] = {
+                    str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
+                    v8::Number::New(isolate, value1),
+                    v8::Number::New(isolate, value2),
+                    v8::Number::New(isolate, value3),
+                    v8::Boolean::New(isolate, flag),
+                    getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -3879,15 +4329,20 @@ void Hook_Void_Str_Float_Float_Float_Bool_Cbase(Hook* hook, void* pthis, const c
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[6] = {
-                str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
-                v8::Number::New(isolate, value1),
-                v8::Number::New(isolate, value2),
-                v8::Number::New(isolate, value3),
-                v8::Boolean::New(isolate, flag),
-                getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[6] = {
+                    str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
+                    v8::Number::New(isolate, value1),
+                    v8::Number::New(isolate, value2),
+                    v8::Number::New(isolate, value3),
+                    v8::Boolean::New(isolate, flag),
+                    getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -3904,14 +4359,19 @@ void Hook_Void_Entvar_Entvar_Float_Int_Int(Hook* hook, void* pthis, void* entvar
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[5] = {
-                entvars1 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars1)) : v8::Null(isolate).As<v8::Value>(),
-                entvars2 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars2)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Number::New(isolate, value),
-                v8::Integer::New(isolate, value1),
-                v8::Integer::New(isolate, value2)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[5] = {
+                    entvars1 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars1)) : v8::Null(isolate).As<v8::Value>(),
+                    entvars2 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars2)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Number::New(isolate, value),
+                    v8::Integer::New(isolate, value1),
+                    v8::Integer::New(isolate, value2)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -3929,14 +4389,19 @@ void Hook_Void_Entvar_Entvar_Float_Int_Int(Hook* hook, void* pthis, void* entvar
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[5] = {
-                entvars1 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars1)) : v8::Null(isolate).As<v8::Value>(),
-                entvars2 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars2)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Number::New(isolate, value),
-                v8::Integer::New(isolate, value1),
-                v8::Integer::New(isolate, value2)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[5] = {
+                    entvars1 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars1)) : v8::Null(isolate).As<v8::Value>(),
+                    entvars2 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars2)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Number::New(isolate, value),
+                    v8::Integer::New(isolate, value1),
+                    v8::Integer::New(isolate, value2)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -3953,15 +4418,20 @@ void Hook_Void_Vector_Entvar_Entvar_Float_Int_Int(Hook* hook, void* pthis, float
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[6] = {
-                v8::Null(isolate).As<v8::Value>(),
-                entvars1 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars1)) : v8::Null(isolate).As<v8::Value>(),
-                entvars2 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars2)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Number::New(isolate, value),
-                v8::Integer::New(isolate, value1),
-                v8::Integer::New(isolate, value2)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[6] = {
+                    v8::Null(isolate).As<v8::Value>(),
+                    entvars1 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars1)) : v8::Null(isolate).As<v8::Value>(),
+                    entvars2 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars2)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Number::New(isolate, value),
+                    v8::Integer::New(isolate, value1),
+                    v8::Integer::New(isolate, value2)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -3979,15 +4449,20 @@ void Hook_Void_Vector_Entvar_Entvar_Float_Int_Int(Hook* hook, void* pthis, float
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[6] = {
-                v8::Null(isolate).As<v8::Value>(),
-                entvars1 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars1)) : v8::Null(isolate).As<v8::Value>(),
-                entvars2 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars2)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Number::New(isolate, value),
-                v8::Integer::New(isolate, value1),
-                v8::Integer::New(isolate, value2)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[6] = {
+                    v8::Null(isolate).As<v8::Value>(),
+                    entvars1 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars1)) : v8::Null(isolate).As<v8::Value>(),
+                    entvars2 ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars2)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Number::New(isolate, value),
+                    v8::Integer::New(isolate, value1),
+                    v8::Integer::New(isolate, value2)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -4008,10 +4483,15 @@ int Hook_Int_Short(Hook* hook, void* pthis, short value) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                v8::Integer::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    v8::Integer::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -4029,10 +4509,15 @@ int Hook_Int_Short(Hook* hook, void* pthis, short value) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                v8::Integer::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    v8::Integer::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -4050,10 +4535,15 @@ int Hook_Int_Str(Hook* hook, void* pthis, const char* str) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -4071,10 +4561,15 @@ int Hook_Int_Str(Hook* hook, void* pthis, const char* str) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -4092,10 +4587,15 @@ int Hook_Int_Vector(Hook* hook, void* pthis, float* vec) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -4113,10 +4613,15 @@ int Hook_Int_Vector(Hook* hook, void* pthis, float* vec) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -4134,11 +4639,16 @@ int Hook_Int_Cbase_Bool(Hook* hook, void* pthis, void* entity, bool flag) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Boolean::New(isolate, flag)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Boolean::New(isolate, flag)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -4156,11 +4666,16 @@ int Hook_Int_Cbase_Bool(Hook* hook, void* pthis, void* entity, bool flag) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Boolean::New(isolate, flag)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Boolean::New(isolate, flag)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -4178,11 +4693,16 @@ int Hook_Int_Entvar_Float(Hook* hook, void* pthis, void* entvars, float value) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                entvars ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Number::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    entvars ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Number::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -4200,11 +4720,16 @@ int Hook_Int_Entvar_Float(Hook* hook, void* pthis, void* entvars, float value) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                entvars ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars)) : v8::Null(isolate).As<v8::Value>(),
-                v8::Number::New(isolate, value)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    entvars ? structures::wrapEntvars(isolate, static_cast<entvars_t*>(entvars)) : v8::Null(isolate).As<v8::Value>(),
+                    v8::Number::New(isolate, value)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -4222,11 +4747,16 @@ int Hook_Int_Cbase_pVector(Hook* hook, void* pthis, void* entity, float* vec) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
-                utils::vect2js(isolate, vec)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
+                    utils::vect2js(isolate, vec)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -4244,11 +4774,16 @@ int Hook_Int_Cbase_pVector(Hook* hook, void* pthis, void* entity, float* vec) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
-                utils::vect2js(isolate, vec)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
+                    utils::vect2js(isolate, vec)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -4266,11 +4801,16 @@ int Hook_Int_Vector_Cbase(Hook* hook, void* pthis, float* vec, void* entity) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                v8::Null(isolate).As<v8::Value>(),
-                getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    v8::Null(isolate).As<v8::Value>(),
+                    getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -4288,11 +4828,16 @@ int Hook_Int_Vector_Cbase(Hook* hook, void* pthis, float* vec, void* entity) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                v8::Null(isolate).As<v8::Value>(),
-                getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    v8::Null(isolate).As<v8::Value>(),
+                    getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -4310,11 +4855,16 @@ int Hook_Int_Vector_Vector(Hook* hook, void* pthis, float* vec1, float* vec2) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                v8::Null(isolate).As<v8::Value>(),
-                v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    v8::Null(isolate).As<v8::Value>(),
+                    v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -4332,11 +4882,16 @@ int Hook_Int_Vector_Vector(Hook* hook, void* pthis, float* vec1, float* vec2) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                v8::Null(isolate).As<v8::Value>(),
-                v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    v8::Null(isolate).As<v8::Value>(),
+                    v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -4354,11 +4909,16 @@ int Hook_Int_Str_Str(Hook* hook, void* pthis, const char* str1, const char* str2
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                str1 ? v8::String::NewFromUtf8(isolate, str1).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
-                str2 ? v8::String::NewFromUtf8(isolate, str2).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    str1 ? v8::String::NewFromUtf8(isolate, str1).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
+                    str2 ? v8::String::NewFromUtf8(isolate, str2).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -4376,11 +4936,16 @@ int Hook_Int_Str_Str(Hook* hook, void* pthis, const char* str1, const char* str2
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[2] = {
-                str1 ? v8::String::NewFromUtf8(isolate, str1).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
-                str2 ? v8::String::NewFromUtf8(isolate, str2).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[2] = {
+                    str1 ? v8::String::NewFromUtf8(isolate, str1).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
+                    str2 ? v8::String::NewFromUtf8(isolate, str2).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -4398,10 +4963,15 @@ int Hook_Int_ItemInfo(Hook* hook, void* pthis, void* itemInfo) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -4419,10 +4989,15 @@ int Hook_Int_ItemInfo(Hook* hook, void* pthis, void* itemInfo) {
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[1] = {
-                v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[1] = {
+                    v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -4440,12 +5015,17 @@ int Hook_Int_Float_Int_Int(Hook* hook, void* pthis, float value, int value1, int
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[3] = {
-                v8::Number::New(isolate, value),
-                v8::Integer::New(isolate, value1),
-                v8::Integer::New(isolate, value2)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[3] = {
+                    v8::Number::New(isolate, value),
+                    v8::Integer::New(isolate, value1),
+                    v8::Integer::New(isolate, value2)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -4463,12 +5043,17 @@ int Hook_Int_Float_Int_Int(Hook* hook, void* pthis, float value, int value1, int
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[3] = {
-                v8::Number::New(isolate, value),
-                v8::Integer::New(isolate, value1),
-                v8::Integer::New(isolate, value2)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[3] = {
+                    v8::Number::New(isolate, value),
+                    v8::Integer::New(isolate, value1),
+                    v8::Integer::New(isolate, value2)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -4486,13 +5071,18 @@ int Hook_Int_Int_Int_Float_Int(Hook* hook, void* pthis, int value1, int value2, 
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[4] = {
-                v8::Integer::New(isolate, value1),
-                v8::Integer::New(isolate, value2),
-                v8::Number::New(isolate, value),
-                v8::Integer::New(isolate, value3)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[4] = {
+                    v8::Integer::New(isolate, value1),
+                    v8::Integer::New(isolate, value2),
+                    v8::Number::New(isolate, value),
+                    v8::Integer::New(isolate, value3)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -4510,13 +5100,18 @@ int Hook_Int_Int_Int_Float_Int(Hook* hook, void* pthis, int value1, int value2, 
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[4] = {
-                v8::Integer::New(isolate, value1),
-                v8::Integer::New(isolate, value2),
-                v8::Number::New(isolate, value),
-                v8::Integer::New(isolate, value3)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[4] = {
+                    v8::Integer::New(isolate, value1),
+                    v8::Integer::New(isolate, value2),
+                    v8::Number::New(isolate, value),
+                    v8::Integer::New(isolate, value3)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -4534,13 +5129,18 @@ int Hook_Int_Int_Str_Int_Int(Hook* hook, void* pthis, int value1, const char* st
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[4] = {
-                v8::Integer::New(isolate, value1),
-                str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
-                v8::Integer::New(isolate, value2),
-                v8::Integer::New(isolate, value3)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[4] = {
+                    v8::Integer::New(isolate, value1),
+                    str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
+                    v8::Integer::New(isolate, value2),
+                    v8::Integer::New(isolate, value3)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -4558,13 +5158,18 @@ int Hook_Int_Int_Str_Int_Int(Hook* hook, void* pthis, int value1, const char* st
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[4] = {
-                v8::Integer::New(isolate, value1),
-                str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
-                v8::Integer::New(isolate, value2),
-                v8::Integer::New(isolate, value3)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[4] = {
+                    v8::Integer::New(isolate, value1),
+                    str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
+                    v8::Integer::New(isolate, value2),
+                    v8::Integer::New(isolate, value3)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -4582,13 +5187,18 @@ int Hook_Int_Int_Str_Int_Bool(Hook* hook, void* pthis, int value1, const char* s
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[4] = {
-                v8::Integer::New(isolate, value1),
-                str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
-                v8::Integer::New(isolate, value2),
-                v8::Boolean::New(isolate, flag)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[4] = {
+                    v8::Integer::New(isolate, value1),
+                    str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
+                    v8::Integer::New(isolate, value2),
+                    v8::Boolean::New(isolate, flag)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -4606,13 +5216,18 @@ int Hook_Int_Int_Str_Int_Bool(Hook* hook, void* pthis, int value1, const char* s
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[4] = {
-                v8::Integer::New(isolate, value1),
-                str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
-                v8::Integer::New(isolate, value2),
-                v8::Boolean::New(isolate, flag)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[4] = {
+                    v8::Integer::New(isolate, value1),
+                    str ? v8::String::NewFromUtf8(isolate, str).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
+                    v8::Integer::New(isolate, value2),
+                    v8::Boolean::New(isolate, flag)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -4630,12 +5245,17 @@ int Hook_Int_Str_Vector_Str(Hook* hook, void* pthis, const char* str1, float* ve
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[3] = {
-                str1 ? v8::String::NewFromUtf8(isolate, str1).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
-                v8::Null(isolate).As<v8::Value>(),
-                str2 ? v8::String::NewFromUtf8(isolate, str2).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[3] = {
+                    str1 ? v8::String::NewFromUtf8(isolate, str1).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
+                    v8::Null(isolate).As<v8::Value>(),
+                    str2 ? v8::String::NewFromUtf8(isolate, str2).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -4653,12 +5273,17 @@ int Hook_Int_Str_Vector_Str(Hook* hook, void* pthis, const char* str1, float* ve
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[3] = {
-                str1 ? v8::String::NewFromUtf8(isolate, str1).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
-                v8::Null(isolate).As<v8::Value>(),
-                str2 ? v8::String::NewFromUtf8(isolate, str2).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[3] = {
+                    str1 ? v8::String::NewFromUtf8(isolate, str1).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
+                    v8::Null(isolate).As<v8::Value>(),
+                    str2 ? v8::String::NewFromUtf8(isolate, str2).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -4676,15 +5301,20 @@ int Hook_Int_Str_Str_Int_Str_Int_Int(Hook* hook, void* pthis, const char* str1, 
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[6] = {
-                str1 ? v8::String::NewFromUtf8(isolate, str1).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
-                str2 ? v8::String::NewFromUtf8(isolate, str2).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
-                v8::Integer::New(isolate, value1),
-                str3 ? v8::String::NewFromUtf8(isolate, str3).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
-                v8::Integer::New(isolate, value2),
-                v8::Integer::New(isolate, value3)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[6] = {
+                    str1 ? v8::String::NewFromUtf8(isolate, str1).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
+                    str2 ? v8::String::NewFromUtf8(isolate, str2).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
+                    v8::Integer::New(isolate, value1),
+                    str3 ? v8::String::NewFromUtf8(isolate, str3).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
+                    v8::Integer::New(isolate, value2),
+                    v8::Integer::New(isolate, value3)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -4702,15 +5332,20 @@ int Hook_Int_Str_Str_Int_Str_Int_Int(Hook* hook, void* pthis, const char* str1, 
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[6] = {
-                str1 ? v8::String::NewFromUtf8(isolate, str1).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
-                str2 ? v8::String::NewFromUtf8(isolate, str2).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
-                v8::Integer::New(isolate, value1),
-                str3 ? v8::String::NewFromUtf8(isolate, str3).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
-                v8::Integer::New(isolate, value2),
-                v8::Integer::New(isolate, value3)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[6] = {
+                    str1 ? v8::String::NewFromUtf8(isolate, str1).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
+                    str2 ? v8::String::NewFromUtf8(isolate, str2).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
+                    v8::Integer::New(isolate, value1),
+                    str3 ? v8::String::NewFromUtf8(isolate, str3).ToLocalChecked().As<v8::Value>() : v8::Null(isolate).As<v8::Value>(),
+                    v8::Integer::New(isolate, value2),
+                    v8::Integer::New(isolate, value3)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -4728,13 +5363,18 @@ int Hook_Int_Vector_Vector_Float_Float(Hook* hook, void* pthis, float* vec1, flo
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[4] = {
-                v8::Null(isolate).As<v8::Value>(),
-                v8::Null(isolate).As<v8::Value>(),
-                v8::Number::New(isolate, value1),
-                v8::Number::New(isolate, value2)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[4] = {
+                    v8::Null(isolate).As<v8::Value>(),
+                    v8::Null(isolate).As<v8::Value>(),
+                    v8::Number::New(isolate, value1),
+                    v8::Number::New(isolate, value2)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -4752,13 +5392,18 @@ int Hook_Int_Vector_Vector_Float_Float(Hook* hook, void* pthis, float* vec1, flo
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[4] = {
-                v8::Null(isolate).As<v8::Value>(),
-                v8::Null(isolate).As<v8::Value>(),
-                v8::Number::New(isolate, value1),
-                v8::Number::New(isolate, value2)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[4] = {
+                    v8::Null(isolate).As<v8::Value>(),
+                    v8::Null(isolate).As<v8::Value>(),
+                    v8::Number::New(isolate, value1),
+                    v8::Number::New(isolate, value2)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -4776,13 +5421,18 @@ int Hook_Int_pVector_pVector_Cbase_pFloat(Hook* hook, void* pthis, float* vec1, 
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[4] = {
-                utils::vect2js(isolate, vec1),
-                utils::vect2js(isolate, vec2),
-                getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
-                value ? v8::Number::New(isolate, *value) : v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[4] = {
+                    utils::vect2js(isolate, vec1),
+                    utils::vect2js(isolate, vec2),
+                    getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
+                    value ? v8::Number::New(isolate, *value) : v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -4800,13 +5450,18 @@ int Hook_Int_pVector_pVector_Cbase_pFloat(Hook* hook, void* pthis, float* vec1, 
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[4] = {
-                utils::vect2js(isolate, vec1),
-                utils::vect2js(isolate, vec2),
-                getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
-                value ? v8::Number::New(isolate, *value) : v8::Null(isolate).As<v8::Value>()
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[4] = {
+                    utils::vect2js(isolate, vec1),
+                    utils::vect2js(isolate, vec2),
+                    getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
+                    value ? v8::Number::New(isolate, *value) : v8::Null(isolate).As<v8::Value>()
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -4824,14 +5479,19 @@ int Hook_Int_pVector_pVector_Float_Cbase_pVector(Hook* hook, void* pthis, float*
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[5] = {
-                utils::vect2js(isolate, vec1),
-                utils::vect2js(isolate, vec2),
-                v8::Number::New(isolate, value),
-                getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
-                utils::vect2js(isolate, vec3)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[5] = {
+                    utils::vect2js(isolate, vec1),
+                    utils::vect2js(isolate, vec2),
+                    v8::Number::New(isolate, value),
+                    getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
+                    utils::vect2js(isolate, vec3)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -4849,14 +5509,19 @@ int Hook_Int_pVector_pVector_Float_Cbase_pVector(Hook* hook, void* pthis, float*
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[5] = {
-                utils::vect2js(isolate, vec1),
-                utils::vect2js(isolate, vec2),
-                v8::Number::New(isolate, value),
-                getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
-                utils::vect2js(isolate, vec3)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[5] = {
+                    utils::vect2js(isolate, vec1),
+                    utils::vect2js(isolate, vec2),
+                    v8::Number::New(isolate, value),
+                    getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
+                    utils::vect2js(isolate, vec3)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()
@@ -4874,16 +5539,21 @@ int Hook_Int_pVector_pVector_Float_Cbase_pVector_pVector_Bool(Hook* hook, void* 
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[7] = {
-                utils::vect2js(isolate, vec1),
-                utils::vect2js(isolate, vec2),
-                v8::Number::New(isolate, value),
-                getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
-                utils::vect2js(isolate, vec3),
-                utils::vect2js(isolate, vec4),
-                v8::Boolean::New(isolate, flag)
-            };
-            executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[7] = {
+                    utils::vect2js(isolate, vec1),
+                    utils::vect2js(isolate, vec2),
+                    v8::Number::New(isolate, value),
+                    getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
+                    utils::vect2js(isolate, vec3),
+                    utils::vect2js(isolate, vec4),
+                    v8::Boolean::New(isolate, flag)
+                };
+                executeCallbacksWithArgs(hook, pthis, true, isolate, extraArgs);
+            }
         }
     }
 
@@ -4901,16 +5571,21 @@ int Hook_Int_pVector_pVector_Float_Cbase_pVector_pVector_Bool(Hook* hook, void* 
             v8::Isolate::Scope isolateScope(isolate);
             v8::HandleScope handleScope(isolate);
 
-            v8::Local<v8::Value> extraArgs[7] = {
-                utils::vect2js(isolate, vec1),
-                utils::vect2js(isolate, vec2),
-                v8::Number::New(isolate, value),
-                getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
-                utils::vect2js(isolate, vec3),
-                utils::vect2js(isolate, vec4),
-                v8::Boolean::New(isolate, flag)
-            };
-            executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            v8::Local<v8::Context> context = mgr.getContext();
+            if (!context.IsEmpty()) {
+                v8::Context::Scope contextScope(context);
+
+                v8::Local<v8::Value> extraArgs[7] = {
+                    utils::vect2js(isolate, vec1),
+                    utils::vect2js(isolate, vec2),
+                    v8::Number::New(isolate, value),
+                    getEdictFromThis(entity) ? structures::wrapEntity(isolate, getEdictFromThis(entity)) : v8::Null(isolate).As<v8::Value>(),
+                    utils::vect2js(isolate, vec3),
+                    utils::vect2js(isolate, vec4),
+                    v8::Boolean::New(isolate, flag)
+                };
+                executeCallbacksWithArgs(hook, pthis, false, isolate, extraArgs);
+            }
         }
     }
     POP()

@@ -60,6 +60,13 @@ public:
     v8::Isolate* getIsolate() const { return m_isolate; }
     void setIsolate(v8::Isolate* isolate) { m_isolate = isolate; }
 
+    v8::Local<v8::Context> getContext() const {
+        return m_context.IsEmpty() ? v8::Local<v8::Context>() : m_context.Get(m_isolate);
+    }
+    void setContext(v8::Isolate* isolate, v8::Local<v8::Context> context) {
+        m_context.Reset(isolate, context);
+    }
+
     int getBaseOffset() const { return m_baseOffset; }
 
 private:
@@ -82,6 +89,7 @@ private:
     v8::Global<v8::Value> m_returnValue;
     v8::Global<v8::Value> m_origReturnValue;
     v8::Isolate* m_isolate = nullptr;
+    v8::Global<v8::Context> m_context;
 
     int m_baseOffset = 0;
 };

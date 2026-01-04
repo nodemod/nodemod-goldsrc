@@ -569,22 +569,15 @@ bool HamManager::initialize(const std::string& gameDataPath) {
     }
     m_baseOffset = m_gameData.getBaseOffset();
 
-    // DEBUG: Check if base offset needs adjustment for nodemod
-    // The user discovered a 34-byte difference in pdata offsets between AMXX and nodemod
-    printf("[HAM] Gamedata base offset: 0x%x (%d)\n", m_baseOffset, m_baseOffset);
-
     return true;
 }
 
 void HamManager::shutdown() {
-    printf("[HAM] Shutting down HamManager, clearing %zu hooks\n", m_hooks.size());
-    fflush(stdout);
     m_hooks.clear();  // This calls Hook destructors which restore vtables and free trampolines
     m_hookIdMap.clear();
     m_returnValue.Reset();
     m_origReturnValue.Reset();
-    printf("[HAM] HamManager shutdown complete\n");
-    fflush(stdout);
+    m_context.Reset();
 }
 
 int HamManager::getVTableOffset(HamType function) const {
@@ -615,10 +608,8 @@ void** HamManager::getEntityVTable(edict_t* ent) const {
 
     // GetVTable: return *((void***)(((char*)pthis) + size))
     char* base = static_cast<char*>(ent->pvPrivateData);
-    printf("[HAM] pvPrivateData=%p, baseOffset=0x%x\n", ent->pvPrivateData, m_baseOffset);
     base += m_baseOffset;
     void** vtable = *reinterpret_cast<void***>(base);
-    printf("[HAM] VTable pointer at %p = %p\n", base, vtable);
     return vtable;
 }
 
@@ -685,14 +676,6 @@ int HamManager::registerHook(
     v8::Local<v8::Function> callback,
     bool isPre
 ) {
-    // DEBUG: Set to true to completely skip all ham registration (just return dummy ID)
-    static bool skipAll = false;
-    if (skipAll) {
-        printf("[HAM] DEBUG: Skipping all ham registration (disabled for testing)\n");
-        static int dummyId = 1000;
-        return dummyId++;
-    }
-
     // Validate function
     if (function < 0 || function >= Ham_EndMarker) {
         return -1;
@@ -700,11 +683,7 @@ int HamManager::registerHook(
 
     // Check if vtable offset is configured
     int vtableIndex = getVTableOffset(function);
-    const HamFunctionInfo* funcInfo = getFunctionInfo(function);
-    printf("[HAM] Registering hook: func=%d (%s) vtableIndex=%d entityClass=%s isPre=%d\n",
-           function, funcInfo ? funcInfo->name : "unknown", vtableIndex, entityClass, isPre);
     if (vtableIndex < 0) {
-        printf("[HAM] ERROR: VTable offset not found for function %d\n", function);
         return -1;
     }
 
@@ -714,20 +693,8 @@ int HamManager::registerHook(
         return -1;
     }
 
-    // DEBUG: Set to true to skip entity creation/removal
-    static bool skipEntityCreation = false;
-    if (skipEntityCreation) {
-        printf("[HAM] DEBUG: Skipping entity creation (returning dummy hook)\n");
-        return 999;
-    }
-
     // Create a temporary entity to get the vtable
-    printf("[HAM] Creating temporary entity of class '%s'...\n", entityClass);
-    fflush(stdout);
     edict_t* tempEnt = createEntityByClass(entityClass);
-    printf("[HAM] Temporary entity created: %p, pvPrivateData=%p\n",
-           tempEnt, tempEnt ? tempEnt->pvPrivateData : nullptr);
-    fflush(stdout);
 
     if (!tempEnt || !tempEnt->pvPrivateData) {
         if (tempEnt) {
@@ -739,44 +706,11 @@ int HamManager::registerHook(
     // Get the vtable from the entity
     void** vtable = getEntityVTable(tempEnt);
 
-    // DEBUG: Show page info for this vtable and compare with breakable
-    if (vtable) {
-        uintptr_t vtableAddr = (uintptr_t)vtable;
-        uintptr_t pageAddr = vtableAddr & ~(sysconf(_SC_PAGESIZE) - 1);
-        printf("[HAM] DEBUG: %s vtable at %p, page %p\n", entityClass, vtable, (void*)pageAddr);
-
-        // Also check func_breakable vtable for comparison
-        edict_t* breakableEnt = createEntityByClass("func_breakable");
-        if (breakableEnt && breakableEnt->pvPrivateData) {
-            void** breakableVTable = getEntityVTable(breakableEnt);
-            if (breakableVTable) {
-                uintptr_t bvAddr = (uintptr_t)breakableVTable;
-                uintptr_t bvPage = bvAddr & ~(sysconf(_SC_PAGESIZE) - 1);
-                printf("[HAM] DEBUG: func_breakable vtable at %p, page %p\n", breakableVTable, (void*)bvPage);
-                if (bvPage == pageAddr) {
-                    printf("[HAM] DEBUG: WARNING - player and func_breakable vtables are on SAME PAGE!\n");
-                }
-            }
-            removeEntity(breakableEnt);
-        }
-    }
-
     // Remove the temporary entity
-    printf("[HAM] Removing temporary entity...\n");
-    fflush(stdout);
     removeEntity(tempEnt);
-    printf("[HAM] Temporary entity removed\n");
-    fflush(stdout);
 
     if (!vtable) {
         return -1;
-    }
-
-    // DEBUG: Set to true to skip hook creation (entity created/removed, vtable obtained)
-    static bool skipHookCreation = false;
-    if (skipHookCreation) {
-        printf("[HAM] DEBUG: Entity created, vtable=%p, skipping hook creation\n", vtable);
-        return 998;
     }
 
     // Check if we already have a hook for this class/function combo
@@ -796,13 +730,6 @@ int HamManager::registerHook(
         auto newHook = std::make_unique<Hook>(vtable, vtableIndex, hookCallback, info->paramCount, entityClass);
         hook = newHook.get();
         m_hooks[key] = std::move(newHook);
-    }
-
-    // DEBUG: Set to true to skip callback registration (Hook created, vtable patched)
-    static bool skipCallbackReg = false;
-    if (skipCallbackReg) {
-        printf("[HAM] DEBUG: Hook created, skipping callback registration\n");
-        return 997;
     }
 
     // Add the callback with context
