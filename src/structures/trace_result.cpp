@@ -1,6 +1,9 @@
 #include "structures.hpp"
 #include "common_macros.hpp"
+#include "extdll.h"
 #include <unordered_map>
+
+extern globalvars_t *gpGlobals;
 
 namespace structures {
 
@@ -156,8 +159,25 @@ v8::Local<v8::Value> wrapTraceResult(v8::Isolate* isolate, TraceResult* trace) {
     planeNormal->Set(context, 2, v8::Number::New(isolate, trace->vecPlaneNormal.z)).Check();
     obj->Set(context, v8::String::NewFromUtf8(isolate, "planeNormal").ToLocalChecked(), planeNormal).Check();
     
-    // Handle hit entity
-    if (trace->pHit) {
+    // Handle hit entity - validate pointer is within edict array range
+    // before calling wrapEntity which calls IndexOfEdict
+    bool validHit = false;
+    if (trace->pHit && gpGlobals && gpGlobals->maxEntities > 0) {
+        // Get worldspawn (edict 0) to calculate array bounds
+        edict_t* worldspawn = (*g_engfuncs.pfnPEntityOfEntIndex)(0);
+        if (worldspawn) {
+            // Check if pHit is within the valid edict array range
+            ptrdiff_t offset = trace->pHit - worldspawn;
+            if (offset >= 0 && offset < gpGlobals->maxEntities) {
+                // Pointer is within bounds - now safe to dereference and check if freed
+                if (!trace->pHit->free) {
+                    validHit = true;
+                }
+            }
+        }
+    }
+
+    if (validHit) {
         obj->Set(context, v8::String::NewFromUtf8(isolate, "hit").ToLocalChecked(), wrapEntity(isolate, trace->pHit)).Check();
     } else {
         obj->Set(context, v8::String::NewFromUtf8(isolate, "hit").ToLocalChecked(), v8::Null(isolate)).Check();

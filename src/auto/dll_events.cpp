@@ -1,5 +1,6 @@
 // This file builded by: node scripts/buildEvents.js
   #include <extdll.h>
+  #include <string>
   #include "node/nodeimpl.hpp"
   #include "node/events.hpp"
   #include "meta_api.h"
@@ -870,6 +871,7 @@
       v8_args[0] = structures::wrapEntity(isolate, pEntity); // pEntity (edict_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    clearPlayerCustomizations(pEntity);
   }
 
 // nodemod.on('postDllClientKill', (pEntity) => console.log('postDllClientKill fired!'));
@@ -1006,6 +1008,7 @@
       v8_args[1] = structures::wrapCustomization(isolate, pCustom); // pCustom (customization_t *)
       return std::pair<unsigned int, v8::Local<v8::Value>*>(v8_argCount, v8_args);
     });
+    storePlayerCustomization(pEntity, pCustom);
   }
 
 // nodemod.on('postDllSpectatorConnect', (pEntity) => console.log('postDllSpectatorConnect fired!'));

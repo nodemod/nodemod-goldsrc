@@ -2,6 +2,12 @@
 
 #include <unordered_map>
 #include "node.h"
+
+// Forward declarations for customization storage functions
+struct edict_s;
+typedef struct edict_s edict_t;
+struct customization_s;
+typedef struct customization_s customization_t;
 #include "node_api.h"
 #include "v8.h"
 #include "uv.h"
@@ -61,3 +67,7 @@ private:
 };
 
 extern NodeImpl nodeImpl;
+
+// Player customization storage for reload catch-up events
+void storePlayerCustomization(edict_t* player, customization_t* custom);
+void clearPlayerCustomizations(edict_t* player);

@@ -71,9 +71,11 @@ public:
 
 private:
     HamManager() = default;
-    ~HamManager() = default;
+    ~HamManager();
     HamManager(const HamManager&) = delete;
     HamManager& operator=(const HamManager&) = delete;
+
+    bool m_isShutdown = false;  // Track if shutdown was explicitly called
 
     void** getEntityVTable(edict_t* ent) const;
     Hook* findOrCreateHook(HamType function, const char* entityClass, edict_t* ent);

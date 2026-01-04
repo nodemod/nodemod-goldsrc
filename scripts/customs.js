@@ -496,6 +496,16 @@ structures::unwrapEntity(isolate, info[4]),
     }
   },
   dll: {
+    pfnPlayerCustomization: {
+      postEvent: {
+        afterBody: 'storePlayerCustomization(pEntity, pCustom);'
+      }
+    },
+    pfnClientDisconnect: {
+      postEvent: {
+        afterBody: 'clearPlayerCustomizations(pEntity);'
+      }
+    },
     pfnClientCommand: {
       event: {
         argsString: 'edict_t* ed',

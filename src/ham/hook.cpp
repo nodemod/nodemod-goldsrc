@@ -27,8 +27,10 @@ Hook::Hook(void** vtable, int entry, void* target, int paramCount, const char* e
 }
 
 Hook::~Hook() {
-    // Restore original vtable entry
-    restoreVTable();
+    // Restore original vtable entry (unless skipped during shutdown)
+    if (!m_skipRestore) {
+        restoreVTable();
+    }
 
     // Free trampoline memory
     if (m_trampoline) {

@@ -48,6 +48,8 @@ public:
     bool shouldDelete() const { return m_pendingDelete; }
     void markForDeletion() { m_pendingDelete = true; }
 
+    void skipVTableRestore() { m_skipRestore = true; }
+
 private:
     void** m_vtable;
     int m_entry;
@@ -61,6 +63,7 @@ private:
 
     bool m_executing = false;
     bool m_pendingDelete = false;
+    bool m_skipRestore = false;  // Skip vtable restoration in destructor
     int m_nextCallbackId = 1;
 
     void patchVTable(void* newFunc);

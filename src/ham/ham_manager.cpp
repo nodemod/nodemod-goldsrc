@@ -563,6 +563,19 @@ HamManager& HamManager::instance() {
     return instance;
 }
 
+HamManager::~HamManager() {
+    // If shutdown was already called, hooks are already cleared
+    // This prevents crashes when static destructor runs after game DLL unloads
+    if (!m_isShutdown && !m_hooks.empty()) {
+        // Mark all hooks to skip vtable restoration - game DLL may be unloaded
+        for (auto& pair : m_hooks) {
+            pair.second->skipVTableRestore();
+        }
+        m_hookIdMap.clear();
+        m_hooks.clear();
+    }
+}
+
 bool HamManager::initialize(const std::string& gameDataPath) {
     if (!m_gameData.loadFromFile(gameDataPath)) {
         return false;
@@ -578,6 +591,7 @@ void HamManager::shutdown() {
     m_returnValue.Reset();
     m_origReturnValue.Reset();
     m_context.Reset();
+    m_isShutdown = true;  // Mark as shutdown to prevent destructor from trying to restore vtables
 }
 
 int HamManager::getVTableOffset(HamType function) const {

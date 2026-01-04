@@ -6,6 +6,8 @@
 #include <node_buffer.h>
 #include <unordered_map>
 
+extern globalvars_t *gpGlobals;
+
 namespace structures
 {
   v8::Eternal<v8::ObjectTemplate> entity;
@@ -46,7 +48,21 @@ namespace structures
       return v8::Null(isolate);
     }
 
+    // Validate entity is not freed before calling IndexOfEdict
+    // A freed entity has entity->free set to true
+    if (entity->free)
+    {
+      return v8::Null(isolate);
+    }
+
     int entityId = (*g_engfuncs.pfnIndexOfEdict)(entity);
+
+    // Validate entity index is in valid range
+    if (entityId < 0 || (gpGlobals && entityId >= gpGlobals->maxEntities))
+    {
+      return v8::Null(isolate);
+    }
+
     if (wrappedEntities.find(entityId) != wrappedEntities.end())
     {
       v8::Local<v8::Object> existingObject = v8::Local<v8::Object>::New(isolate, wrappedEntities[entityId]);
