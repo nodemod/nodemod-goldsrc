@@ -37,7 +37,15 @@ namespace structures
     }
 
     auto field = object.ToLocalChecked()->GetAlignedPointerFromInternalField(0);
-    return static_cast<edict_t *>(field);
+    edict_t *ent = static_cast<edict_t *>(field);
+
+    // Validate entity is still valid (not freed)
+    if (ent == NULL || ent->free)
+    {
+      return NULL;
+    }
+
+    return ent;
   }
 
   v8::Local<v8::Value> wrapEntity(v8::Isolate *isolate, const edict_t *entity)

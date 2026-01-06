@@ -23,6 +23,16 @@ export default {
         body: `(*g_engfuncs.pfnAlertMessage)((ALERT_TYPE)info[0]->Int32Value(context).ToChecked(), "%s", utils::js2string(isolate, info[1]));`
       }
     },
+    pfnIndexOfEdict: {
+      api: {
+        body: `edict_t* ent = structures::unwrapEntity(isolate, info[0]);
+  if (ent == NULL) {
+    info.GetReturnValue().Set(v8::Number::New(isolate, -1));
+    return;
+  }
+  info.GetReturnValue().Set(v8::Number::New(isolate, (*g_engfuncs.pfnIndexOfEdict)(ent)));`
+      }
+    },
     pfnCVarRegister: {
       api: {
         body: `// Create a new cvar_t structure from JavaScript object

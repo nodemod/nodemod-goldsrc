@@ -202,6 +202,154 @@ function clearByDefines(list) {
   return response;
 }
 
+/**
+ * Parse const.h to extract #define constants grouped by prefix
+ */
+async function parseConstHeader() {
+  const constContent = await fs.readFile('./build/vcpkg_installed/x86-linux/include/hlsdk/common/const.h').then(v => v.toString());
+
+  // Match #define lines with numeric values (including bit shifts and floats)
+  const defineRegex = /^#define\s+([A-Z_][A-Z0-9_]*)\s+(.+?)(?:\s*\/\/\s*(.*))?$/gm;
+
+  const constants = [];
+  let match;
+
+  while ((match = defineRegex.exec(constContent)) !== null) {
+    const name = match[1];
+    let valueStr = match[2].trim();
+    const comment = match[3] ? match[3].trim() : '';
+
+    // Skip non-numeric defines (like strings or complex expressions)
+    if (valueStr.startsWith('"') || valueStr.startsWith('sizeof') || valueStr.includes('BREAK_')) {
+      // Special case: BOUNCE_* references BREAK_* - skip those that reference other defines
+      if (name.startsWith('BOUNCE_') && valueStr.startsWith('BREAK_')) {
+        continue;
+      }
+      if (!valueStr.match(/^[\d\(\)\-\+\*\/\<\<\>\>\s\.xXa-fA-F]+$/) && !valueStr.startsWith('(float)')) {
+        continue;
+      }
+    }
+
+    // Evaluate the value
+    let value;
+    try {
+      // Handle (float) cast
+      valueStr = valueStr.replace(/\(float\)/g, '');
+      // Handle bit shifts and numeric expressions
+      value = eval(valueStr);
+      if (typeof value !== 'number' || isNaN(value)) {
+        continue;
+      }
+    } catch (e) {
+      continue;
+    }
+
+    constants.push({ name, value, comment });
+  }
+
+  // Group constants by prefix
+  const groups = {};
+  const prefixOrder = [
+    'FL', 'FTRACE', 'WALKMOVE', 'MOVETYPE', 'SOLID', 'DEAD', 'DAMAGE',
+    'EF', 'EFLAG', 'TE_EXPLFLAG', 'TE_BOUNCE', 'TEFIRE_FLAG', 'TE',
+    'MSG', 'CONTENTS', 'CONTENT', 'CHAN', 'ATTN', 'PITCH', 'VOL',
+    'PLAT', 'SF_TRAIN', 'IN', 'BREAK', 'BOUNCE'
+  ];
+
+  for (const { name, value, comment } of constants) {
+    // Find matching prefix (longest first to handle TE_EXPLFLAG before TE)
+    let matchedPrefix = null;
+    for (const prefix of prefixOrder) {
+      if (name.startsWith(prefix + '_') || name === prefix) {
+        // Check if a longer prefix matches
+        const longerMatch = prefixOrder.find(p =>
+          p.length > prefix.length && name.startsWith(p + '_')
+        );
+        if (!longerMatch) {
+          matchedPrefix = prefix;
+          break;
+        }
+      }
+    }
+
+    if (!matchedPrefix) continue;
+
+    if (!groups[matchedPrefix]) {
+      groups[matchedPrefix] = [];
+    }
+
+    // Get the constant name without the prefix
+    let shortName = name.startsWith(matchedPrefix + '_')
+      ? name.slice(matchedPrefix.length + 1)
+      : name;
+
+    // If the name starts with a digit, prefix with underscore (e.g., BREAK_2 -> _2)
+    if (/^\d/.test(shortName)) {
+      shortName = '_' + shortName;
+    }
+
+    groups[matchedPrefix].push({
+      name: shortName,
+      fullName: name,
+      value,
+      comment
+    });
+  }
+
+  // Sort each group by value
+  for (const prefix of Object.keys(groups)) {
+    groups[prefix].sort((a, b) => a.value - b.value);
+  }
+
+  return groups;
+}
+
+/**
+ * Parse C++ enums from const.h (kRenderMode, kRenderFx)
+ */
+async function parseConstEnums() {
+  const constContent = await fs.readFile('./build/vcpkg_installed/x86-linux/include/hlsdk/common/const.h').then(v => v.toString());
+
+  const enums = {};
+
+  // Match anonymous enums with their members
+  const enumRegex = /enum\s*\n?\{([^}]+)\}/g;
+  let match;
+
+  while ((match = enumRegex.exec(constContent)) !== null) {
+    const enumBody = match[1];
+    const members = [];
+    let currentValue = 0;
+
+    // Parse each member
+    const memberRegex = /(\w+)(?:\s*=\s*(\d+))?\s*,?\s*(?:\/\/\s*(.*))?/g;
+    let memberMatch;
+
+    while ((memberMatch = memberRegex.exec(enumBody)) !== null) {
+      const name = memberMatch[1];
+      if (memberMatch[2]) {
+        currentValue = parseInt(memberMatch[2], 10);
+      }
+      const comment = memberMatch[3] ? memberMatch[3].trim() : '';
+
+      members.push({ name, value: currentValue, comment });
+      currentValue++;
+    }
+
+    // Determine enum name from first member prefix
+    if (members.length > 0) {
+      const firstName = members[0].name;
+      if (firstName.startsWith('kRenderFx')) {
+        enums['kRenderFx'] = members;
+      } else if (firstName.startsWith('kRender')) {
+        enums['kRenderMode'] = members;
+      }
+    }
+  }
+
+  return enums;
+}
+
 function parseFunction(line) {
   try {
     const prettyLine = line.replace(/[ \t]+/g, ' ');
@@ -316,8 +464,12 @@ function parseFunction(line) {
   // Parse Ham files for type generation
   const hamData = await parseHamFiles();
 
+  // Parse const.h for enum constants
+  const constGroups = await parseConstHeader();
+  const constEnums = await parseConstEnums();
+
   // Generate split type files
-  const typeFiles = fileMaker.typings.makeIndex(computed, structureInterfaces, eventNames, eventInterfaces, hamData);
+  const typeFiles = fileMaker.typings.makeIndex(computed, structureInterfaces, eventNames, eventInterfaces, hamData, constGroups, constEnums);
 
   // Write each type file to packages/core/types
   for (const [filename, content] of Object.entries(typeFiles)) {
